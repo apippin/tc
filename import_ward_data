@@ -1,0 +1,611 @@
+#!/usr/bin/perl
+
+use DBI;
+use Getopt::Std;
+###################################################
+# GLOBALS
+$dbname = "phpgroupware";
+$dbhost = "192.168.0.2";
+$dbport = 3306;
+$dbuser = "phpgroupware";
+$dbpass = "phpgroupware";
+%hometeaching_data = ();
+%membership_data = ();
+getopts('vsn:o:');
+
+$monthname2num{'Jan'} = '01';
+$monthname2num{'Feb'} = '02';
+$monthname2num{'Mar'} = '03';
+$monthname2num{'Apr'} = '04';
+$monthname2num{'May'} = '05';
+$monthname2num{'Jun'} = '06';
+$monthname2num{'Jul'} = '07';
+$monthname2num{'Aug'} = '08';
+$monthname2num{'Sep'} = '09';
+$monthname2num{'Oct'} = '10';
+$monthname2num{'Nov'} = '11';
+$monthname2num{'Dec'} = '12';
+
+######################################################################
+# SUBROUTINES
+######################################################################
+sub csv_to_hash
+{
+    my ($filename, $hashref) = @_;
+
+    open(FILE,$filename) || die "-E- Could not open $filename for reading\n";
+
+    my $found_header = 0; my $index = 0;
+    while(<FILE>)
+    {
+	$line = $_;
+	@data = split /\",/, $line;
+	if(!$found_header) { @header = @data; $found_header = 1; }
+	else {
+	    foreach $i (0..$#data-1) {
+		$data[$i] =~ s/\"//g;
+		$header[$i] =~ s/\"//g;
+	        $hashref->{$index}{$header[$i]} = $data[$i];
+		#print "$index: $i: $header[$i]: $data[$i]\n";
+	    }
+	    $index++;
+	}
+    }
+    
+    close(FILE);
+}
+
+######################################################################
+sub print_hash
+{
+    my ($hashref) = @_;
+
+    foreach $key (sort {$a <=> $b} keys %$hashref) {
+	print "Index: $key\n";
+	foreach $field (keys %{$hashref->{$key}}) {
+	    print "$field: $hashref->{$key}{$field}\n";
+	}
+	print "\n";
+    }
+}
+
+######################################################################
+
+# EQ_AARONIC
+#+-------+--------------------+------+-----+---------+-------+
+#| Field | Type               | Null | Key | Default | Extra |
+#+-------+--------------------+------+-----+---------+-------+
+#| aaronic | int(16) unsigned |      | PRI | 0       |   A   |
+#| name    | varchar(60)      | YES  |     | NULL    |       |
+#| valid   | tinyint(1)       | YES  |     | NULL    |       |
+#+-------+--------------------+------+-----+---------+-------+
+sub update_eq_aaronic_table
+{
+    print "-> Updating eq_aaronic table\n";
+    foreach $index (keys %membership_data)
+    {
+	$hashref = $membership_data{$index};
+	foreach $key (keys %$hashref) {
+	    if($key =~ /Priesthood/i &&
+	       ($membership_data{$index}{$key} =~ /^Teacher\s*$/i ||
+		$membership_data{$index}{$key} =~ /^Priest\s*$/i)) {
+		$aaronic_name = $membership_data{$index}{'Preferred Name'};
+		$sth = $dbh->prepare("select * from eq_aaronic where name='$aaronic_name'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		my @data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+		my $rows = scalar @data;
+		if($rows == 0) {
+		    # No existing records found for this aaronic, make a new entry
+		    print "   Adding new Aaronic: $aaronic_name\n";
+		    $sth = $dbh->prepare("insert into eq_aaronic values (NULL,'$aaronic_name',1)");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} elsif($rows == 1) {
+		    # An existing record was found for this aaronic, update it if it is valid
+		    if($data[0]->{valid} == 1) {
+			print "   Updating existing aaronic: $aaronic_name\n";
+		    }
+		} else {
+		    # More than one record was found. Error! This shouldn't happen.
+		    print "   -E- More than one record found ($rows) for aaronic name: $aaronic_name\n";
+		}
+	    }
+	}
+    }
+    $sth->finish();
+}
+
+# EQ_ELDER
+#+------------+------------------+------+-----+---------+-------+
+#| Field      | Type             | Null | Key | Default | Extra |
+#+------------+------------------+------+-----+---------+-------+
+#| elder      | int(16) unsigned |      | PRI | 0       |   A   |
+#| name       | varchar(60)      | YES  |     | NULL    |       |
+#| valid      | tinyint(1)       | YES  |     | NULL    |       |
+#+------------+------------------+------+-----+---------+-------+
+sub update_eq_elder_table
+{
+    print "-> Updating eq_elder table\n";
+
+    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
+    $sth = $dbh->prepare("update eq_elder set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
+    foreach $index (keys %membership_data)
+    {
+	$hashref = $membership_data{$index};
+	foreach $key (keys %$hashref) {
+	    if($key =~ /Priesthood/i && $membership_data{$index}{$key} =~ /Elder/i) {
+		$elder_name = $membership_data{$index}{'Preferred Name'};
+		$sth = $dbh->prepare("select * from eq_elder where name='$elder_name'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		my @data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+		my $rows = scalar @data;
+		if($rows == 0) {
+		    # No existing records found for this elder, make a new entry
+		    print "   Adding new Elder: $elder_name\n";
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name',1)");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} elsif($rows == 1) {
+		    # An existing record was found for this elder, update it
+		    print "   Updating existing Elder: $elder_name\n";
+		    $sth = $dbh->prepare("update eq_elder set valid=1 where name='$elder_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} else {
+		    # More than one record was found. Error! This shouldn't happen.
+		    print "   -E- More than one record found ($rows) for Elder: $elder_name\n";
+		}
+	    }
+	}
+    }
+    $sth->finish();
+}
+
+# EQ_DISTRICT
+#+------------+------------------+------+-----+---------+-------+
+#| Field      | Type             | Null | Key | Default | Extra |
+#+------------+------------------+------+-----+---------+-------+
+#| district   | int(16) unsigned |      | PRI | 0       |       |
+#| name       | varchar(30)      | YES  |     | NULL    |       |
+#| supervisor | int(16) unsigned | YES  |     | NULL    |       |
+#| valid      | tinyint(1)       | YES  |     | NULL    |       |
+#+------------+------------------+------+-----+---------+-------+
+sub update_eq_district_table
+{
+    # Districts should be created by hand. This subroutine only
+    # updates the supervisor's ID in each district.
+    print "-> Updating eq_district table\n";
+    $sth = $dbh->prepare("select * from eq_district");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    while($sqlhashref = $sth->fetchrow_hashref) {
+	$supervisor_name = $sqlhashref->{name};
+	$district = $sqlhashref->{district};
+	$sth2 = $dbh->prepare("select * from eq_elder where name='$supervisor_name'");
+	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+	$sqlhashref2 = $sth2->fetchrow_hashref;
+	$supervisor_id = $sqlhashref2->{elder};
+	$sth2->finish();
+	$sth2 = $dbh->prepare("update eq_district set supervisor='$supervisor_id' where district='$district'");
+	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+	$sth2->finish();
+    }
+    $sth->finish();
+}
+
+# EQ_COMPANIONSHIP
+#+---------------+------------------+------+-----+---------+-------+
+#| Field         | Type             | Null | Key | Default | Extra |
+#+---------------+------------------+------+-----+---------+-------+
+#| companionship | int(16) unsigned |      |     | 0       |       |
+#| elder         | int(16) unsigned | YES  |     | NULL    |       |
+#| aaronic       | int(16) unsigned | YES  |     | NULL    |       |
+#| district      | int(16) unsigned | YES  |     | NULL    |       |
+#| valid         | tinyint(1)       | YES  |     | NULL    |       |
+#+---------------+------------------+------+-----+---------+-------+
+sub update_eq_companionship_table
+{
+    print "-> Updating eq_companionship table\n";
+
+    # First, mark all existing companionships as invalid in case they have been dissolved
+    $sth = $dbh->prepare("update eq_companionship set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    # Second, mark all the aaronic invalid. We'll only mark the ones as valid that are assigned to hometeach
+    $sth = $dbh->prepare("update eq_aaronic set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
+    foreach $index (keys %hometeaching_data)
+    {
+	$hashref = $hometeaching_data{$index};
+	foreach $key (keys %$hashref) {
+	    if($key =~ /Quorum/i && $hometeaching_data{$index}{$key} =~ /Elders/i) {
+		foreach $field ("Home Teacher 1","Home Teacher 2") {
+		    $elder_name = $hometeaching_data{$index}{$field};
+		    if($elder_name eq "") { next; }
+		    $sth2 = $dbh->prepare("select * from eq_elder where name='$elder_name'");
+		    $sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sqlhashref2 = $sth2->fetchrow_hashref;
+		    $elder = $sqlhashref2->{elder};
+		    $aaronic = "NULL";
+		    if($elder eq "") {
+			$sth2 = $dbh->prepare("select * from eq_aaronic where name='$elder_name'");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			$sqlhashref2 = $sth2->fetchrow_hashref;
+			$aaronic = $sqlhashref2->{aaronic};
+			$elder = "NULL";
+			if($aaronic eq "") { print "-W- Unable to find $elder_name in eq_elder or eq_aaronic tables\n"; }
+		    } 
+		    $id = $hometeaching_data{$index}{'Comp ID'};
+		    $district = $hometeaching_data{$index}{'HT District'};
+		    $sth = $dbh->prepare("select * from eq_companionship where elder='$elder' and aaronic='$aaronic'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    my @data = ();
+		    while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+		    my $rows = scalar @data;
+		    if($rows == 0) {
+			# No existing records found for this companionship, make a new entry
+			print "   Adding Elder to companionship: $elder_name -> $id\n";
+			$sth = $dbh->prepare("insert into eq_companionship values ($id,'$elder','$aaronic','$district',1)");
+			$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    } else {
+			# An existing companionship was found for this companionship, update it
+			$sth2 = $dbh->prepare("select * from eq_companionship where district='$district' and companionship='$id'");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			if($elder ne "NULL") {
+			    print "   Updating Companionship with Elder: $elder_name ($elder) -> $id\n";
+			    $sth = $dbh->prepare("update eq_companionship set district='$district' where elder='$elder'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set companionship='$id' where elder='$elder'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set valid=1 where elder='$elder'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			} else {
+			    print "   Updating Companionship with Aaronic: $elder_name ($aaronic) -> $id\n";
+			    $sth = $dbh->prepare("update eq_companionship set district='$district' where aaronic='$aaronic'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set companionship='$id' where aaronic='$aaronic'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set valid=1 where aaronic='$aaronic'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";			    
+			    $sth = $dbh->prepare("update eq_aaronic set valid=1 where aaronic='$aaronic'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			}
+		    }
+		    $sth->finish();
+		    $sth2->finish();		    
+		}
+	    }
+	}
+    }
+}
+
+# EQ_FAMILY
+#+---------------+------------------+------+-----+---------+-------+
+#| Field         | Type             | Null | Key | Default | Extra |
+#+---------------+------------------+------+-----+---------+-------+
+#| family        | int(16) unsigned |      | PRI | 0       |   A   |
+#| hofh_id       | int(16) unsigned | YES  |     | NULL    |       |
+#| name          | varchar(30)      | YES  |     | NULL    |       |
+#| companionship | int(16) unsigned | YES  |     | NULL    |       |
+#| valid         | tinyint(1)       | YES  |     | NULL    |       |
+#+---------------+------------------+------+-----+---------+-------+
+sub update_eq_family_table
+{
+    print "-> Updating eq_family table\n";
+
+    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
+    $sth = $dbh->prepare("update eq_family set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
+    foreach $index (keys %membership_data)
+    {
+	$hashref = $membership_data{$index};
+	foreach $key (keys %$hashref) {
+	    if($key =~ /HH Position/i && $membership_data{$index}{$key} =~ /Head of Household/i) {
+		$family_name = $membership_data{$index}{'Preferred Name'};
+		$family_name =~ s/\'/\\'/g; #'
+		$id = $membership_data{$index}{'HofH ID'};
+
+		# Find out how many families match this family's name
+		$sth = $dbh->prepare("select * from eq_family where name='$family_name'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		my @data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+		my $rows = scalar @data;
+		
+		if($rows == 0) {
+		    # No existing records found for this family, make a new entry
+		    print "   Adding new Family: $family_name\n";
+		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','0',1)");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} elsif($rows == 1) {
+		    # An existing record was found for this family, update it
+		    print "   Updating existing family: $family_name\n";
+		    $sth = $dbh->prepare("update eq_family set hofh_id=$id where name='$family_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_family set valid=1 where name='$family_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} else {
+		    # More than one record was found. Error! This shouldn't happen.
+		    print "   -E- More than one record found ($rows) for family name: $family_name\n";
+		}
+		# Now update the hometeaching field for this family
+		foreach $index (keys %hometeaching_data)
+		{
+		    $hashref = $hometeaching_data{$index};
+		    foreach $key (keys %$hashref) {
+			if($hometeaching_data{$index}{'Household'} =~ /(\S+)\s+(\S+),\s+(\S+)\s+(.*)/) {
+			    print "I: Adjusting hometeaching match from: $hometeaching_data{$index}{'Household'} to $1, $3 $4\n";
+			    $hometeaching_data{$index}{'Household'} = "$1, $3 $4";
+			}
+			if($key =~ /Quorum/i &&
+			   $hometeaching_data{$index}{$key} =~ /Elders/i &&
+			   $hometeaching_data{$index}{'Household'} =~ /$family_name/ &&
+			   $data[0]->{companionship} != $hometeaching_data{$index}{'Comp ID'}
+			   )
+			{
+			    print "   Updating hometeaching assignment for $family_name family\n";
+			    $companionship = $hometeaching_data{$index}{'Comp ID'};
+			    $sth = $dbh->prepare("update eq_family set companionship='$companionship' where name='$family_name'");
+			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			}
+		    }
+		}
+		$sth->finish();
+	    }
+	}
+    }
+}
+
+# EQ_PARENT
+#+----------+------------------+------+-----+---------+-------+
+#| Field    | Type             | Null | Key | Default | Extra |
+#+----------+------------------+------+-----+---------+-------+
+#| parent   | int(16) unsigned |      | PRI | 0       |   A   |
+#| family   | int(16) unsigned | YES  |     | NULL    |       |
+#| name     | varchar(30)      | YES  |     | NULL    |       |
+#| birthday | date             | YES  |     | NULL    |       |
+#| valid    | tinyint(1)       | YES  |     | NULL    |       |
+#+----------+------------------+------+-----+---------+-------+
+sub update_eq_parent_table
+{
+    print "-> Updating eq_parent table\n";
+
+    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
+    $sth = $dbh->prepare("update eq_parent set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
+    foreach $index (keys %membership_data)
+    {
+	$hashref = $membership_data{$index};
+	foreach $key (keys %$hashref) {
+	    if($key =~ /HH Position/i &&
+	       $membership_data{$index}{$key} =~ /Head of Household/i ||
+	       $membership_data{$index}{$key} =~ /Spouse/i
+	       ) {
+		# Get some information from the hash about this parent
+		$parent_name = $membership_data{$index}{'Preferred Name'};
+		$parent_name =~ s/\'/\\'/g; #'
+		$birthday = $membership_data{$index}{'Birth'};
+		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
+		$hofh_id = $membership_data{$index}{'HofH ID'};
+
+		# Find the family id for this parent's HofH_ID.
+		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		$sqlhashref = $sth->fetchrow_hashref();
+		$family_id = $sqlhashref->{'family'};
+
+		# Find out how many parents match this parent's name
+		$sth = $dbh->prepare("select * from eq_parent where name='$parent_name'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		my @data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+		my $rows = scalar @data;
+		
+		if($rows == 0) {
+		    # No existing records found for this parent, make a new entry
+		    print "   Adding new Parent: $parent_name\n";
+		    $sth = $dbh->prepare("insert into eq_parent values (NULL,$family_id,'$parent_name','$year-$month-$day',1)");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} elsif($rows == 1) {
+		    # An existing record was found for this parent, update it
+		    print "   Updating existing parent: $parent_name\n";
+		    $sth = $dbh->prepare("update eq_parent set family='$family_id' where name='$parent_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_parent set birthday='$year-$month-$day' where name='$parent_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_parent set valid=1 where name='$parent_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    } else {
+		    # More than one record was found. Error! This shouldn't happen.
+		    print "   -E- More than one record found with same parent name: $parent_name\n";
+		}
+		$sth->finish();
+	    }
+	}
+    }
+}
+
+# EQ_CHILD
+#+----------+------------------+------+-----+---------+-------+
+#| Field    | Type             | Null | Key | Default | Extra |
+#+----------+------------------+------+-----+---------+-------+
+#| child    | int(16) unsigned |      | PRI | 0       |   A   |
+#| family   | int(16) unsigned | YES  |     | NULL    |       |
+#| name     | varchar(30)      | YES  |     | NULL    |       |
+#| birthday | date             | YES  |     | NULL    |       |
+#| valid    | tinyint(1)       | YES  |     | NULL    |       |
+#+----------+------------------+------+-----+---------+-------+
+sub update_eq_child_table
+{
+    print "-> Updating eq_child table\n";
+
+    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
+    $sth = $dbh->prepare("update eq_child set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
+    foreach $index (keys %membership_data)
+    {
+	$hashref = $membership_data{$index};
+	foreach $key (keys %$hashref) {
+	    if($key =~ /HH Position/i && $membership_data{$index}{$key} =~ /Other/i ) {
+		$child_name = $membership_data{$index}{'Full Name'};
+		$child_name =~ s/\'/\\'/g; #'
+		$birthday = $membership_data{$index}{'Birth'};
+		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
+		$id = $membership_data{$index}{'Indiv ID'};
+		$hofh_id = $membership_data{$index}{'HofH ID'};
+
+		# Find the family id for this child's HofH_ID.
+		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		$sqlhashref = $sth->fetchrow_hashref();
+		$family_id = $sqlhashref->{'family'};
+
+		# Find out how many children have the same name for the same family
+		$sth = $dbh->prepare("select * from eq_child where name='$child_name'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		my @data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+		my $rows = scalar @data;
+		
+		if($rows == 0) {
+		    # No existing records found for this child, make a new entry
+		    print "   Adding new Child: $child_name\n";
+		    $sth = $dbh->prepare("insert into eq_child values (NULL,$family_id,'$child_name','$year-$month-$day',1)");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} elsif($rows == 1) {
+		    # An existing record was found for this child, update it
+		    print "   Updating existing child: $child_name\n";
+		    $sth = $dbh->prepare("update eq_child set family='$family_id' where name='$child_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_child set birthday='$year-$month-$day' where name='$child_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_child set valid=1 where name='$child_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		} else {
+		    # More than one record was found. Error! This shouldn't happen.
+		    print "   -E- More than one record found ($rows) with same child name: $child_name\n";
+		}
+		$sth->finish();
+	    }
+	}
+    }
+}
+
+######################################################################
+sub check_for_changed_ids
+{
+    # If the Indiv ID & HofH ID has changed between data sets, we could have problems
+    my ($oldhashref, $newhashref) = @_;
+    my $found_problem = 0;
+    
+    foreach $oldindex (keys %$oldhashref)
+    {
+	$indiv_id = $oldhashref->{$oldindex}{'Indiv ID'};
+	$hofh_id  = $oldhashref->{$oldindex}{'HofH ID'};
+	$full_name = $oldhashref->{$oldindex}{'Full Name'};
+	$hh_position = $oldhashref->{$oldindex}{'HH Position'};
+	if($hh_position =~ /Other/i) { next; }
+
+	foreach $newindex (keys %$newhashref)
+	{
+	    if($newhashref->{$newindex}{'Full Name'} eq $full_name &&
+	       $indiv_id != $newhashref->{$newindex}{'Indiv ID'})
+	    {
+		print "-W- Indiv ID for $full_name changed from $indiv_id to $newhashref->{$newindex}{'Indiv ID'}\n";
+		$found_problem = 1;
+	    }
+
+	    if($newhashref->{$newindex}{'Full Name'} eq $full_name &&
+	       $hofh_id != $newhashref->{$newindex}{'HofH ID'})
+	    {
+		print "-W- HofH ID for $full_name changed from $hofh_id to $newhashref->{$newindex}{'HofH ID'}\n";
+		$found_problem = 1;
+	    }
+	}
+    }
+    
+    return $found_problem;
+}
+
+######################################################################
+# MAIN
+######################################################################
+
+###################################################
+# Open a connection to the database
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname;host=$dbhost port=$dbport",$dbuser,$dbpass,{
+    AutoCommit=>0,
+    PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
+
+###################################################
+# Check old directory against new directory to ensure
+# that the Indiv ID & HofH ID have not changed between updates
+if(defined $opt_o) {
+    print "-> Comparing old data files to new ones: $opt_o => $opt_n\n";
+    my %old_membership_data = ();
+    my %new_membership_data = ();
+    &csv_to_hash("$opt_o/Membership.csv",\%old_membership_data);
+    &csv_to_hash("$opt_n/Membership.csv",\%new_membership_data);
+
+    $changed_ids=&check_for_changed_ids(\%old_membership_data, \%new_membership_data);
+    
+    if($changed_ids) {
+	print "\n";
+	print "-E- Some Indiv IDs and HofH IDs have changed for Head of Households between \n";
+	print "    $opt_o and $opt_n data sets.\n";
+	print "    This script is not currently setup to handle this properly.\n";
+	print "\n";
+	print "    Exiting without updating...\n\n";
+	exit;
+    }
+}
+
+###################################################
+# Process command line options
+if(defined $opt_n) { $datadir = $opt_n; }
+else { $datadir = shift(@ARGV); }
+print "-> Processing all ward data files in $datadir\n";
+
+###################################################
+# Parse Ward Data Files
+&csv_to_hash("$datadir/Membership.csv",\%membership_data);
+&csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
+
+if($opt_v) {
+    print "-> Membership Data Dump\n\n";
+    &print_hash(\%membership_data);
+    print "-> HomeTeaching Data Dump\n\n";
+    &print_hash(\%hometeaching_data);
+}
+
+if($opt_s) { $dbh->disconnect(); exit; }
+
+# Now update the various eq DB tables
+&update_eq_elder_table();
+&update_eq_aaronic_table();
+&update_eq_district_table();
+&update_eq_companionship_table();
+&update_eq_family_table();
+&update_eq_parent_table();
+&update_eq_child_table();
+
+###################################################
+# Disconnect from the database
+$dbh->disconnect();
+
+######################################################################
+
+
+
+
+
+
+
+
+
+
+
+

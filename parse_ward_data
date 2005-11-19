@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+use DBI;
+use Getopt::Std;
+###################################################
+# GLOBALS
+$dbname = "phpgroupware";
+$dbhost = "192.168.0.2";
+$dbport = 3306;
+$dbuser = "phpgroupware";
+$dbpass = "phpgroupware";
+%hometeaching_data = ();
+%membership_data = ();
+getopts('vsn:o:b');
+
+$monthname2num{'Jan'} = '01';
+$monthname2num{'Feb'} = '02';
+$monthname2num{'Mar'} = '03';
+$monthname2num{'Apr'} = '04';
+$monthname2num{'May'} = '05';
+$monthname2num{'Jun'} = '06';
+$monthname2num{'Jul'} = '07';
+$monthname2num{'Aug'} = '08';
+$monthname2num{'Sep'} = '09';
+$monthname2num{'Oct'} = '10';
+$monthname2num{'Nov'} = '11';
+$monthname2num{'Dec'} = '12';
+
+######################################################################
+# SUBROUTINES
+######################################################################
+sub csv_to_hash
+{
+    my ($filename, $hashref) = @_;
+
+    open(FILE,$filename) || die "-E- Could not open $filename for reading\n";
+
+    my $found_header = 0; my $index = 0;
+    while(<FILE>)
+    {
+	$line = $_;
+	@data = split /\",/, $line;
+	if(!$found_header) { @header = @data; $found_header = 1; }
+	else {
+	    foreach $i (0..$#data-1) {
+		$data[$i] =~ s/\"//g;
+		$header[$i] =~ s/\"//g;
+	        $hashref->{$index}{$header[$i]} = $data[$i];
+		#print "$index: $i: $header[$i]: $data[$i]\n";
+	    }
+	    $index++;
+	}
+    }
+    
+    close(FILE);
+}
+
+######################################################################
+sub print_hash
+{
+    my ($hashref) = @_;
+
+    foreach $key (sort {$a <=> $b} keys %$hashref) {
+	print "Index: $key\n";
+	foreach $field (keys %{$hashref->{$key}}) {
+	    print "$field: $hashref->{$key}{$field}\n";
+	}
+	print "\n";
+    }
+}
+
+######################################################################
+sub print_birthdays
+{
+    my ($hashref) = @_;
+
+    foreach $key (sort {$a <=> $b} keys %$hashref) {
+	$name = "";
+	$birthday = "";
+	foreach $field (keys %{$hashref->{$key}}) {
+	    if($field =~ /Full Name/) { $name = $hashref->{$key}{$field}; }
+	    if($field =~ /Birth/) { $birthday = $hashref->{$key}{$field}; }
+	}
+	if($name ne "" && $birthday ne "") { printf "%-30s %-10s\n",$name,$birthday; }
+    }
+}
+
+######################################################################
+# MAIN
+######################################################################
+
+###################################################
+# Open a connection to the database
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname;host=$dbhost port=$dbport",$dbuser,$dbpass,{
+    AutoCommit=>0,
+    PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
+
+###################################################
+# Process command line options
+if(defined $opt_n) { $datadir = $opt_n; }
+else { $datadir = shift(@ARGV); }
+print "-> Processing all ward data files in $datadir\n";
+
+###################################################
+# Parse Ward Data Files
+&csv_to_hash("$datadir/Membership.csv",\%membership_data);
+&csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
+
+if($opt_v) {
+    print "-> Membership Data Dump\n\n";
+    &print_hash(\%membership_data);
+    print "-> HomeTeaching Data Dump\n\n";
+    &print_hash(\%hometeaching_data);
+}
+
+if($opt_b) { &print_birthdays(\%membership_data); }
+
+if($opt_s) { $dbh->disconnect(); exit; }
+
+###################################################
+# Disconnect from the database
+$dbh->disconnect();
+
+######################################################################
+
+
+
+
+
+
+
+
+
+
+
+
