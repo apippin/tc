@@ -170,7 +170,7 @@ class eq
 	$unique_companionships='';
 		
 	// Select all the unique companionship numbers for this district
-	$sql = "SELECT distinct companionship FROM eq_companionship where district=". $districts[$i]['district'];
+	$sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$j=0;
 	while ($this->db->next_record())
@@ -870,7 +870,7 @@ class eq
 	  $sql = "SELECT distinct companionship FROM eq_companionship";
 	} 
 	else {
-	  $sql = "SELECT distinct companionship FROM eq_companionship where district=". $districts[$i]['district'];
+	  $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];
 	}
 	$this->db->query($sql,__LINE__,__FILE__);
 	$j=0;
@@ -879,9 +879,9 @@ class eq
 	    $unique_companionships[$j]['companionship'] = $this->db->f('companionship');
 	    $j++;
 	  }
-
+	
 	$comp_width=400; $ppi_width=25; $table_width=$comp_width + $num_months*$ppi_width;
-	$table_data=""; $num_companionships = 0; $num_elders = 0;
+	$table_data=""; $num_companionships = $j; $num_elders = 0;
 	for($m=$num_months; $m >= 0; $m--) { $ppis[$m] = 0; }
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  // Select all the companions in each companionship
@@ -898,7 +898,7 @@ class eq
 	  while ($this->db->next_record())
 	    {
 	      // Get this companions information
-	      $num_elders++; $num_companionships++;
+	      $num_elders++;
 	      $companionship = $this->db->f('companionship');
 	      $elder_id = $this->db->f('elder');
 	      $aaronic_id = $this->db->f('aaronic');
@@ -967,7 +967,6 @@ class eq
 	      $table_data .= "</tr>"; 
 	      $k++;
 	    }
-	  if($num_companionships % 2 != 0) { $num_companionships++; }
 	  $table_data .= "<tr><td colspan=20><hr></td></tr>";
 	}
 	// Now add Elders not assigned to any companionship to the table if we are in eqpresppi mode
@@ -978,7 +977,7 @@ class eq
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if(!$this->db->next_record()) {
 	      // We found an Elder not in a companionship, add them to the table
-	      $num_elders++; $num_companionships++;
+	      $num_elders++;
 	      $companionship=0;
 	      $name = $elders[$elder_id];
 	      $link_data['menuaction'] = 'eq.eq.ppi_update';
@@ -1018,7 +1017,6 @@ class eq
 	    }
 	  }
 	}
-	$num_companionships = ceil($num_companionships/2);
 	$total_companionships += $num_companionships;
 	if($eqpresppi == 1) {
 	  $stat_data = "<tr><td><b><font size=-2>$num_elders Elders<br>PPI Totals:</font></b></td>";
@@ -1208,7 +1206,7 @@ class eq
 	{	  
 	  $this->nextmatchs->template_alternate_row_color(&$this->t);
 
-	  $sql = "SELECT * FROM eq_family WHERE valid=1 AND family=".$visit_list[$i]['family'];
+	  $sql = "SELECT * FROM eq_family WHERE family=".$visit_list[$i]['family'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  	  

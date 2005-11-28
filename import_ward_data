@@ -237,7 +237,7 @@ sub update_eq_companionship_table
 		    } 
 		    $id = $hometeaching_data{$index}{'Comp ID'};
 		    $district = $hometeaching_data{$index}{'HT District'};
-		    $sth = $dbh->prepare("select * from eq_companionship where elder='$elder' and aaronic='$aaronic'");
+		    $sth = $dbh->prepare("select * from eq_companionship where elder='$elder' and aaronic='$aaronic' and companionship='$id'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    my @data = ();
 		    while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
@@ -253,19 +253,19 @@ sub update_eq_companionship_table
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 			if($elder ne "NULL") {
 			    print "   Updating Companionship with Elder: $elder_name ($elder) -> $id\n";
-			    $sth = $dbh->prepare("update eq_companionship set district='$district' where elder='$elder'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			    $sth = $dbh->prepare("update eq_companionship set companionship='$id' where elder='$elder'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			    $sth = $dbh->prepare("update eq_companionship set valid=1 where elder='$elder'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set district='$district' where elder='$elder' and companionship='$id'");
+			    $sth->execute or die "-E- DB error 'district': $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set elder='$elder' where elder='$elder' and companionship='$id'");
+			    $sth->execute or die "-E- DB error 'elder': $DBI::errstr\n";
+			    $sth = $dbh->prepare("update eq_companionship set valid=1 where elder='$elder' and companionship='$id'");
+			    $sth->execute or die "-E- DB error 'valid': $DBI::errstr\n";
 			} else {
 			    print "   Updating Companionship with Aaronic: $elder_name ($aaronic) -> $id\n";
-			    $sth = $dbh->prepare("update eq_companionship set district='$district' where aaronic='$aaronic'");
+			    $sth = $dbh->prepare("update eq_companionship set district='$district' where aaronic='$aaronic' and companionship='$id'");
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			    $sth = $dbh->prepare("update eq_companionship set companionship='$id' where aaronic='$aaronic'");
+			    $sth = $dbh->prepare("update eq_companionship set aaronic='$aaronic' where aaronic='$aaronic' and companionship='$id'");
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			    $sth = $dbh->prepare("update eq_companionship set valid=1 where aaronic='$aaronic'");
+			    $sth = $dbh->prepare("update eq_companionship set valid=1 where aaronic='$aaronic' and companionship='$id'");
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";			    
 			    $sth = $dbh->prepare("update eq_aaronic set valid=1 where aaronic='$aaronic'");
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
