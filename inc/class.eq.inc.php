@@ -217,9 +217,10 @@ class eq
 	      // in the past $num_months for this Family
 	      $header_row="<th width=$comp_width><font size=-2>Families</th>";
 	      for($m=$num_months; $m >= 0; $m--) {
-		$month = date('m/Y', strtotime('-'.$m.' month'));
-		$month_start = date('Y-m', strtotime('-'.$m.' month')); $month_start .= "-01";
-		$month_end = date('Y-m', strtotime('-'.$m.' month')); $month_end .= "-31";
+		if(`date '+%d'` == 31) { $d = 1; } else { $d = 0; }
+		$month = date('m/Y', strtotime('-'.$m.' month -'.$d.' day'));
+		$month_start = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_start .= "-01";
+		$month_end = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_end .= "-31";
 		$sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 		       " AND companionship=" . $unique_companionships[$j]['companionship'].
  		       " AND family=". $family_id;
@@ -931,9 +932,10 @@ class eq
 		  $header_row .= "<th width=150><font size=-2>$year</th>"; 
 	        }
 	        else {
-		  $month = date('m/Y', strtotime('-'.$m.' month'));
-		  $month_start = date('Y-m', strtotime('-'.$m.' month')); $month_start .= "-01";
-		  $month_end = date('Y-m', strtotime('-'.$m.' month')); $month_end .= "-31";
+		  if(`date '+%d'` == 31) { $d = 1; } else { $d = 0; }
+		  $month = date('m/Y', strtotime('-'.$m.' month -'.$d.' day'));
+		  $month_start = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_start .= "-01";
+		  $month_end = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_end .= "-31";
 		  $sql = "SELECT * FROM eq_ppi WHERE date >= '$month_start' AND date <= '$month_end' ".
 		         "AND elder=" . $elder_id . " AND eqpresppi=0";
 		  $this->db2->query($sql,__LINE__,__FILE__);
