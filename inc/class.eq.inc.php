@@ -952,7 +952,7 @@ class eq
 		  $ppis[$m]++; $total_ppis[$m]++;
 		  $link_data['menuaction'] = 'eq.eq.ppi_update';
 		  $link_data['companionship'] = $companionship;
-		  $link_data['interviewer'] = $supervisor;
+		  $link_data['interviewer'] = $this->db2->f('interviewer');
 		  $link_data['elder'] = $elder_id;
 		  $link_data['name'] = $name;
 		  $link_data['ppi'] = $this->db2->f('ppi');
