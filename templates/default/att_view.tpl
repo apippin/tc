@@ -41,4 +41,27 @@
 <!-- END elder_list -->
 
 	</table>
+	<br>
+
+	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
+	<tr bgcolor="#c9c9c9"><th width={elder_width}><font size=-2>{total_elders} Total Elders</font></th>{header_row}</tr>
+	<tr>
+		<td><b><font size=-2>Elders Attending:</b></font></td>
+		{attendance}
+	</tr>
+	<tr>
+		<td><b><font size=-2>Elders <font color=red>Not</font> Attending:</b></font></td>
+		{nonattendance}
+	</tr>
+	<tr><td colspan={span}><hr></td></tr>
+	<tr>
+		<td><b><font size=-2>Average Elders Attending:</b></font></td>
+		{aveattendance}
+	</tr>
+	<tr>
+		<td><b><font size=-2>Average Elders <font color=red>Not</font> Attending:</b></font></td>	
+		{avenonattendance}
+	</tr>
+	</table>
 </center>
+

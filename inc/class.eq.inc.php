@@ -244,9 +244,15 @@ class eq
 		  else if($this->db2->f('visited') == 'n') {
 		    $table_data .= '<td align=center><a href="'.$link.'"><img src="x.gif"></a></td>';
 		  }
-		  else { $table_data .= "<td>&nbsp;</td>"; }
+		  else {
+		    $visits[$m]++; $total_visits[$m]++;
+		    $table_data .= "<td>&nbsp;</td>";
+		  }
 		}
-		else { $table_data .= "<td>&nbsp;</td>"; }
+		else {
+		  $visits[$m]++; $total_visits[$m]++;
+		  $table_data .= "<td>&nbsp;</td>";
+		}
 	      }
 	      $table_data .= "</tr>"; 
 	      $k++;
@@ -1422,7 +1428,8 @@ class eq
 	$last_time += 90000;
 	if($found_sunday) { $i++; $found_sunday=0; }
       }
-      
+
+      $total_elders = count($elder_id);
       $old_month=$sunday_list[0]['month']; $span=0;
       for ($i=0; $i < count($sunday_list); $i++) {
         $date = $sunday_list[$i]['date'];
@@ -1436,6 +1443,9 @@ class eq
 	  $link_data['month'] = $sunday_list[$i-1]['month'];
 	  $link_data['year'] = $sunday_list[$i-1]['year'];
 	  $link_data['action'] = 'update_month';
+	  $cur_month = $sunday_list[$i-1]['month'];
+	  $cur_year = $sunday_list[$i-1]['year'];
+	  $header_row .= "<th><font size=-3>$cur_month&nbsp;$cur_year</font></th>";
 	  $this->t->set_var('update_month',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
 	  $this->t->set_var('month',$sunday_list[$i-1]['month']);
 	  $this->t->set_var('year',$sunday_list[$i-1]['year']);
@@ -1443,7 +1453,9 @@ class eq
 	  $this->t->fp('list1','month_list',True);
 	} $span++;
       }
-
+      $this->t->set_var('total_elders',$total_elders);
+      $this->t->set_var('header_row',$header_row);
+      
       $elder_width=200; $att_width=25; $total_width=$elder_width; 
       for ($i=0; $i < count($sunday_list); $i++) {
       	$link_data['menuaction'] = 'eq.eq.att_update';
@@ -1474,6 +1486,11 @@ class eq
 	     . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
+	    $cur_month = $sunday_list[$j]['month'];
+	    if($attended[$i][$cur_month] != 1) { 
+	      $attended[$i][$cur_month]=1;
+	      $attendance[$cur_month]++;
+	    }
 	    $att_table .= '<td align=center><img src="checkmark.gif"></td>';
 	  } else {
 	    $att_table .= '<td>&nbsp;</td>';
@@ -1486,6 +1503,35 @@ class eq
       $this->t->set_var('elder_width',$elder_width);
       $this->t->set_var('att_width',$att_width);
 
+      # Now calculate attendance for these months
+      $attendance_str = "";
+      $nonattendance_str = "";
+      $aveattendance_str = "";
+      $avenonattendance_str = "";
+      $num_months=0;
+      $ave_total_attended=0;
+      foreach($attendance as $att => $value) {
+	$total_attended = $attendance[$att];
+	$ave_total_attended += $attendance[$att]; $num_months++;
+	$percent = ceil(($total_attended / $total_elders)*100);
+	$attendance_str.="<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
+	$total_nonattended = $total_elders - $total_attended;
+	$percent = ceil(($total_nonattended / $total_elders)*100);
+	$nonattendance_str.="<td align=center><font size=-2><b>$total_nonattended ($percent%)</b></font></td>";
+	
+	$total_attended = ceil(($ave_total_attended / $num_months));
+	$percent = ceil(($total_attended / $total_elders)*100);
+	$aveattendance_str .= "<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
+	$total_attended = $total_elders - ceil(($ave_total_attended / $num_months));
+	$percent = ceil(($total_attended / $total_elders)*100);
+	$avenonattendance_str .= "<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
+      }
+      
+      $this->t->set_var('attendance',$attendance_str);
+      $this->t->set_var('aveattendance',$aveattendance_str);
+      $this->t->set_var('nonattendance',$nonattendance_str);
+      $this->t->set_var('avenonattendance',$avenonattendance_str);
+      
       $this->t->pfp('out','att_view_t');
       $this->save_sessiondata(); 
     }
