@@ -221,8 +221,10 @@ class eq
 		$month = date('m/Y', strtotime('-'.$m.' month -'.$d.' day'));
 		$month_start = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_start .= "-01";
 		$month_end = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_end .= "-31";
+		// Add this to the query to filter on only visits made by this companionship:
+		// " AND companionship=" . $unique_companionships[$j]['companionship'].
 		$sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
-		       " AND companionship=" . $unique_companionships[$j]['companionship'].
+		       " AND companionship!=0".
  		       " AND family=". $family_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$link_data['menuaction'] = 'eq.eq.ht_update';
@@ -324,6 +326,13 @@ class eq
 	    }
 	  for ($j=0; $j < count($unique_companionships); $j++)
 	    {
+	      // FIXME: We won't be able to go back and edit history on families that have been
+	      // reassigned to a different companionship. The following delete command will not delete
+	      // the history of visits under an older companionship, only the ones for the existing
+	      // companionship. This will lead to duplicate visits being entered for an older
+	      // month for the same family, making it impossible to change the past history once
+	      // a family is reassigned. However, you will be able to view the history just fine.
+	      
 	      // Delete all the visits that have taken place for all families for this month
 	      $this->db->query("DELETE from eq_visit where companionship=" . $unique_companionships[$j]['companionship'] .
 			       " AND " . "date='" . $date . "'",__LINE__,__FILE__);
@@ -421,7 +430,7 @@ class eq
 	    
 	    $header_row="<th width=$comp_width><font size=-2>Families</th>";
 	    $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
-	           " AND companionship=" . $unique_companionships[$j]['companionship'] .
+	           " AND companionship!=0".
 	           " AND family=". $family_id;
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    $value = $family_id . "/" . $unique_companionships[$j]['companionship'] . "/" . $date;
