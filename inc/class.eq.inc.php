@@ -386,7 +386,7 @@ class eq
 	}
       
       // Select all the unique companionship numbers for this district
-      $sql = "SELECT distinct companionship FROM eq_companionship where district=". $district;
+      $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $district;
       $this->db->query($sql,__LINE__,__FILE__);
       $j=0; $unique_companionships='';
       while ($this->db->next_record())
@@ -395,7 +395,7 @@ class eq
 	  $j++;
 	}
       
-      $comp_width=300; $visit_width=25; $table_width=$comp_width + $num_months*$visit_width;
+      $comp_width=300; $visit_width=25; $table_width=$comp_width + $visit_width;
       $table_data=""; $num_companionships = 0; $num_families = 0; $visits=0;
       for ($j=0; $j < count($unique_companionships); $j++) {
 	$companion_table_entry = "";
