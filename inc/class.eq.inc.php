@@ -369,6 +369,7 @@ class eq
 	{
 	  $elder_id[$i] = $this->db->f('elder');
 	  $elder_name[$i] = $this->db->f('name');
+	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
@@ -409,15 +410,16 @@ class eq
 	while ($this->db->next_record())
 	  {
 	    // Get this companions information
-	    if($companion_table_entry != "") { $companion_table_entry .= "&nbsp;/&nbsp;"; }
+	    if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 	    $companionship = $this->db->f('companionship');
 	    $elder_id = $this->db->f('elder');
 	    $aaronic_id = $this->db->f('aaronic');
+	    $phone = $elder_phone[$elder_id];
 	    if($elder_id) { $name = $elders[$elder_id]; }
 	    else if($aaronic_id) { $name = $aaronic[$aaronic_id]['name']; }
-	    $companion_table_entry .= "$name";
+	    $companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
 	  }
-	$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><b>$companion_table_entry</b><hr></td></tr>";
+	$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 	
 	// Get the names of the families assigned this home teaching companionship
 	$sql = "SELECT * from eq_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
@@ -854,6 +856,7 @@ class eq
 	{
 	  $elder_id[$i] = $this->db->f('elder');
 	  $elder_name[$i] = $this->db->f('name');
+	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
@@ -920,6 +923,7 @@ class eq
 	      $companionship = $this->db->f('companionship');
 	      $elder_id = $this->db->f('elder');
 	      $aaronic_id = $this->db->f('aaronic');
+	      $phone = $elder_phone[$elder_id];
 	      if($elder_id) { $name = $elders[$elder_id]; }
 	      else if($aaronic_id) { $name = $aaronic[$aaronic_id]['name']; }
 	      $link_data['menuaction'] = 'eq.eq.ppi_update';
@@ -932,7 +936,7 @@ class eq
 	      $link_data['action'] = 'add';
 	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	      if($aaronic_id == 0) {
-		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td><a href=$link>$name</a></td>";
+		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 	      } else {
 		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$name</td>";
 	      }
