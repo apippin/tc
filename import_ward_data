@@ -121,6 +121,7 @@ sub update_eq_aaronic_table
 #+------------+------------------+------+-----+---------+-------+
 #| elder      | int(16) unsigned |      | PRI | 0       |   A   |
 #| name       | varchar(60)      | YES  |     | NULL    |       |
+#| phone      | varchar(12)      | YES  |     | NULL    |       |
 #| valid      | tinyint(1)       | YES  |     | NULL    |       |
 #+------------+------------------+------+-----+---------+-------+
 sub update_eq_elder_table
@@ -137,6 +138,9 @@ sub update_eq_elder_table
 	foreach $key (keys %$hashref) {
 	    if($key =~ /Priesthood/i && $membership_data{$index}{$key} =~ /Elder/i) {
 		$elder_name = $membership_data{$index}{'Preferred Name'};
+		$phone = $membership_data{$index}{'Phone 1'};
+		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
+		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$sth = $dbh->prepare("select * from eq_elder where name='$elder_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @data = ();
@@ -145,12 +149,18 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name',1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it
 		    print "   Updating existing Elder: $elder_name\n";
 		    $sth = $dbh->prepare("update eq_elder set valid=1 where name='$elder_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    if($phone ne "") { 
+			$sth = $dbh->prepare("update eq_elder set phone='$phone' where name='$elder_name'");
+		    } else {
+			$sth = $dbh->prepare("update eq_elder set phone=NULL where name='$elder_name'");
+		    }
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
