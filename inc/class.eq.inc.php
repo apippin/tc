@@ -37,7 +37,8 @@ class eq
      'vis_view'   => True,
      'vis_update' => True,
      'att_view'   => True,
-     'att_update' => True
+     'att_update' => True,
+     'dir_view'   => True
      );
  
   function eq()
@@ -105,6 +106,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.att_view';	
       $this->t->set_var('link_attendance',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_attendance','Attendance');
+      $link_data['menuaction'] = 'eq.eq.dir_view';	
+      $this->t->set_var('link_dir',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_dir','Directory');
 		
       $this->t->pparse('out','eq_header');
     }
@@ -1700,6 +1704,14 @@ class eq
       $this->save_sessiondata();       
     }
 
+  function dir_view()
+    {
+      $this->t->set_file(array('form' => 'dir_view.tpl'));
+      
+      $this->t->pfp('out','form');
+      $this->save_sessiondata();   
+    }
+  
 }
 
 ?>

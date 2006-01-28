@@ -399,6 +399,13 @@ sub update_eq_parent_table
 		$birthday = $membership_data{$index}{'Birth'};
 		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
 		$hofh_id = $membership_data{$index}{'HofH ID'};
+		$phone = $membership_data{$index}{'Phone 1'};
+		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
+		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
+		$address = $membership_data{$index}{'Street 1'};
+		if($membership_data{$index}{'Street 2'} ne "") { 
+		    $address .= " " . $membership_data{$index}{'Street 2'};
+		}
 
 		# Find the family id for this parent's HofH_ID.
 		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id'");
@@ -416,7 +423,7 @@ sub update_eq_parent_table
 		if($rows == 0) {
 		    # No existing records found for this parent, make a new entry
 		    print "   Adding new Parent: $parent_name\n";
-		    $sth = $dbh->prepare("insert into eq_parent values (NULL,$family_id,'$parent_name','$year-$month-$day',1)");
+		    $sth = $dbh->prepare("insert into eq_parent values (NULL,$family_id,'$parent_name','$year-$month-$day','$phone','$address',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this parent, update it
@@ -424,6 +431,10 @@ sub update_eq_parent_table
 		    $sth = $dbh->prepare("update eq_parent set family='$family_id' where name='$parent_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_parent set birthday='$year-$month-$day' where name='$parent_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_parent set phone='$phone' where name='$parent_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_parent set address='$address' where name='$parent_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_parent set valid=1 where name='$parent_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";

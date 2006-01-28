@@ -21,6 +21,9 @@
 					&nbsp;
                                         &nbsp;
                                         <a href="{link_attendance}">{lang_attendance}</a>
+					&nbsp;
+                                        &nbsp;
+                                        <a href="{link_dir}">{lang_dir}</a>
 					</b></font></td>
 
 			</tr>
