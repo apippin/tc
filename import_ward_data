@@ -77,6 +77,7 @@ sub print_hash
 #+-------+--------------------+------+-----+---------+-------+
 #| aaronic | int(16) unsigned |      | PRI | 0       |   A   |
 #| name    | varchar(60)      | YES  |     | NULL    |       |
+#| phone   | varchar(12)      | YES  |     | NULL    |       |
 #| valid   | tinyint(1)       | YES  |     | NULL    |       |
 #+-------+--------------------+------+-----+---------+-------+
 sub update_eq_aaronic_table
@@ -90,6 +91,9 @@ sub update_eq_aaronic_table
 	       ($membership_data{$index}{$key} =~ /^Teacher\s*$/i ||
 		$membership_data{$index}{$key} =~ /^Priest\s*$/i)) {
 		$aaronic_name = $membership_data{$index}{'Preferred Name'};
+		$phone = $membership_data{$index}{'Phone 1'};
+		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
+		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$sth = $dbh->prepare("select * from eq_aaronic where name='$aaronic_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @data = ();
@@ -98,12 +102,14 @@ sub update_eq_aaronic_table
 		if($rows == 0) {
 		    # No existing records found for this aaronic, make a new entry
 		    print "   Adding new Aaronic: $aaronic_name\n";
-		    $sth = $dbh->prepare("insert into eq_aaronic values (NULL,'$aaronic_name',1)");
+		    $sth = $dbh->prepare("insert into eq_aaronic values (NULL,'$aaronic_name','$phone',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this aaronic, update it if it is valid
 		    if($data[0]->{valid} == 1) {
 			print "   Updating existing aaronic: $aaronic_name\n";
+			$sth = $dbh->prepare("update eq_aaronic set phone='$phone' where name='$aaronic_name'");
+			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    }
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.

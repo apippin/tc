@@ -4,6 +4,7 @@
 	<form action="{actionurl}" method="POST">
 	<input type=hidden name=interviewer value={interviewer}>
 	<input type=hidden name=elder value={elder}>
+	<input type=hidden name=aaronic value={aaronic}>
 	<input type=hidden name=companionship value={companionship}>
 	<input type=hidden name=eqpresppi value={eqpresppi}>
 	<table border="0" width="60%" cellspacing="2" cellpadding="2">

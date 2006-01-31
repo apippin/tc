@@ -164,6 +164,7 @@ class eq
 	{
 	  $aaronic_id = $this->db->f('aaronic');
 	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
+	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
 	}
       
       $total_families = 0;
@@ -201,9 +202,14 @@ class eq
 	      $companionship = $this->db->f('companionship');
 	      $elder_id = $this->db->f('elder');
 	      $aaronic_id = $this->db->f('aaronic');
-	      $phone = $elder_phone[$elder_id];
-	      if($elder_id) { $name = $elders[$elder_id]; }
-	      else if($aaronic_id) { $name = $aaronic[$aaronic_id]['name']; }
+	      if($elder_id) {
+		$name = $elders[$elder_id];
+		$phone = $elder_phone[$elder_id];
+	      }
+	      else if($aaronic_id) {
+		$name = $aaronic[$aaronic_id]['name'];
+		$phone = $aaronic[$aaronic_id]['phone'];		
+	      }
 	      $companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
 	    }
 	  $table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
@@ -390,6 +396,7 @@ class eq
 	{
 	  $aaronic_id = $this->db->f('aaronic');
 	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
+	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
 	}
       
       // Select all the unique companionship numbers for this district
@@ -418,9 +425,14 @@ class eq
 	    $companionship = $this->db->f('companionship');
 	    $elder_id = $this->db->f('elder');
 	    $aaronic_id = $this->db->f('aaronic');
-	    $phone = $elder_phone[$elder_id];
-	    if($elder_id) { $name = $elders[$elder_id]; }
-	    else if($aaronic_id) { $name = $aaronic[$aaronic_id]['name']; }
+	    if($elder_id) {
+	      $name = $elders[$elder_id];
+	      $phone = $elder_phone[$elder_id];
+	    }
+	    else if($aaronic_id) {
+	      $name = $aaronic[$aaronic_id]['name'];
+	      $phone = $aaronic[$aaronic_id]['phone'];
+	    }
 	    $companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
 	  }
 	$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
@@ -875,6 +887,7 @@ class eq
 	{
 	  $aaronic_id = $this->db->f('aaronic');
 	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
+	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
 	}
       
       $total_companionships = 0;
@@ -920,6 +933,8 @@ class eq
           }
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $k=0;
+	  $comp = $unique_companionships[$j]['companionship'];
+	  for($m=$num_months; $m >= 0; $m--) { $ppi_recorded[$comp][$m] = 0; }
 	  while ($this->db->next_record())
 	    {
 	      // Get this companions information
@@ -927,24 +942,26 @@ class eq
 	      $companionship = $this->db->f('companionship');
 	      $elder_id = $this->db->f('elder');
 	      $aaronic_id = $this->db->f('aaronic');
-	      $phone = $elder_phone[$elder_id];
-	      if($elder_id) { $name = $elders[$elder_id]; }
-	      else if($aaronic_id) { $name = $aaronic[$aaronic_id]['name']; }
+	      if($elder_id) {
+		$name = $elders[$elder_id];
+		$phone = $elder_phone[$elder_id];
+	      }
+	      else if($aaronic_id) {
+		$name = $aaronic[$aaronic_id]['name'];
+		$phone = $aaronic[$aaronic_id]['phone'];
+	      }
 	      $link_data['menuaction'] = 'eq.eq.ppi_update';
 	      $link_data['companionship'] = $companionship;
 	      $link_data['interviewer'] = $supervisor;
 	      $link_data['elder'] = $elder_id;
+	      $link_data['aaronic'] = $aaronic_id;
 	      $link_data['name'] = $name;
 	      $link_data['ppi'] = '';
 	      $link_data['eqpresppi'] = $eqpresppi;
 	      $link_data['action'] = 'add';
 	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
-	      if($aaronic_id == 0) {
-		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
-	      } else {
-		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$name</td>";
-	      }
-	      
+	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
+
 	      // Find out how many times PPIs were performed in the past $num_months for this Elder
 	      $header_row="<th width=$comp_width><font size=-2>Companionship</th>";
 	      for($m=$num_months; $m >= 0; $m--) {
@@ -952,7 +969,7 @@ class eq
 		  $year = date('Y') - $m;
 		  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 		  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
-		         "AND elder=" . $elder_id . " AND eqpresppi=1";
+		         "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id . " AND eqpresppi=1";
 	          $this->db2->query($sql,__LINE__,__FILE__);
 		  $header_row .= "<th width=150><font size=-2>$year</th>"; 
 	        }
@@ -962,17 +979,20 @@ class eq
 		  $month_start = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_start .= "-01";
 		  $month_end = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_end .= "-31";
 		  $sql = "SELECT * FROM eq_ppi WHERE date >= '$month_start' AND date <= '$month_end' ".
-		         "AND elder=" . $elder_id . " AND eqpresppi=0";
+		         "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id . " AND eqpresppi=0";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  $header_row .= "<th width=$ppi_width><font size=-2>$month</th>";
 		}
 		if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
 		if($this->db2->next_record()) {
-		  $ppis[$m]++; $total_ppis[$m]++;
+		  if(!$ppi_recorded[$companionship][$m]) {
+		    $ppis[$m]++; $total_ppis[$m]++; $ppi_recorded[$companionship][$m]=1;
+		  }
 		  $link_data['menuaction'] = 'eq.eq.ppi_update';
 		  $link_data['companionship'] = $companionship;
 		  $link_data['interviewer'] = $this->db2->f('interviewer');
 		  $link_data['elder'] = $elder_id;
+		  $link_data['aaronic'] = $aaronic_id;
 		  $link_data['name'] = $name;
 		  $link_data['ppi'] = $this->db2->f('ppi');
 		  $link_data['eqpresppi'] = $eqpresppi;
@@ -982,12 +1002,7 @@ class eq
 		  $month = $date_array[1];
 		  $day   = $date_array[2];
 		  $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
-
-		  if($aaronic_id == 0) {
-		    $table_data .= '<td align=center><a href='.$link.'><img src="checkmark.gif"><br>'.$month.'-'.$day.'</a></td>';
-		  } else {
-		    $table_data .= '<td align=center><img src="checkmark.gif"></td>';
-		  }
+		  $table_data .= '<td align=center><a href='.$link.'><img src="checkmark.gif"><br>'.$month.'-'.$day.'</a></td>';
 		}
 		else { $table_data .= "<td>&nbsp;</td>"; }
 	      }
@@ -1093,10 +1108,11 @@ class eq
       $name = get_var('name',array('GET','POST'));
       $ppi = get_var('ppi',array('GET','POST'));
       $elder = get_var('elder',array('GET','POST'));
+      $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
       $eqpresppi = get_var('eqpresppi',array('GET','POST'));
-
+      
       $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
@@ -1123,6 +1139,7 @@ class eq
 			   "   ppi='" . $ppi . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
+			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 	              ", eqpresppi='" . $eqpresppi . "'" .
@@ -1134,8 +1151,8 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
-	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,date,notes,eqpresppi) "
-			   . "VALUES ('" . $interviewer . "','" . $elder . "','"
+	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
+			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
 			   . $date . "','" . $notes . "','" . $eqpresppi  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
@@ -1148,6 +1165,7 @@ class eq
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('elder',$elder);
+	  $this->t->set_var('aaronic',$aaronic);
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('eqpresppi',$eqpresppi);
@@ -1166,6 +1184,7 @@ class eq
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
 	  $this->t->set_var('elder',$this->db->f('elder'));
+	  $this->t->set_var('aaronic',$this->db->f('aaronic'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
 	  $this->t->set_var('eqpresppi',$this->db->f('eqpresppi'));
