@@ -83,6 +83,11 @@ sub print_hash
 sub update_eq_aaronic_table
 {
     print "-> Updating eq_aaronic table\n";
+
+    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
+    $sth = $dbh->prepare("update eq_aaronic set valid=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
     foreach $index (keys %membership_data)
     {
 	$hashref = $membership_data{$index};
@@ -105,12 +110,12 @@ sub update_eq_aaronic_table
 		    $sth = $dbh->prepare("insert into eq_aaronic values (NULL,'$aaronic_name','$phone',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
-		    # An existing record was found for this aaronic, update it if it is valid
-		    if($data[0]->{valid} == 1) {
-			print "   Updating existing aaronic: $aaronic_name\n";
-			$sth = $dbh->prepare("update eq_aaronic set phone='$phone' where name='$aaronic_name'");
-			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    }
+		    # An existing record was found for this aaronic, update it, mark it valid!
+		    print "   Updating existing aaronic: $aaronic_name\n";
+		    $sth = $dbh->prepare("update eq_aaronic set phone='$phone' where name='$aaronic_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_aaronic set valid=1 where name='$aaronic_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
 		    print "   -E- More than one record found ($rows) for aaronic name: $aaronic_name\n";
