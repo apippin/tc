@@ -43,10 +43,10 @@ class eq
  
   function eq()
     {
-      $this->default_ht_num_months = 1;
-      $this->default_ppi_num_months = 1;
+      $this->default_ht_num_months = 3;
+      $this->default_ppi_num_months = 3;
       $this->default_ppi_num_years = 0;
-      $this->default_att_num_months = 1;
+      $this->default_att_num_months = 3;
       
       $this->db		= $GLOBALS['phpgw']->db;
       $this->db2	= $this->db;

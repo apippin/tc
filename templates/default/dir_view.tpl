@@ -5,7 +5,7 @@
 	</tr>
 	</table>
 	<br>
-	<table border="0" width=100% cellspacing="2" cellpadding="2">
+	<table border="0" width=80% cellspacing="2" cellpadding="2">
 	<tr>
 	  <td colspan="1" align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Phone</b></font></td>
 	  <td colspan="1" align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Name</b></font></td>
