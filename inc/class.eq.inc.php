@@ -1727,9 +1727,35 @@ class eq
 
   function dir_view()
     {
-      $this->t->set_file(array('form' => 'dir_view.tpl'));
+      $this->t->set_file(array('dir_view_t' => 'dir_view.tpl'));
+      $this->t->set_block('dir_view_t','dir_list','list');
       
-      $this->t->pfp('out','form');
+      $sql = "SELECT * FROM eq_parent where valid=1 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+      	{
+	  $parent[$i]['id'] = $this->db->f('parent');
+	  $parent[$i]['name'] = $this->db->f('name');
+	  $parent[$i]['phone'] = $this->db->f('phone');
+	  $parent[$i]['address'] = $this->db->f('address');
+	  $i++;
+	}   
+      
+      for ($i=0; $i < count($parent); $i++) 
+      {
+        $name = $parent[$i]['name'];
+	$phone = $parent[$i]['phone'];
+	$address = $parent[$i]['address'];
+	$this->t->set_var('name', $name);
+	$this->t->set_var('address', $address);
+	$this->t->set_var('phone', $phone);
+        $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+        $this->t->set_var('tr_color',$tr_color);
+	$this->t->fp('list','dir_list',True);
+	//print "$phone $name $address<br>";
+      }
+      $this->t->pfp('out','dir_view_t');
       $this->save_sessiondata();   
     }
   
