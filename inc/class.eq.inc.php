@@ -328,7 +328,7 @@ class eq
       if($action == 'save')
 	{
 	  // Get a list of all the companionships in this district
-	  $sql = "SELECT distinct companionship FROM eq_companionship where district=". $district;
+	  $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $district;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $j=0;
 	  while ($this->db->next_record())
@@ -344,7 +344,9 @@ class eq
 	      // companionship. This will lead to duplicate visits being entered for an older
 	      // month for the same family, making it impossible to change the past history once
 	      // a family is reassigned. However, you will be able to view the history just fine.
-	      
+
+	      //$comp=$unique_companionships[$j]['companionship'];
+	      //print "deleting from eq_visit where companionship=$comp and date=$date and district=$district<br>";
 	      // Delete all the visits that have taken place for all families for this month
 	      $this->db->query("DELETE from eq_visit where companionship=" . $unique_companionships[$j]['companionship'] .
 			       " AND " . "date='" . $date . "'",__LINE__,__FILE__);
@@ -905,7 +907,7 @@ class eq
 		
 	// Select all the unique companionship numbers for this district
 	if($eqpresppi == 1) { 
-	  $sql = "SELECT distinct companionship FROM eq_companionship";
+	  $sql = "SELECT distinct companionship FROM eq_companionship where valid=1";
 	} 
 	else {
 	  $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];

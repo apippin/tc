@@ -265,7 +265,7 @@ sub update_eq_companionship_table
 		    my $rows = scalar @data;
 		    if($rows == 0) {
 			# No existing records found for this companionship, make a new entry
-			print "   Adding Elder to companionship: $elder_name -> $id\n";
+			print "   Adding Companion to companionship: $elder_name -> $id\n";
 			$sth = $dbh->prepare("insert into eq_companionship values ($id,'$elder','$aaronic','$district',1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    } else {
