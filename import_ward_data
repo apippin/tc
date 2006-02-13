@@ -317,6 +317,8 @@ sub update_eq_family_table
     # Set all records to be invalid. Only mark them as valid if they appear on the new list.
     $sth = $dbh->prepare("update eq_family set valid=0");
     $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    $sth = $dbh->prepare("update eq_family set companionship=0");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
     
     foreach $index (keys %membership_data)
     {
