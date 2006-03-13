@@ -216,6 +216,7 @@ class eq
 	  
 	  // Get the names of the families assigned this home teaching companionship
 	  $sql = "SELECT * from eq_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+	  $sql = $sql . " ORDER BY name ASC";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $k=0;
 	  while ($this->db->next_record())
@@ -441,6 +442,7 @@ class eq
 	
 	// Get the names of the families assigned this home teaching companionship
 	$sql = "SELECT * from eq_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+	$sql = $sql . " ORDER BY name ASC";
 	$this->db->query($sql,__LINE__,__FILE__);
 	while ($this->db->next_record())
 	  {
