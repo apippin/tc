@@ -307,6 +307,7 @@ sub update_eq_companionship_table
 #| family        | int(16) unsigned |      | PRI | 0       |   A   |
 #| hofh_id       | int(16) unsigned | YES  |     | NULL    |       |
 #| name          | varchar(30)      | YES  |     | NULL    |       |
+#| name_id       | varchar(30)      | YES  |     | NULL    |       |
 #| companionship | int(16) unsigned | YES  |     | NULL    |       |
 #| valid         | tinyint(1)       | YES  |     | NULL    |       |
 #+---------------+------------------+------+-----+---------+-------+
@@ -328,9 +329,10 @@ sub update_eq_family_table
 		$family_name = $membership_data{$index}{'Preferred Name'};
 		$family_name =~ s/\'/\\'/g; #'
 		$id = $membership_data{$index}{'HofH ID'};
+		$name_id = uc($family_name);
 
 		# Find out how many families match this family's name
-		$sth = $dbh->prepare("select * from eq_family where name='$family_name'");
+		$sth = $dbh->prepare("select * from eq_family where name_id='$name_id'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @data = ();
 		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
@@ -339,14 +341,14 @@ sub update_eq_family_table
 		if($rows == 0) {
 		    # No existing records found for this family, make a new entry
 		    print "   Adding new Family: $family_name\n";
-		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','0',1)");
+		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this family, update it
 		    print "   Updating existing family: $family_name\n";
-		    $sth = $dbh->prepare("update eq_family set hofh_id=$id where name='$family_name'");
+		    $sth = $dbh->prepare("update eq_family set hofh_id=$id where name_id='$name_id'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update eq_family set valid=1 where name='$family_name'");
+		    $sth = $dbh->prepare("update eq_family set valid=1 where name_id='$name_id'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
@@ -363,13 +365,13 @@ sub update_eq_family_table
 			}
 			if($key =~ /Quorum/i &&
 			   $hometeaching_data{$index}{$key} =~ /Elders/i &&
-			   $hometeaching_data{$index}{'Household'} =~ /$family_name/ &&
+			   $hometeaching_data{$index}{'Household'} =~ /$family_name/i &&
 			   $data[0]->{companionship} != $hometeaching_data{$index}{'Comp ID'}
 			   )
 			{
 			    print "   Updating hometeaching assignment for $family_name family\n";
 			    $companionship = $hometeaching_data{$index}{'Comp ID'};
-			    $sth = $dbh->prepare("update eq_family set companionship='$companionship' where name='$family_name'");
+			    $sth = $dbh->prepare("update eq_family set companionship='$companionship' where name_id='$name_id'");
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 			}
 		    }
