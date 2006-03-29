@@ -23,6 +23,8 @@ class eq
   var $default_ppi_num_months;
   var $default_ppi_num_years;
   var $default_att_num_months;
+  var $current_year;
+  var $current_month;
   
   var $public_functions = array
     (
@@ -64,6 +66,12 @@ class eq
        
       $GLOBALS['phpgw_info']['flags']['app_header'] = 'Elders Quorum Tools';
       $GLOBALS['phpgw']->common->phpgw_header();
+      
+      $this->current_month = `date '+%m'`;
+      $this->current_month = $this->current_month-0; // Make it numeric
+      $this->current_year = `date '+%Y'`;
+      $this->current_year = $this->current_year-0; // Make it numeric
+
       echo parse_navbar();
       $this->display_app_header();	
     }
@@ -128,7 +136,7 @@ class eq
       
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ht_view'));
       $this->t->set_var('title','Hometeaching'); 
-
+      
       $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
@@ -230,10 +238,14 @@ class eq
 	      // in the past $num_months for this Family
 	      $header_row="<th width=$comp_width><font size=-2>Families</th>";
 	      for($m=$num_months; $m >= 0; $m--) {
-		if(`date '+%d'` == 31) { $d = 1; } else { $d = 0; }
-		$month = date('m/Y', strtotime('-'.$m.' month -'.$d.' day'));
-		$month_start = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_start .= "-01";
-		$month_end = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_end .= "-31";
+		$month = $this->current_month - $m;
+		$year = $this->current_year;
+		if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
+		if($month < 10) { $month = "0"."$month"; }
+		$month_start = "$year"."-"."$month"."-"."01";
+		$month_end = "$year"."-"."$month"."-"."31";
+		$month = "$month"."/"."$year";
+		//print "m: $m month: $month year: $year month_start: $month_start month_end: $month_end<br>";
 		// Add this to the query to filter on only visits made by this companionship:
 		// " AND companionship=" . $unique_companionships[$j]['companionship'].
 		$sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
@@ -978,10 +990,13 @@ class eq
 		  $header_row .= "<th width=150><font size=-2>$year</th>"; 
 	        }
 	        else {
-		  if(`date '+%d'` == 31) { $d = 1; } else { $d = 0; }
-		  $month = date('m/Y', strtotime('-'.$m.' month -'.$d.' day'));
-		  $month_start = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_start .= "-01";
-		  $month_end = date('Y-m', strtotime('-'.$m.' month -'.$d.' day')); $month_end .= "-31";
+		  $month = $this->current_month - $m;
+		  $year = $this->current_year;
+		  if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
+		  if($month < 10) { $month = "0"."$month"; }
+		  $month_start = "$year"."-"."$month"."-"."01";
+		  $month_end = "$year"."-"."$month"."-"."31";
+		  $month = "$month"."/"."$year";
 		  $sql = "SELECT * FROM eq_ppi WHERE date >= '$month_start' AND date <= '$month_end' ".
 		         "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id . " AND eqpresppi=0";
 		  $this->db2->query($sql,__LINE__,__FILE__);
