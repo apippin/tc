@@ -875,10 +875,16 @@ class eq
       $i=0;
       while ($this->db->next_record())
 	{
-	  $districts[$i]['district'] = $this->db->f('district');
-	  $districts[$i]['name'] = $this->db->f('name');
-	  $districts[$i]['supervisor'] = $this->db->f('supervisor');
-	  if($eqpresppi == 0) { $i++; }
+	  if($eqpresppi == 1 && $this->db->f('district') == 1) {
+	    $districts[$i]['district'] = $this->db->f('district');
+	    $districts[$i]['name'] = $this->db->f('name');
+	    $districts[$i]['supervisor'] = $this->db->f('supervisor');
+          } else if($eqpresppi == 0) {
+            $districts[$i]['district'] = $this->db->f('district');
+	    $districts[$i]['name'] = $this->db->f('name');
+            $districts[$i]['supervisor'] = $this->db->f('supervisor');
+            $i++;
+	  }
 	}
 
       $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
