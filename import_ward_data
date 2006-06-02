@@ -254,7 +254,7 @@ sub update_eq_companionship_table
 			$sqlhashref2 = $sth2->fetchrow_hashref;
 			$aaronic = $sqlhashref2->{aaronic};
 			$elder = "NULL";
-			if($aaronic eq "") { print "-W- Unable to find $elder_name in eq_elder or eq_aaronic tables\n"; }
+			if($aaronic eq "") { print "-W- Unable to find $elder_name in eq_elder or eq_aaronic tables\n"; next; }
 		    } 
 		    $id = $hometeaching_data{$index}{'Comp ID'};
 		    $district = $hometeaching_data{$index}{'HT District'};
