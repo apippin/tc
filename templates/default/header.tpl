@@ -8,12 +8,6 @@
 					<a href="{link_hometeaching}">{lang_hometeaching}</a>
 					&nbsp;
                                         &nbsp;
-                                        <a href="{link_activity}">{lang_activity}</a>
-					&nbsp;
-					&nbsp;
-					<a href="{link_participation}">{lang_participation}</a>
-					&nbsp;
-                                        &nbsp;
                                         <a href="{link_ppi}">{lang_ppi}</a>
 					&nbsp;
                                         &nbsp;
@@ -21,6 +15,12 @@
 					&nbsp;
                                         &nbsp;
                                         <a href="{link_attendance}">{lang_attendance}</a>
+					&nbsp;
+                                        &nbsp;
+                                        <a href="{link_activity}">{lang_activity}</a>
+					&nbsp;
+					&nbsp;
+					<a href="{link_participation}">{lang_participation}</a>
 					&nbsp;
                                         &nbsp;
                                         <a href="{link_dir}">{lang_dir}</a>
