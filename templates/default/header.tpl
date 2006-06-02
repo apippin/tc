@@ -24,6 +24,9 @@
 					&nbsp;
                                         &nbsp;
                                         <a href="{link_dir}">{lang_dir}</a>
+					&nbsp;
+                                        &nbsp;
+                                        <a href="{link_org}">{lang_org}</a>
 					</b></font></td>
 
 			</tr>

@@ -183,6 +183,46 @@ sub update_eq_elder_table
     $sth->finish();
 }
 
+# EQ_CALLING
+#+--------------+------------------+------+-----+---------+-------+
+#| Field        | Type             | Null | Key | Default | Extra |
+#+--------------+------------------+------+-----+---------+-------+
+#| indiv_id     | int(16) unsigned | YES  |     | NULL    |       |
+#| name         | varchar(30)      | YES  |     | NULL    |       |
+#| organization | varchar(30)      | YES  |     | NULL    |       |
+#| position     | varchar(30)      | YES  |     | NULL    |       |
+#| sequence     | int(16) unsigned | YES  |     | NULL    |       |
+#| sustained    | date             | YES  |     | NULL    |       |
+#+--------------+------------------+------+-----+---------+-------+
+sub update_eq_calling_table()
+{
+    print "-> Updating eq_calling table\n";
+
+    #print "-> Organization Data Dump\n\n";
+    #&print_hash(\%organization_data);
+    
+    # Delete all records from the calling table. We have no history to
+    # save here. Just re-populate with the latest calling information.
+    $sth = $dbh->prepare("delete from eq_calling ");
+    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+    
+    foreach $index (keys %organization_data)
+    {
+	$indiv_id = $organization_data{$index}{'Indiv ID'};
+	$name = $organization_data{$index}{'Indiv Name'};
+	$name =~ s/\'/\\'/g; #'
+	$organization = $organization_data{$index}{'Organization'};
+	$position = $organization_data{$index}{'Position'};
+	$sequence = $organization_data{$index}{'Org Seq'};
+	$sustained = $organization_data{$index}{'Sustained'};
+	$sustained =~ /(\S+) (\d+)/; $month=$1; $year=$2;
+	if($name eq "") { next; }
+	print "   Adding new Calling: $name -> $position\n";
+	$sth = $dbh->prepare("insert into eq_calling values ('$indiv_id','$name','$organization','$position','$sequence','$month $year')");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+    }
+}
+
 # EQ_DISTRICT
 #+------------+------------------+------+-----+---------+-------+
 #| Field      | Type             | Null | Key | Default | Extra |
@@ -390,6 +430,9 @@ sub update_eq_family_table
 #| family   | int(16) unsigned | YES  |     | NULL    |       |
 #| name     | varchar(30)      | YES  |     | NULL    |       |
 #| birthday | date             | YES  |     | NULL    |       |
+#| phone    | varchar(12)      | YES  |     | NULL    |       |
+#| address  | varchar(255)     | YES  |     | NULL    |       |
+#| indiv_id | int(16) unsigned | YES  | UNI | NULL    |       |
 #| valid    | tinyint(1)       | YES  |     | NULL    |       |
 #+----------+------------------+------+-----+---------+-------+
 sub update_eq_parent_table
@@ -414,6 +457,7 @@ sub update_eq_parent_table
 		$birthday = $membership_data{$index}{'Birth'};
 		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
 		$hofh_id = $membership_data{$index}{'HofH ID'};
+		$id = $membership_data{$index}{'Indiv ID'};
 		$phone = $membership_data{$index}{'Phone 1'};
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
@@ -438,7 +482,7 @@ sub update_eq_parent_table
 		if($rows == 0) {
 		    # No existing records found for this parent, make a new entry
 		    print "   Adding new Parent: $parent_name\n";
-		    $sth = $dbh->prepare("insert into eq_parent values (NULL,$family_id,'$parent_name','$year-$month-$day','$phone','$address',1)");
+		    $sth = $dbh->prepare("insert into eq_parent values (NULL,$family_id,'$parent_name','$year-$month-$day','$phone','$address','$id',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this parent, update it
@@ -452,6 +496,8 @@ sub update_eq_parent_table
 		    $sth = $dbh->prepare("update eq_parent set address='$address' where name='$parent_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_parent set valid=1 where name='$parent_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_parent set indiv_id='$id' where name='$parent_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 	    } else {
 		    # More than one record was found. Error! This shouldn't happen.
@@ -471,6 +517,7 @@ sub update_eq_parent_table
 #| family   | int(16) unsigned | YES  |     | NULL    |       |
 #| name     | varchar(30)      | YES  |     | NULL    |       |
 #| birthday | date             | YES  |     | NULL    |       |
+#| indiv_id | int(16) unsigned | YES  | UNI | NULL    |       |
 #| valid    | tinyint(1)       | YES  |     | NULL    |       |
 #+----------+------------------+------+-----+---------+-------+
 sub update_eq_child_table
@@ -509,7 +556,7 @@ sub update_eq_child_table
 		if($rows == 0) {
 		    # No existing records found for this child, make a new entry
 		    print "   Adding new Child: $child_name\n";
-		    $sth = $dbh->prepare("insert into eq_child values (NULL,$family_id,'$child_name','$year-$month-$day',1)");
+		    $sth = $dbh->prepare("insert into eq_child values (NULL,$family_id,'$child_name','$year-$month-$day','$id',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this child, update it
@@ -519,6 +566,8 @@ sub update_eq_child_table
 		    $sth = $dbh->prepare("update eq_child set birthday='$year-$month-$day' where name='$child_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_child set valid=1 where name='$child_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_child set indiv_id='$id' where name='$child_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
@@ -609,12 +658,15 @@ print "-> Processing all ward data files in $datadir\n";
 # Parse Ward Data Files
 &csv_to_hash("$datadir/Membership.csv",\%membership_data);
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
+&csv_to_hash("$datadir/Organization.csv",\%organization_data);
 
 if($opt_v) {
     print "-> Membership Data Dump\n\n";
     &print_hash(\%membership_data);
     print "-> HomeTeaching Data Dump\n\n";
     &print_hash(\%hometeaching_data);
+    print "-> Organization Data Dump\n\n";
+    &print_hash(\%organization_data);
 }
 
 if($opt_s) { $dbh->disconnect(); exit; }
@@ -627,6 +679,7 @@ if($opt_s) { $dbh->disconnect(); exit; }
 &update_eq_family_table();
 &update_eq_parent_table();
 &update_eq_child_table();
+&update_eq_calling_table();
 
 ###################################################
 # Disconnect from the database

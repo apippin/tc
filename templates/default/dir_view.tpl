@@ -1,7 +1,7 @@
 <center>
 	<table border="0" width="80%" cellspacing="2" cellpadding="2">
 	<tr>
-	  <td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Online Ward Directory</b></font></td>
+	  <td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Ward Directory</b></font></td>
 	</tr>
 	</table>
 	<br>

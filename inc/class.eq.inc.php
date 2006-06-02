@@ -40,7 +40,8 @@ class eq
      'vis_update' => True,
      'att_view'   => True,
      'att_update' => True,
-     'dir_view'   => True
+     'dir_view'   => True,
+     'org_view'   => True
      );
  
   function eq()
@@ -117,6 +118,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.dir_view';	
       $this->t->set_var('link_dir',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_dir','Directory');
+      $link_data['menuaction'] = 'eq.eq.org_view';	
+      $this->t->set_var('link_org',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_org','Callings');
 		
       $this->t->pparse('out','eq_header');
     }
@@ -1779,6 +1783,72 @@ class eq
 	//print "$phone $name $address<br>";
       }
       $this->t->pfp('out','dir_view_t');
+      $this->save_sessiondata();   
+    }
+  
+  function org_view()
+    {
+      $this->t->set_file(array('org_view_t' => 'org_view.tpl'));
+      $this->t->set_block('org_view_t','calling_list','list1');
+      $this->t->set_block('org_view_t','org_list','list2');
+
+      # Display a list ordered alphabetically
+      $sql = "SELECT * FROM eq_calling ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+      	{
+	  $calling[$i]['id'] = $this->db->f('indiv_id');
+	  $calling[$i]['name'] = $this->db->f('name');
+	  $calling[$i]['position'] = $this->db->f('position');
+	  $calling[$i]['sustained'] = $this->db->f('sustained');
+	  $calling[$i]['organization'] = $this->db->f('organization');
+	  $i++;
+	}   
+      for ($i=0; $i < count($calling); $i++) 
+      {
+        $name = $calling[$i]['name'];
+	$position = $calling[$i]['position'];
+	$sustained = $calling[$i]['sustained'];
+	$organization = $calling[$i]['organization'];
+	$this->t->set_var('name', $name);
+	$this->t->set_var('position', $position);
+	$this->t->set_var('sustained', $sustained);
+	$this->t->set_var('organization', $organization);
+        $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+        $this->t->set_var('tr_color',$tr_color);
+	$this->t->fp('list1','calling_list',True);
+      }
+
+      # Display a list ordered by organization
+      $sql = "SELECT * FROM eq_calling ORDER BY sequence ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+      	{
+	  $calling[$i]['id'] = $this->db->f('indiv_id');
+	  $calling[$i]['name'] = $this->db->f('name');
+	  $calling[$i]['position'] = $this->db->f('position');
+	  $calling[$i]['sustained'] = $this->db->f('sustained');
+	  $calling[$i]['organization'] = $this->db->f('organization');
+	  $i++;
+	}   
+      for ($i=0; $i < count($calling); $i++) 
+      {
+        $name = $calling[$i]['name'];
+	$position = $calling[$i]['position'];
+	$sustained = $calling[$i]['sustained'];
+	$organization = $calling[$i]['organization'];
+	$this->t->set_var('name', $name);
+	$this->t->set_var('position', $position);
+	$this->t->set_var('sustained', $sustained);
+	$this->t->set_var('organization', $organization);
+        $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+        $this->t->set_var('tr_color',$tr_color);
+	$this->t->fp('list2','org_list',True);
+      }
+      
+      $this->t->pfp('out','org_view_t');
       $this->save_sessiondata();   
     }
   
