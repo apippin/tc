@@ -93,7 +93,8 @@ sub update_eq_aaronic_table
 	$hashref = $membership_data{$index};
 	foreach $key (keys %$hashref) {
 	    if($key =~ /Priesthood/i &&
-	       ($membership_data{$index}{$key} =~ /^Teacher\s*$/i ||
+	       ($membership_data{$index}{$key} =~ /^Deacon\s*$/i ||
+	        $membership_data{$index}{$key} =~ /^Teacher\s*$/i ||
 		$membership_data{$index}{$key} =~ /^Priest\s*$/i)) {
 		$aaronic_name = $membership_data{$index}{'Preferred Name'};
 		$phone = $membership_data{$index}{'Phone 1'};
