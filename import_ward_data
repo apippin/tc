@@ -401,8 +401,11 @@ sub update_eq_family_table
 		    $hashref = $hometeaching_data{$index};
 		    foreach $key (keys %$hashref) {
 			if($hometeaching_data{$index}{'Household'} =~ /(\S+)\s+(\S+),\s+(\S+)\s+(.*)/) {
-			    print "I: Adjusting hometeaching match from: $hometeaching_data{$index}{'Household'} to $1, $3 $4\n";
-			    $hometeaching_data{$index}{'Household'} = "$1, $3 $4";
+			    $a = $1; $b = $2; $c = $3; $d = $4;
+			    if($family_name =~ /$a/ && $hometeaching_data{$index}{'Household'} !~ /$family_name/i) { 
+				print "I: Adjusting hometeaching match from: $hometeaching_data{$index}{'Household'} to $a, $c $d\n";
+				$hometeaching_data{$index}{'Household'} = "$a, $c $d";
+			    }
 			}
 			if($key =~ /Quorum/i &&
 			   $hometeaching_data{$index}{$key} =~ /Elders/i &&
