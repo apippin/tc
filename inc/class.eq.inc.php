@@ -25,6 +25,8 @@ class eq
   var $default_att_num_months;
   var $current_year;
   var $current_month;
+  var $upload_target_path;
+  var $script_path;
   
   var $public_functions = array
     (
@@ -41,7 +43,8 @@ class eq
      'att_view'   => True,
      'att_update' => True,
      'dir_view'   => True,
-     'org_view'   => True
+     'org_view'   => True,
+     'admin'      => True
      );
  
   function eq()
@@ -50,6 +53,8 @@ class eq
       $this->default_ppi_num_months = 3;
       $this->default_ppi_num_years = 0;
       $this->default_att_num_months = 3;
+      $this->upload_target_path = "/home/users/eqpres/eq_data/";
+      $this->script_path = "/usr/share/phpgroupware/eq/";
       
       $this->db		= $GLOBALS['phpgw']->db;
       $this->db2	= $this->db;
@@ -121,6 +126,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.org_view';	
       $this->t->set_var('link_org',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_org','Callings');
+      $link_data['menuaction'] = 'eq.eq.admin';	
+      $this->t->set_var('link_admin',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_admin','Admin');
 		
       $this->t->pparse('out','eq_header');
     }
@@ -1849,6 +1857,123 @@ class eq
       }
       
       $this->t->pfp('out','org_view_t');
+      $this->save_sessiondata();   
+    }
+
+  function admin()
+    {
+      $this->t->set_file(array('admin_t' => 'admin.tpl'));
+      $this->t->set_block('admin_t','upload','uploadhandle');
+      $this->t->set_block('admin_t','admin','adminhandle');
+      $this->t->set_block('admin_t','cmd','cmdhandle');
+      
+      $this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.admin&action=upload'));
+      
+      $action = get_var('action',array('GET','POST'));
+
+      $this->t->pfp('out','admin_t');
+      
+      if($action == 'upload')
+	{	 
+	  $target_path = $this->upload_target_path . basename( $_FILES['uploadedfile']['name']);
+	  
+	  if(($_FILES['uploadedfile']['type'] == "application/zip") &&
+	     (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))) {
+	    $uploadstatus = "<b>The following file was uploaded successfully: </b><br><br>";
+	    $uploadstatus.= "Filename : " . $_FILES['uploadedfile']['name'] . "<br>";
+	    $uploadstatus.= "Type     : " . $_FILES['uploadedfile']['type'] . "<br>";
+	    $uploadstatus.= "Size     : " . $_FILES['uploadedfile']['size'] . "<br>";	 
+	    $this->t->set_var('uploadstatus',$uploadstatus);
+	    $this->t->pfp('uploadhandle','upload');
+	    $this->t->set_var('uploadhandle','');
+	    print "<table border=1 width=80%><tr><td>\n<pre>";
+	    
+	    # make a directory for this data to be stored in
+	    $date="data_" . date("Y_m_d");
+	    $data_dir = $this->upload_target_path . $date;
+	    print "-> Making the data directory: $date<br>\n";
+	    exec('mkdir ' . $data_dir . ' 2>&1', $result, $return_code);
+	    if($return_code != 0) {
+	      print implode('\n',$result) . "<br>";
+	      print "<b><font color=red>";
+	      print "-E- Unable to create the data directory. Aborting import.";
+	      print "</font></b>";
+	      return 0;
+	    }
+
+	    # move the file uploaded into this directory
+	    print "-> Moving the uploaded file into the data dir<br>\n";
+	    exec('mv ' . $target_path . ' ' . $data_dir . '/' . ' 2>&1', $result, $return_code);
+	    if($return_code != 0) {
+	      print implode('\n',$result) . "<br>";
+	      print "<b><font color=red>";
+	      print "-E- Unable to move the uploaded file into the data dir. Aborting import.";
+	      print "</font></b>";
+	      return 0;
+	    }
+	    
+	    # unzip the data into this directory
+	    print "-> Unzipping the data<br>\n";
+	    $data_file = $data_dir . '';
+	    exec('unzip ' . $data_dir . '/*.zip -d ' . $data_dir . ' 2>&1', $result, $return_code);
+	    if($return_code != 0) {
+	      print implode('\n',$result) . "<br>";
+	      print "<b><font color=red>";
+	      print "-E- Unable to unzip the uploaded file into the data dir. Aborting import.";
+	      print "</font></b>";
+	      return 0;
+	    }
+	    exec('mv ' . $data_dir . '/*/* '. $data_dir . ' 2>&1', $result, $return_code);
+
+	    # update the data_latest link to point to this new directory
+	    print "-> Updating the latest data dir link<br>\n";
+	    $data_latest = $this->upload_target_path . 'data_latest';
+	    exec('rm ' . $data_latest. '; ln -s ' . $data_dir .' '. $data_latest .' 2>&1', $result, $return_code);
+	    if($return_code != 0) {
+	      print implode('\n',$result) . "<br>";
+	      print "<b><font color=red>";
+	      print "-E- Unable to update the data latest link. Aborting import.";
+	      print "</font></b>";
+	      return 0;
+	    }
+	    
+	    # run the import perl script to encorporate it into the DB
+	    ob_start('ob_logstdout', 2);
+	    print "-> Importing the data into the EQ database<br>\n";
+	    ob_flush(); flush(); sleep(1);
+	    $import_log = $this->upload_target_path . '/import.log';
+	    $data_log = $this->upload_target_path . '/data.log';
+	    $import_cmd = $this->script_path . 'import_ward_data ' . $data_latest . ' | tee ' . $import_log;
+	    $parse_cmd = $this->script_path . 'parse_ward_data -v ' . $data_latest . ' > ' . $data_log;
+	    #print "import_cmd: $import_cmd<br>";
+	    #print "parse_cmd: $parse_cmd<br>";
+	    ob_start('ob_logstdout', 2);
+	    passthru($import_cmd);
+	    passthru($parse_cmd);
+	    ob_flush(); flush(); sleep(1);
+
+	    # fix the permissions of the data dir
+	    exec('chmod -R o-rwx ' . $data_dir, $result, $return_code);
+	    
+	    $this->t->pfp('cmdhandle','cmd');
+	    print "</pre></td></tr></table>";
+	    
+	  } else if($_FILES['uploadedfile']['type'] != "application/zip") {
+	    $uploadstatus = "<b><font color=red>The file format must be a .zip file, please try again! </font></b>";
+	    $this->t->set_var('uploadstatus',$uploadstatus);
+	    
+	  } else {
+	    $uploadstatus = "<b><font color=red> There was an error (" . $_FILES['uploadedfile']['error'];
+	    $uploadstatus.= ") uploading the file, please try again! </font></b>";
+	    $this->t->set_var('uploadstatus',$uploadstatus);
+	  }
+	}
+      else
+	{
+	  $this->t->set_var('adminhandle','');
+	  $this->t->pfp('adminhandle','admin'); 
+	}
+      
       $this->save_sessiondata();   
     }
   

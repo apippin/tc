@@ -82,7 +82,7 @@ sub print_hash
 #+-------+--------------------+------+-----+---------+-------+
 sub update_eq_aaronic_table
 {
-    print "-> Updating eq_aaronic table\n";
+    print "\n-> Updating eq_aaronic table\n";
 
     # Set all records to be invalid. Only mark them as valid if they appear on the new list.
     $sth = $dbh->prepare("update eq_aaronic set valid=0");
@@ -138,7 +138,7 @@ sub update_eq_aaronic_table
 #+------------+------------------+------+-----+---------+-------+
 sub update_eq_elder_table
 {
-    print "-> Updating eq_elder table\n";
+    print "\n-> Updating eq_elder table\n";
 
     # Set all records to be invalid. Only mark them as valid if they appear on the new list.
     $sth = $dbh->prepare("update eq_elder set valid=0");
@@ -197,7 +197,7 @@ sub update_eq_elder_table
 #+--------------+------------------+------+-----+---------+-------+
 sub update_eq_calling_table()
 {
-    print "-> Updating eq_calling table\n";
+    print "\n-> Updating eq_calling table\n";
 
     #print "-> Organization Data Dump\n\n";
     #&print_hash(\%organization_data);
@@ -237,7 +237,7 @@ sub update_eq_district_table
 {
     # Districts should be created by hand. This subroutine only
     # updates the supervisor's ID in each district.
-    print "-> Updating eq_district table\n";
+    print "\n-> Updating eq_district table\n";
     $sth = $dbh->prepare("select * from eq_district");
     $sth->execute or die "-E- DB error: $DBI::errstr\n";
     while($sqlhashref = $sth->fetchrow_hashref) {
@@ -267,7 +267,7 @@ sub update_eq_district_table
 #+---------------+------------------+------+-----+---------+-------+
 sub update_eq_companionship_table
 {
-    print "-> Updating eq_companionship table\n";
+    print "\n-> Updating eq_companionship table\n";
 
     # First, mark all existing companionships as invalid in case they have been dissolved
     $sth = $dbh->prepare("update eq_companionship set valid=0");
@@ -354,7 +354,7 @@ sub update_eq_companionship_table
 #+---------------+------------------+------+-----+---------+-------+
 sub update_eq_family_table
 {
-    print "-> Updating eq_family table\n";
+    print "\n-> Updating eq_family table\n";
 
     # Set all records to be invalid. Only mark them as valid if they appear on the new list.
     $sth = $dbh->prepare("update eq_family set valid=0");
@@ -441,7 +441,7 @@ sub update_eq_family_table
 #+----------+------------------+------+-----+---------+-------+
 sub update_eq_parent_table
 {
-    print "-> Updating eq_parent table\n";
+    print "\n-> Updating eq_parent table\n";
 
     # Set all records to be invalid. Only mark them as valid if they appear on the new list.
     $sth = $dbh->prepare("update eq_parent set valid=0");
@@ -526,7 +526,7 @@ sub update_eq_parent_table
 #+----------+------------------+------+-----+---------+-------+
 sub update_eq_child_table
 {
-    print "-> Updating eq_child table\n";
+    print "\n-> Updating eq_child table\n";
 
     # Set all records to be invalid. Only mark them as valid if they appear on the new list.
     $sth = $dbh->prepare("update eq_child set valid=0");
@@ -656,7 +656,7 @@ if(defined $opt_o) {
 # Process command line options
 if(defined $opt_n) { $datadir = $opt_n; }
 else { $datadir = shift(@ARGV); }
-print "-> Processing all ward data files in $datadir\n";
+print "\n-> Processing all ward data files in $datadir\n";
 
 ###################################################
 # Parse Ward Data Files

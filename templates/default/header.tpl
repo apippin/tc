@@ -2,7 +2,7 @@
 
 <p>
 	<center>
-		<table border="0" width=70% cellpadding="2" cellspacing="2">
+		<table border="0" width=80% cellpadding="2" cellspacing="2">
 			<tr>
 				<td width=100% align="center" bgcolor="{bg_color}"><font face="{font}"><b>
 					<a href="{link_hometeaching}">{lang_hometeaching}</a>
@@ -27,6 +27,9 @@
 					&nbsp;
                                         &nbsp;
                                         <a href="{link_org}">{lang_org}</a>
+					&nbsp;
+                                        &nbsp;
+                                        <a href="{link_admin}">{lang_admin}</a>
 					</b></font></td>
 
 			</tr>
