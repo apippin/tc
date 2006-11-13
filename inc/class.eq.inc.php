@@ -878,7 +878,7 @@ class eq
       $header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
       $header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
       $header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
-      $table_data="";
+      $table_data=""; $completed_data=""; $totals_data="";
 
       $year = date('Y');
       
@@ -952,14 +952,27 @@ class eq
 	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_id]" value="'.$id.'">';
 	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_name]" value="'.$name.'">';
 	    $table_data.= '</td>';
+	    $table_data.= '</tr>';
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
-	    $table_data.= '</tr>';
 	  } else {
 	    $elders_with_yearly_ppi++;
+	    $date = $this->db2->f('date');
+	    $completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
+	    $completed_data.= "<td align=left>$phone</td>";
+	    $completed_data.= "<td align=left>$date</td>";
+	    $completed_data.= '</tr>';
+	    $tr_color2 = $this->nextmatchs->alternate_row_color($tr_color2);
+	    $this->t->set_var('tr_color2',$tr_color2);
 	  }
       }
 
+      $name_width=300; $phone_width=150; $date_width=100;
+      $completed_table_width=$name_width + $phone_width + $date_width;
+      $completed_header_row = "<th width=$name_width><font size=-2>Elder Name</th>";
+      $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
+      $completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
+      
       $elders_width=300; $totals_width=100;
       $totals_table_width=$elders_width + $totals_width;
       $totals_header_row = "<th width=$elders_width><font size=-2>Elders</th>";
@@ -980,6 +993,9 @@ class eq
       $this->t->set_var('table_data',$table_data);
       $this->t->set_var('totals_header_row',$totals_header_row);
       $this->t->set_var('totals_table_width',$totals_table_width);
+      $this->t->set_var('completed_header_row',$completed_header_row);
+      $this->t->set_var('completed_table_width',$completed_table_width);
+      $this->t->set_var('completed',$completed_data);
       $this->t->set_var('totals',$totals_data);
       $this->t->fp('list','elder_list',True);
       
