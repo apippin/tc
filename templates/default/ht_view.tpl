@@ -8,13 +8,13 @@
 	<br>
 
 	<form action="{linkurl}" method="POST">
-	<table width="70%" border="0" cellspacing="2" cellpadding="2" align=center>
+	<table width="40%" border="0" cellspacing="2" cellpadding="2" align=center>
 	<tr>
-		<td align=center>
+		<td align=center width=90%>
 		Showing <input type=text size="2" name="num_months" value="{num_months}">
 		{lang_num_months}
 		</td>
-		<td align=center>	
+		<td align=center width=10%>	
 		<font face="{font}"><input type="submit" name="filter" value="{lang_filter}"></font>
 		</td>
 	</tr>

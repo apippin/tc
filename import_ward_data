@@ -128,14 +128,18 @@ sub update_eq_aaronic_table
 }
 
 # EQ_ELDER
-#+------------+------------------+------+-----+---------+-------+
-#| Field      | Type             | Null | Key | Default | Extra |
-#+------------+------------------+------+-----+---------+-------+
-#| elder      | int(16) unsigned |      | PRI | 0       |   A   |
-#| name       | varchar(60)      | YES  |     | NULL    |       |
-#| phone      | varchar(12)      | YES  |     | NULL    |       |
-#| valid      | tinyint(1)       | YES  |     | NULL    |       |
-#+------------+------------------+------+-----+---------+-------+
+#+-------------+------------------+------+-----+---------+----------------+
+#| Field       | Type             | Null | Key | Default | Extra          |
+#+-------------+------------------+------+-----+---------+----------------+
+#| elder       | int(16) unsigned |      | PRI | NULL    | auto_increment |
+#| name        | varchar(60)      | YES  |     | NULL    |                |
+#| phone       | varchar(12)      | YES  |     | NULL    |                |
+#| ppi_pri     | int(10) unsigned | YES  |     | 1       |                |
+#| visit_pri   | int(10) unsigned | YES  |     | 1       |                |
+#| ppi_notes   | varchar(128)     | YES  |     | NULL    |                |
+#| visit_notes | varchar(128)     | YES  |     | NULL    |                |
+#| valid       | tinyint(1)       | YES  |     | NULL    |                |
+#+-------------+------------------+------+-----+---------+----------------+
 sub update_eq_elder_table
 {
     print "\n-> Updating eq_elder table\n";
@@ -161,7 +165,7 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone',1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone','1','1','','',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it

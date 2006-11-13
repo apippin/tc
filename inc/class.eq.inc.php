@@ -38,6 +38,7 @@ class eq
      'par_view'   => True,
      'ppi_view'   => True,
      'ppi_update' => True,
+     'ppi_sched'  => True,
      'vis_view'   => True,
      'vis_update' => True,
      'att_view'   => True,
@@ -849,7 +850,144 @@ class eq
       $this->t->pfp('out','par_view_t');
       $this->save_sessiondata(); 
     }
+  
+  function ppi_sched()
+    {
+      $this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
+      $this->t->set_block('ppi_sched_t','elder_list','list');
+      $action = get_var('action',array('GET','POST'));
 
+      $this->t->set_var('lang_save','Save Priorities & Notes');
+      $this->t->set_var('lang_reset','Clear Changes');
+      
+      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('ppi_link_title','Hometeaching PPIs');
+      
+      $this->t->set_var('eqpres_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view&eqpresppi=1'));
+      $this->t->set_var('eqpres_ppi_link_title','EQ President Yearly PPIs'); 
+
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
+
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched&action=save'));
+      $this->t->set_var('title','EQ President Yearly PPIs Scheduler');
+
+      $elder_width=450; $phone_width=25; $pri_width=10; $notes_width=128;
+      $table_width=$elder_width + $phone_width + $pri_width + $notes_width;
+      $header_row = "<th width=$elder_width><font size=-2>Elder Name</th>";
+      $header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
+      $header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
+      $header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
+      $table_data="";
+
+      $year = date('Y');
+      
+      if($action == 'save')
+	{
+	  $new_data = get_var('ppi_notes',array('POST'));
+	  foreach ($new_data as $entry)
+	   {
+	     $ppi_notes = $entry['notes'];
+	     $elder_id = $entry['elder_id'];
+	     $ppi_pri = $entry['pri'];
+	     
+	     // Perform database save actions here
+	     $this->db->query("UPDATE eq_elder set " .
+			      " ppi_notes='" . $ppi_notes . "'" .
+			      ",ppi_pri='" . $ppi_pri . "'" .
+			      " WHERE elder=" . $elder_id,__LINE__,__FILE__);
+	     
+	   }
+
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched');
+	  Header('Location: ' . $take_me_to_url);
+	}
+
+      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY ppi_pri ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+
+      $total_elders=0; $elders_with_yearly_ppi=0;
+      
+      $i=0; 
+      $elder_id = NULL;
+      while ($this->db->next_record())
+	{
+	  $elder_id[$i] = $this->db->f('elder');
+	  $elder_name[$i] = $this->db->f('name');
+	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $elder_ppi_pri[$elder_id[$i]] = $this->db->f('ppi_pri');
+	  $elder_ppi_notes[$elder_id[$i]] = $this->db->f('ppi_notes');
+	  $i++;
+	  $total_elders++;
+	}
+
+      $max = count($elder_id);
+      
+      for($i=0; $i < $max; $i++) {
+          $id = $elder_id[$i];
+          $name = $elder_name[$i];
+	  $phone = $elder_phone[$id];
+	  $ppi_pri = $elder_ppi_pri[$id];
+	  $ppi_notes = $elder_ppi_notes[$id];
+
+	  // If this elder has had a yearly PPI this year, don't show him on the schedule list
+	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
+	  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
+	     "AND elder=" . $id . " AND eqpresppi=1";
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  
+	  if(!$this->db2->next_record()) {
+	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
+	    $table_data.= "<td align=center>$phone</td>";
+	    //$table_data.= "<td align=center>$ppi_pri</td>";
+	    $table_data.= "<td align=center>";
+	    $table_data.= '<select name=ppi_notes['.$i.'][pri]>';
+	    foreach(range(0,6) as $num) {
+	      if($num == 0) { $num = 1; } else {$num = $num*5; }
+	      if($ppi_pri == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
+	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+	    }
+	    $table_data.= '</select></td>';
+	    $table_data.= '<td><input type=text size="50" maxlength="128" name="ppi_notes['.$i.'][notes]" value="'.$ppi_notes.'">';
+	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_id]" value="'.$id.'">';
+	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_name]" value="'.$name.'">';
+	    $table_data.= '</td>';
+	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	    $this->t->set_var('tr_color',$tr_color);
+	    $table_data.= '</tr>';
+	  } else {
+	    $elders_with_yearly_ppi++;
+	  }
+      }
+
+      $elders_width=300; $totals_width=100;
+      $totals_table_width=$elders_width + $totals_width;
+      $totals_header_row = "<th width=$elders_width><font size=-2>Elders</th>";
+      $totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
+      $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+      $totals_data.= "<td align=left><font size=-2><b>Total Elders with yearly PPIs completed:</b></font></td>";
+      $totals_data.= "<td align=center><font size=-2><b>$elders_with_yearly_ppi / $total_elders</b></font></td>";
+      $percent = ceil(($elders_with_yearly_ppi / $total_elders)*100);
+      $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+      $this->t->set_var('tr_color',$tr_color);
+      $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+      $totals_data.= "<td align=left><font size=-2><b>Percentage:</b></font></td>";
+      $totals_data.= "<td align=center><font size=-2><b>$percent%</b></font></td>";
+      $totals_data.= "</tr>";
+      
+      $this->t->set_var('table_width',$table_width);
+      $this->t->set_var('header_row',$header_row);
+      $this->t->set_var('table_data',$table_data);
+      $this->t->set_var('totals_header_row',$totals_header_row);
+      $this->t->set_var('totals_table_width',$totals_table_width);
+      $this->t->set_var('totals',$totals_data);
+      $this->t->fp('list','elder_list',True);
+      
+      $this->t->pfp('out','ppi_sched_t');
+      $this->save_sessiondata(); 
+      
+    }
+  
   function ppi_view()
     {
       $this->t->set_file(array('ppi_view_t' => 'ppi_view.tpl'));
@@ -862,24 +1000,28 @@ class eq
       if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
       else {  $this->t->set_var('lang_num_months','Months of History'); }
       $this->t->set_var('lang_filter','Filter');
-      
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      
+      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('ppi_link_title','Hometeaching PPIs');
+      
       $this->t->set_var('eqpres_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view&eqpresppi=1'));
+      $this->t->set_var('eqpres_ppi_link_title','EQ President Yearly PPIs'); 
       $eqpresppi = get_var('eqpresppi',array('GET','POST'));
+
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
       if($eqpresppi == 1) {
+	$this->t->set_var('title','EQ President Yearly PPIs');
 	$num_months = get_var('num_months',array('GET','POST'));
 	if($num_months == '') { $num_months = $this->default_ppi_num_years; }
 	$this->t->set_var('num_months',$num_months);
-        $this->t->set_var('ppi_link_title','PPIs');
-        $this->t->set_var('title','EQ President Yearly PPIs');
 	if($num_months == 1) { $this->t->set_var('lang_num_months','Year of History'); }
-	else { $this->t->set_var('lang_num_months','Years of History'); }
-	$this->t->set_var('eqpres_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+	else { $this->t->set_var('lang_num_months','Years of History'); }	
       }
       else { 
-        $this->t->set_var('ppi_link_title','EQ President Yearly PPIs'); 
-        $this->t->set_var('title','PPIs'); 
+        $this->t->set_var('title','Hometeaching PPIs'); 
       }
 
       $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
@@ -887,7 +1029,7 @@ class eq
       $i=0;
       while ($this->db->next_record())
 	{
-	  if($eqpresppi == 1 && $this->db->f('district') == 1) {
+	  if(($eqpresppi == 1) && ($this->db->f('district') == 1)) {
 	    $districts[$i]['district'] = $this->db->f('district');
 	    $districts[$i]['name'] = $this->db->f('name');
 	    $districts[$i]['supervisor'] = $this->db->f('supervisor');
@@ -907,6 +1049,8 @@ class eq
 	  $elder_id[$i] = $this->db->f('elder');
 	  $elder_name[$i] = $this->db->f('name');
 	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $elder_ppi_pri[$elder_id[$i]] = $this->db->f('ppi_pri');
+	  $elder_ppi_notes[$elder_id[$i]] = $this->db->f('ppi_notes');
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
@@ -1050,7 +1194,7 @@ class eq
 	}
 	// Now add Elders not assigned to any companionship to the table if we are in eqpresppi mode
 	if($eqpresppi == 1) {
-	  $table_data .= "<tr bgcolor=\"#c9c9c9\"><hr><td colspan=20><b>Unassigned Potential Home Teachers</b><hr></td></tr>";
+	  $table_data .= "<tr bgcolor=\"#c9c9c9\"><td colspan=20><b>Unassigned Potential Home Teachers</b><hr></td></tr>";
 	  foreach($elders as $elder_id => $value) {
 	    $sql = "SELECT * FROM eq_companionship where valid=1 and elder=".$elder_id;
 	    $this->db->query($sql,__LINE__,__FILE__);
