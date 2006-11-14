@@ -872,11 +872,12 @@ class eq
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched&action=save'));
       $this->t->set_var('title','EQ President Yearly PPIs Scheduler');
 
-      $elder_width=450; $phone_width=25; $pri_width=10; $notes_width=128;
-      $table_width=$elder_width + $phone_width + $pri_width + $notes_width;
+      $elder_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
+      $table_width=$elder_width + $phone_width + $pri_width + $notes_width + $ppi_date_width;
       $header_row = "<th width=$elder_width><font size=-2>Elder Name</th>";
       $header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
       $header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
+      $header_row.= "<th width=$ppi_date_width><font size=-2>Last PPI</th>";
       $header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
       $table_data=""; $completed_data=""; $totals_data="";
 
@@ -937,6 +938,9 @@ class eq
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
+	    $sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " AND eqpresppi=1 ORDER BY date DESC";
+	    $this->db->query($sql,__LINE__,__FILE__);
+	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 	    $table_data.= "<td align=center>$phone</td>";
 	    //$table_data.= "<td align=center>$ppi_pri</td>";
@@ -948,6 +952,7 @@ class eq
 	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
 	    }
 	    $table_data.= '</select></td>';
+	    $table_data.= "<td align=center>$date</td>";
 	    $table_data.= '<td><input type=text size="50" maxlength="128" name="ppi_notes['.$i.'][notes]" value="'.$ppi_notes.'">';
 	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_id]" value="'.$id.'">';
 	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_name]" value="'.$name.'">';
@@ -959,19 +964,21 @@ class eq
 	    $elders_with_yearly_ppi++;
 	    $date = $this->db2->f('date');
 	    $completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
-	    $completed_data.= "<td align=left>$phone</td>";
-	    $completed_data.= "<td align=left>$date</td>";
+	    $completed_data.= "<td align=center>$phone</td>";
+	    $completed_data.= "<td align=center>$date</td>";
+	    $completed_data.= "<td align=center>$ppi_notes</td>";
 	    $completed_data.= '</tr>';
 	    $tr_color2 = $this->nextmatchs->alternate_row_color($tr_color2);
 	    $this->t->set_var('tr_color2',$tr_color2);
 	  }
       }
 
-      $name_width=300; $phone_width=150; $date_width=100;
-      $completed_table_width=$name_width + $phone_width + $date_width;
+      $name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
+      $completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
       $completed_header_row = "<th width=$name_width><font size=-2>Elder Name</th>";
       $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
       $completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
+      $completed_header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
       
       $elders_width=300; $totals_width=100;
       $totals_table_width=$elders_width + $totals_width;

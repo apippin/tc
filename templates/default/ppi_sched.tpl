@@ -25,9 +25,8 @@
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
 		{table_data}
-		{stat_data}
 		<tr>
-		<td></td><td></td><td></td>
+		<td></td><td></td><td></td><td></td>
 		<td height="50" align="right">
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
 			&nbsp; &nbsp;
