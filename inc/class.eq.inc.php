@@ -961,12 +961,23 @@ class eq
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
 	  } else {
+	    $link_data['menuaction'] = 'eq.eq.ppi_update';
+	    $link_data['interviewer'] = $this->db2->f('interviewer');
+	    $link_data['elder'] = $this->db2->f('elder');
+	    $link_data['aaronic'] = $this->db2->f('aaronic');
+	    $link_data['name'] = $name;
+	    $link_data['ppi'] = $this->db2->f('ppi');
+	    $link_data['eqpresppi'] = $this->db2->f('eqpresppi');
+	    $link_data['action'] = 'view';
+	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
 	    $elders_with_yearly_ppi++;
 	    $date = $this->db2->f('date');
+	    $ppi_notes = $this->db2->f('notes');
+	    if(strlen($ppi_notes) > 40) { $ppi_notes = substr($ppi_notes,0,40) . "..."; }
 	    $completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 	    $completed_data.= "<td align=center>$phone</td>";
-	    $completed_data.= "<td align=center>$date</td>";
-	    $completed_data.= "<td align=center>$ppi_notes</td>";
+	    $completed_data.= "<td align=center><a href=".$link.">$date</a></td>";
+	    $completed_data.= "<td align=left>$ppi_notes</td>";
 	    $completed_data.= '</tr>';
 	    $tr_color2 = $this->nextmatchs->alternate_row_color($tr_color2);
 	    $this->t->set_var('tr_color2',$tr_color2);
@@ -978,7 +989,7 @@ class eq
       $completed_header_row = "<th width=$name_width><font size=-2>Elder Name</th>";
       $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
       $completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
-      $completed_header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
+      $completed_header_row.= "<th width=$notes_width><font size=-2>PPI Notes</th>";
       
       $elders_width=300; $totals_width=100;
       $totals_table_width=$elders_width + $totals_width;
