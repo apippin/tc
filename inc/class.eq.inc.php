@@ -39,12 +39,14 @@ class eq
      'ppi_view'   => True,
      'ppi_update' => True,
      'ppi_sched'  => True,
+     'vis_sched'  => True,
      'vis_view'   => True,
      'vis_update' => True,
      'att_view'   => True,
      'att_update' => True,
      'dir_view'   => True,
      'org_view'   => True,
+     'schedule'   => True,
      'admin'      => True
      );
  
@@ -73,7 +75,9 @@ class eq
        
       $GLOBALS['phpgw_info']['flags']['app_header'] = 'Elders Quorum Tools';
       $GLOBALS['phpgw']->common->phpgw_header();
-      
+
+      $this->current_day = `date '+%d'`;
+      $this->current_day = $this->current_day-0; // Make it numeric
       $this->current_month = `date '+%m'`;
       $this->current_month = $this->current_month-0; // Make it numeric
       $this->current_year = `date '+%Y'`;
@@ -130,6 +134,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.admin';	
       $this->t->set_var('link_admin',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_admin','Admin');
+      $link_data['menuaction'] = 'eq.eq.schedule';	
+      $this->t->set_var('link_schedule',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_schedule','Scheduling');
 		
       $this->t->pparse('out','eq_header');
     }
@@ -854,10 +861,11 @@ class eq
   function ppi_sched()
     {
       $this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
-      $this->t->set_block('ppi_sched_t','elder_list','list');
+      $this->t->set_block('ppi_sched_t','elder_list','elderlist');
+      $this->t->set_block('ppi_sched_t','appt_list','apptlist');
       $action = get_var('action',array('GET','POST'));
 
-      $this->t->set_var('lang_save','Save Priorities & Notes');
+      $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
       $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
@@ -885,6 +893,23 @@ class eq
       
       if($action == 'save')
 	{
+	  // Save any changes made to the appointment table
+	  $new_data = get_var('appt_notes',array('POST'));
+	  foreach ($new_data as $entry)
+	   {
+	     $elder = $entry['elder'];
+	     $appointment = $entry['appointment'];
+
+	     //print "elder: $elder appointment: $appointment <br>";
+	     
+	     // Perform database save actions here
+	     $this->db->query("UPDATE eq_appointment set " .
+			      " elder='" . $elder . "'" .
+			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+
+	   }
+	  
+	  // Save any changes made to the ppi notes table
 	  $new_data = get_var('ppi_notes',array('POST'));
 	  foreach ($new_data as $entry)
 	   {
@@ -904,6 +929,73 @@ class eq
 	  Header('Location: ' . $take_me_to_url);
 	}
 
+      // APPOINTMENT TABLE
+      $district = 1;
+      $date_width=150; $time_width=100; $elder_width=200;
+      $appt_table_width=$date_width + $time_width + $elder_width;
+      $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
+      $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
+      $appt_header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $appt_table_data = ""; 
+
+      // create the elder id -> elder name mapping
+      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      $elder_id = NULL;
+      $elder_name = NULL;
+      while ($this->db->next_record())
+	{
+	  $elder_name[$i] = $this->db->f('name');
+	  $elder_id[$i] = $this->db->f('elder');
+	  $i++;
+	}
+      array_multisort($elder_name, $elder_id);
+            
+      // query the database for all the appointments
+      $sql = "SELECT * FROM eq_appointment where district=$district and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+
+      while ($this->db->next_record())
+	{
+	  $appointment = $this->db->f('appointment');
+	  $elder = $this->db->f('elder');
+
+	  $date = $this->db->f('date');
+	  $date_array = explode("-",$date);
+	  $year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
+	  $day_string = date("l d-M-Y", mktime(0,0,0,$month,$day,$year));
+	  
+	  $time = $this->db->f('time');
+	  $time_array = explode(":",$time);
+	  $time_string = date("g:i a", mktime($time_array[0], $time_array[1], $time_array[2]));
+	  
+	  $appt_table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+	  $appt_table_data.= "<td align=center>$day_string</td>";
+	  $appt_table_data.= "<td align=center>$time_string</td>";
+
+	  $appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][elder]>';
+	  $appt_table_data.= '<option value=0></option>';
+	  for ($i=0; $i < count($elder_id); $i++) {
+	    $id = $elder_id[$i];
+	    $name = $elder_name[$i];
+	    if($elder_id[$i] == $elder) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	    $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
+	  }
+	  $appt_table_data.='</select></td>';
+
+	  $appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][appointment]" value="'.$appointment.'">';
+	  
+	  $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	  $this->t->set_var('tr_color',$tr_color);
+	}
+
+      $this->t->set_var('appt_table_data',$appt_table_data);
+      $this->t->set_var('appt_header_row',$appt_header_row);
+      $this->t->set_var('appt_table_width',$appt_table_width);
+
+      
+      // PPI SCHEDULING TABLE
       $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY ppi_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
@@ -1015,9 +1107,271 @@ class eq
       $this->t->set_var('completed_table_width',$completed_table_width);
       $this->t->set_var('completed',$completed_data);
       $this->t->set_var('totals',$totals_data);
-      $this->t->fp('list','elder_list',True);
+      $this->t->fp('elderlist','elder_list',True);
+      $this->t->fp('apptlist','appt_list',True);
       
       $this->t->pfp('out','ppi_sched_t');
+      $this->save_sessiondata(); 
+      
+    }
+  
+  function vis_sched()
+    {
+      $this->t->set_file(array('vis_sched_t' => 'vis_sched.tpl'));
+      $this->t->set_block('vis_sched_t','family_list','familylist');
+      $this->t->set_block('vis_sched_t','appt_list','apptlist');
+      $action = get_var('action',array('GET','POST'));
+
+      $this->t->set_var('lang_save','Save Appt / Pri / Notes');
+      $this->t->set_var('lang_reset','Clear Changes');
+      
+      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $this->t->set_var('vis_link_title','View Yearly Visits');
+      
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
+      $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
+
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched&action=save'));
+      $this->t->set_var('title','EQ Presidency Yearly Visit Scheduler');
+
+      $family_width=500; $phone_width=40; $pri_width=10; $notes_width=128; $visit_date_width=20;
+      $table_width=$family_width + $phone_width + $pri_width + $notes_width + $visit_date_width;
+      $header_row = "<th width=$family_width><font size=-2>Family Name</th>";
+      $header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
+      $header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
+      $header_row.= "<th width=$visit_date_width><font size=-2>Last Visit</th>";
+      $header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
+      $table_data=""; $completed_data=""; $totals_data="";
+
+      $year = date('Y');
+      
+      if($action == 'save')
+	{
+	  // Save any changes made to the appointment table
+	  $new_data = get_var('appt_notes',array('POST'));
+	  foreach ($new_data as $entry)
+	   {
+	     $family = $entry['family'];
+	     $appointment = $entry['appointment'];
+
+	     // Perform database save actions here
+	     $this->db->query("UPDATE eq_appointment set " .
+			      " family='" . $family . "'" .
+			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+
+	   }
+	  
+	  // Save any changes made to the visit notes table
+	  $new_data = get_var('vis_notes',array('POST'));
+	  foreach ($new_data as $entry)
+	   {
+	     $visit_notes = $entry['notes'];
+	     $family_id = $entry['family_id'];
+	     $visit_pri = $entry['pri'];
+	     
+	     // Perform database save actions here
+	     $this->db->query("UPDATE eq_family set " .
+			      " visit_notes='" . $visit_notes . "'" .
+			      ",visit_pri='" . $visit_pri . "'" .
+			      " WHERE family=" . $family_id,__LINE__,__FILE__);
+	     
+	   }
+
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched');
+	  Header('Location: ' . $take_me_to_url);
+	}
+
+      // APPOINTMENT TABLE
+      $district = 4;
+      $date_width=150; $time_width=100; $family_width=250;
+      $appt_table_width=$date_width + $time_width + $family_width;
+      $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
+      $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
+      $appt_header_row.= "<th width=$family_width><font size=-2>Family</th>";
+      $appt_table_data = ""; 
+
+      // create the family id -> family name mapping
+      $sql = "SELECT * FROM eq_family where valid=1 and companionship != 0 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      $family_id = NULL;
+      while ($this->db->next_record())
+	{
+	  $family_id[$i] = $this->db->f('family');
+	  $family_name[$i] = $this->db->f('name');
+	  $i++;
+	}
+      array_multisort($family_name, $family_id);
+      
+      // query the database for all the appointments
+      $sql = "SELECT * FROM eq_appointment where district=$district and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+
+      while ($this->db->next_record())
+	{
+	  $appointment = $this->db->f('appointment');
+	  $family = $this->db->f('family');
+
+	  $date = $this->db->f('date');
+	  $date_array = explode("-",$date);
+	  $year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
+	  $day_string = date("l d-M-Y", mktime(0,0,0,$month,$day,$year));
+	  
+	  $time = $this->db->f('time');
+	  $time_array = explode(":",$time);
+	  $time_string = date("g:i a", mktime($time_array[0], $time_array[1], $time_array[2]));
+	  
+	  $appt_table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+	  $appt_table_data.= "<td align=center>$day_string</td>";
+	  $appt_table_data.= "<td align=center>$time_string</td>";
+
+	  $appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][family]>';
+	  $appt_table_data.= '<option value=0></option>';
+	  for ($i=0; $i < count($family_id); $i++) {
+	    $id = $family_id[$i];
+	    $name = $family_name[$i];
+	    if($family_id[$i] == $family) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	    $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.' Family</option>';
+	  }
+	  $appt_table_data.='</select></td>';
+
+	  $appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][appointment]" value="'.$appointment.'">';
+	  
+	  $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	  $this->t->set_var('tr_color',$tr_color);
+	}
+
+      $this->t->set_var('appt_table_data',$appt_table_data);
+      $this->t->set_var('appt_header_row',$appt_header_row);
+      $this->t->set_var('appt_table_width',$appt_table_width);
+
+      
+      // VISIT SCHEDULING TABLE
+      $sql = "SELECT * FROM eq_family where valid=1 and companionship != 0 ORDER BY visit_pri ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+
+      $total_families=0; $families_with_yearly_visit=0;
+      
+      $i=0; 
+      $family_id = NULL;
+      $family_name = NULL;
+      $family_phone = NULL;
+      $family_visit_pri = NULL;
+      $family_visit_notes = NULL;
+      while ($this->db->next_record())
+	{
+	  $family_id[$i] = $this->db->f('family');
+	  $family_name[$i] = $this->db->f('name');
+	  $family_phone[$family_id[$i]] = $family_id[$i] . " ERROR";
+	  $family_visit_pri[$family_id[$i]] = $this->db->f('visit_pri');
+	  $family_visit_notes[$family_id[$i]] = $this->db->f('visit_notes');
+	  $i++;
+	  $total_families++;
+	}
+
+      $sql = "SELECT * FROM eq_parent where valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      while ($this->db->next_record())
+	{
+	  $family = $this->db->f('family');
+	  $phone = $this->db->f('phone');
+	  $family_phone[$family] = $phone;
+	}
+      
+      $max = count($family_id);
+      
+      for($i=0; $i < $max; $i++) {
+          $id = $family_id[$i];
+          $name = $family_name[$i];
+	  $phone = $family_phone[$id];
+	  $vis_pri = $family_visit_pri[$id];
+	  $vis_notes = $family_visit_notes[$id];
+
+	  // If this family has had a yearly visit this year, don't show them on the schedule list
+	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
+	  $sql = "SELECT * FROM eq_visit WHERE date > '$year_start' AND date < '$year_end' ".
+	     "AND family=" . $id . " AND companionship=0";
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  
+	  if(!$this->db2->next_record()) {
+	    $sql = "SELECT * FROM eq_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
+	    $this->db->query($sql,__LINE__,__FILE__);
+	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
+	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
+	    $table_data.= "<td align=center>$phone</td>";
+	    $table_data.= "<td align=center>";
+	    $table_data.= '<select name=vis_notes['.$i.'][pri]>';
+	    foreach(range(0,6) as $num) {
+	      if($num == 0) { $num = 1; } else {$num = $num*5; }
+	      if($vis_pri == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
+	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+	    }
+	    $table_data.= '</select></td>';
+	    $table_data.= "<td align=center>$date</td>";
+	    $table_data.= '<td><input type=text size="50" maxlength="128" name="vis_notes['.$i.'][notes]" value="'.$vis_notes.'">';
+	    $table_data.= '<input type=hidden name="vis_notes['.$i.'][family_id]" value="'.$id.'">';
+	    $table_data.= '<input type=hidden name="vis_notes['.$i.'][family_name]" value="'.$name.'">';
+	    $table_data.= '</td>';
+	    $table_data.= '</tr>';
+	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	    $this->t->set_var('tr_color',$tr_color);
+	  } else {
+	    $link_data['menuaction'] = 'eq.eq.vis_update';
+	    $link_data['visit'] = $this->db2->f('visit');
+	    $link_data['family'] = $this->db2->f('family');
+	    $link_data['name'] = $name;
+	    $link_data['date'] = $this->db2->f('date');
+	    $link_data['action'] = 'view';
+	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
+	    $families_with_yearly_visit++;
+	    $date = $this->db2->f('date');
+	    $vis_notes = $this->db2->f('notes');
+	    if(strlen($vis_notes) > 40) { $vis_notes = substr($vis_notes,0,40) . "..."; }
+	    $completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
+	    $completed_data.= "<td align=center>$phone</td>";
+	    $completed_data.= "<td align=center><a href=".$link.">$date</a></td>";
+	    $completed_data.= "<td align=left>$vis_notes</td>";
+	    $completed_data.= '</tr>';
+	    $tr_color2 = $this->nextmatchs->alternate_row_color($tr_color2);
+	    $this->t->set_var('tr_color2',$tr_color2);
+	  }
+      }
+
+      $name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
+      $completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
+      $completed_header_row = "<th width=$name_width><font size=-2>Family Name</th>";
+      $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
+      $completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
+      $completed_header_row.= "<th width=$notes_width><font size=-2>Visit Notes</th>";
+      
+      $family_width=300; $totals_width=100;
+      $totals_table_width=$family_width + $totals_width;
+      $totals_header_row = "<th width=$family_width><font size=-2>Families</th>";
+      $totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
+      $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+      $totals_data.= "<td align=left><font size=-2><b>Total Families with yearly Visits completed:</b></font></td>";
+      $totals_data.= "<td align=center><font size=-2><b>$families_with_yearly_visit / $total_families</b></font></td>";
+      $percent = ceil(($families_with_yearly_visit / $total_families)*100);
+      $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+      $this->t->set_var('tr_color',$tr_color);
+      $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+      $totals_data.= "<td align=left><font size=-2><b>Percentage:</b></font></td>";
+      $totals_data.= "<td align=center><font size=-2><b>$percent%</b></font></td>";
+      $totals_data.= "</tr>";
+      
+      $this->t->set_var('table_width',$table_width);
+      $this->t->set_var('header_row',$header_row);
+      $this->t->set_var('table_data',$table_data);
+      $this->t->set_var('totals_header_row',$totals_header_row);
+      $this->t->set_var('totals_table_width',$totals_table_width);
+      $this->t->set_var('completed_header_row',$completed_header_row);
+      $this->t->set_var('completed_table_width',$completed_table_width);
+      $this->t->set_var('completed',$completed_data);
+      $this->t->set_var('totals',$totals_data);
+      $this->t->fp('familylist','family_list',True);
+      $this->t->fp('apptlist','appt_list',True);
+      
+      $this->t->pfp('out','vis_sched_t');
       $this->save_sessiondata(); 
       
     }
@@ -1449,6 +1803,13 @@ class eq
 
       $this->t->set_var('lang_name','Family Name');
       $this->t->set_var('lang_date','Date');
+
+      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $this->t->set_var('vis_link_title','View Yearly Visits');
+      
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
+      $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
+      
       
       $sql = "SELECT * FROM eq_visit WHERE companionship=0 ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -2037,7 +2398,271 @@ class eq
       $this->t->pfp('out','org_view_t');
       $this->save_sessiondata();   
     }
+  
+  function schedule()
+    {
+      $this->t->set_file(array('sched_t' => 'schedule.tpl'));
+      $this->t->set_block('sched_t','district_list','list');
 
+      $action = get_var('action',array('GET','POST'));
+      
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule&action=save'));
+      $this->t->set_var('title','EQ Scheduling Tool');
+
+      $this->t->set_var('lang_save','Save Schedule');
+      $this->t->set_var('lang_reset','Cancel');
+      
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
+
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
+      $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
+      
+      $date_width=150; $time_width=200; $elder_width=200; $family_width=200;
+      $table_width=$date_width + $time_width + $elder_width + $family_width;
+      $header_row = "<th width=$date_width><font size=-2>Date</th>";
+      $header_row.= "<th width=$time_width><font size=-2>Time</th>";      
+      $header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $header_row.= "<th width=$family_width><font size=-2>Family</th>";
+      $table_data = "";
+
+      if($action == 'save')
+	{
+	  $new_data = get_var('sched',array('POST'));
+	  foreach ($new_data as $district_array)
+	   {
+	     foreach ($district_array as $entry)
+	       {
+		 $district = $entry['district'];
+		 $appointment = $entry['appointment'];
+		 $date = $entry['date'];
+		 $hour = $entry['hour'];
+		 $minute = $entry['minute'];
+		 $pm = $entry['pm'];
+		 $elder = $entry['elder'];
+		 $family = $entry['family'];
+		 if($pm) { $hour = $hour + 12; }
+		 $time = $hour.':'.$minute.':'.'00';
+
+		 // Update an existing appointment
+		 if($appointment != 0)
+		   {
+		     $this->db->query("UPDATE eq_appointment set" .
+			      " family=" . $family . 
+			      " ,elder=" . $elder . 
+			      " ,date='" . $date . "'" .
+			      " ,time='" . $time . "'" .
+			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+
+		     //print "updating entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";		     
+		   }
+		 
+		 // Add a new appointment
+		 else if(($appointment == 0) && ($date != "") && ($time != ""))
+		   {
+		     $this->db->query("INSERT INTO eq_appointment (appointment,district,family,elder,date,time) "
+			   . "VALUES ('" . $appointment . "','" . $district . "','" . $family . "','"
+			   . $elder . "','" . $date . "','" . $time  ."')",__LINE__,__FILE__);
+		     
+		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";		     
+		   }
+	       }
+	   }
+	  
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule');
+	  Header('Location: ' . $take_me_to_url);
+	}
+      
+      $sql = "SELECT * FROM eq_district where district != 0 ORDER BY district ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $districts[$i]['district'] = $this->db->f('district');
+	  $districts[$i]['name'] = $this->db->f('name');
+	  $districts[$i]['supervisor'] = $this->db->f('supervisor');
+	  $i++;
+	}
+      
+      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $elder_id[$i] = $this->db->f('elder');
+	  $elder_name[$i] = $this->db->f('name');
+	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $i++;
+	}
+      array_multisort($elder_name, $elder_id);
+
+      $sql = "SELECT * FROM eq_family where valid=1 and companionship != 0 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $family_id[$i] = $this->db->f('family');
+	  $family_name[$i] = $this->db->f('name');
+	  $i++;
+	}
+      array_multisort($family_name, $family_id);
+      
+      for ($i=0; $i < count($districts); $i++) {
+	$district = $districts[$i]['district'];
+	$this->t->set_var('district_number',$districts[$i]['district']);
+	$this->t->set_var('district_name',$districts[$i]['name']);	
+	$supervisor = $districts[$i]['supervisor'];
+	$table_data="";
+	
+	// query the database for all the appointments
+	$sql = "SELECT * FROM eq_appointment where district=$district and date>=CURDATE() ORDER BY date ASC, time ASC";
+	$this->db->query($sql,__LINE__,__FILE__);
+
+	// Prefill any existing appointment slots
+	while ($this->db->next_record())
+	  {
+	    $appointment = $this->db->f('appointment');
+	    $elder = $this->db->f('elder');
+	    $family = $this->db->f('family');
+	    
+	    $date = $this->db->f('date');
+	    $date_array = explode("-",$date);
+	    $year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
+	    $day_string = date("l d-M-Y", mktime(0,0,0,$month,$day,$year));
+	    
+	    $time = $this->db->f('time');
+	    $time_array = explode(":",$time);
+	    $hour = $time_array[0];
+	    $minute = $time_array[1];
+	    $pm = 0;
+	    if($hour > 12) { $pm=1; $hour = $hour - 12; }
+	    $time_string = date("g:i a", mktime($time_array[0], $time_array[1], $time_array[2]));
+	    
+	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+
+	    // Date selection
+	    $table_data.= '<td align=left>';
+	    $table_data.= $this->jscal->input('sched['.$district.']['.$appointment.'][date]',$date,'','','','','',$this->cal_options);
+	    $table_data.= '</td>';
+	    
+	    // Hour & Minutes selection
+	    $table_data.= "<td align=center>";
+	    $table_data.= '<select name=sched['.$district.']['.$appointment.'][hour]>';
+	    foreach(range(1,12) as $num) {
+	      if($hour == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
+	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+	    }
+	    $table_data.= '</select>';
+	    $table_data.= '&nbsp;:&nbsp;';
+	    $table_data.= '<select name=sched['.$district.']['.$appointment.'][minute]>';
+	    foreach(range(0,3) as $num) {
+	      $num = $num * 15; if($num == 0) { $num = "00"; }
+	      if($minute == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
+	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+	    }
+	    $table_data.= '</select>';
+	    $table_data.= '<select name=sched['.$district.']['.$appointment.'][pm]>';
+	    if($pm == 0) { $table_data.= '<option value=0 selected>am</option>'; $table_data.= '<option value=1>pm</option>'; }
+	    else { $table_data.= '<option value=0>am</option>'; $table_data.= '<option value=1 selected>pm</option>'; }
+	    $table_data.= '</select>';
+	    $table_data.= "</td>";
+	    
+	    // Elder drop down list (for PPIs)
+	    $table_data.= '<td align=center><select name=sched['.$district.']['.$appointment.'][elder]>';
+	    $table_data.= '<option value=0></option>';  
+	    for ($j=0; $j < count($elder_id); $j++) {
+	      $id = $elder_id[$j];
+	      $name = $elder_name[$j];
+	      if($elder_id[$j] == $elder) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	      $table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
+	    }
+	    $table_data.='</select></td>';
+
+	    // Family drop down list (for Visits)
+	    $table_data.= '<td align=center><select name=sched['.$district.']['.$appointment.'][family]>';
+	    $table_data.= '<option value=0></option>';  	    
+	    for ($j=0; $j < count($elder_id); $j++) {
+	      $id = $family_id[$j];
+	      $name = $family_name[$j];
+	      if($family_id[$j] == $family) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	      $table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.' Family</option>';
+	    }
+	    $table_data.='</select></td>';
+	    
+	    $table_data.= '<input type=hidden name="sched['.$district.']['.$appointment.'][appointment]" value="'.$appointment.'">';
+	    $table_data.= '<input type=hidden name="sched['.$district.']['.$appointment.'][district]" value="'.$district.'">';
+	
+	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	    $this->t->set_var('tr_color',$tr_color);
+	    
+	  }
+
+	// Create blank appointment slot
+	$appointment = 0;
+	$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+
+        // Date selection
+	$table_data.= '<td align=left>';
+	$table_data.= $this->jscal->input('sched['.$district.']['.$appointment.'][date]','','','','','','',$this->cal_options);
+	$table_data.= '</td>';
+	
+	// Time selection
+	$table_data.= "<td align=center>";
+	$table_data.= '<select name=sched['.$district.']['.$appointment.'][hour]>';
+	$table_data.= '<option value=""></option>';
+	foreach(range(1,12) as $num) {
+	  $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+	}
+	$table_data.= '</select>';
+	$table_data.= '&nbsp;:&nbsp;';
+	$table_data.= '<select name=sched['.$district.']['.$appointment.'][minute]>';
+	$table_data.= '<option value=""></option>';
+	foreach(range(0,3) as $num) {
+	  $num = $num * 15; if($num == 0) { $num = "00"; }
+	  $table_data.= '<option value='.$num.'>'.$num.'</option>';
+	}
+	$table_data.= '</select>';
+	$table_data.= '<select name=sched['.$district.']['.$appointment.'][pm]>';
+	$table_data.= '<option value=""></option>';
+	$table_data.= '<option value=0>am</option>';
+	$table_data.= '<option value=1>pm</option>';
+	$table_data.= '</select>';
+	$table_data.= "</td>";
+	
+	// Elder drop down list
+	$table_data.= '<td align=center><select name=sched['.$district.']['.$appointment.'][elder]>';
+	$table_data.= '<option value=0></option>';  
+	for ($j=0; $j < count($elder_id); $j++) {
+	  $id = $elder_id[$j];
+	  $name = $elder_name[$j];
+	  $table_data.= '<option value='.$id.'>'.$name.'</option>';
+	}
+	$table_data.='</select></td>';
+	
+	// Family drop down list
+	$table_data.= '<td align=center><select name=sched['.$district.']['.$appointment.'][family]>';
+	$table_data.= '<option value=0></option>';  	    
+	for ($j=0; $j < count($elder_id); $j++) {
+	  $id = $family_id[$j];
+	  $name = $family_name[$j];
+	  $table_data.= '<option value='.$id.'>'.$name.' Family</option>';
+	}
+	$table_data.='</select></td>';
+
+	$table_data.= '<input type=hidden name="sched['.$district.']['.$appointment.'][appointment]" value="'.$appointment.'">';
+	$table_data.= '<input type=hidden name="sched['.$district.']['.$appointment.'][district]" value="'.$district.'">';
+	
+	$this->t->set_var('table_data',$table_data);
+	$this->t->set_var('header_row',$header_row);
+	$this->t->set_var('table_width',$table_width);
+	$this->t->fp('list','district_list',True);
+	
+      }
+      
+      $this->t->pfp('out','sched_t');
+      $this->save_sessiondata();   
+    }
+  
   function admin()
     {
       $this->t->set_file(array('admin_t' => 'admin.tpl'));
@@ -2055,7 +2680,7 @@ class eq
 	{	 
 	  $target_path = $this->upload_target_path . basename( $_FILES['uploadedfile']['name']);
 	  
-	  if(($_FILES['uploadedfile']['type'] == "application/zip") &&
+	  if((($_FILES['uploadedfile']['type'] == "application/zip") || ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed")) &&
 	     (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))) {
 	    $uploadstatus = "<b>The following file was uploaded successfully: </b><br><br>";
 	    $uploadstatus.= "Filename : " . $_FILES['uploadedfile']['name'] . "<br>";
@@ -2136,14 +2761,17 @@ class eq
 	    $this->t->pfp('cmdhandle','cmd');
 	    print "</pre></td></tr></table>";
 	    
-	  } else if($_FILES['uploadedfile']['type'] != "application/zip") {
+	  } else if(($_FILES['uploadedfile']['type'] != "application/zip") &&
+		    ($_FILES['uploadedfile']['type'] != "application/x-zip-compressed")) {
 	    $uploadstatus = "<b><font color=red>The file format must be a .zip file, please try again! </font></b>";
+	    $uploadstatus.= "<br><br><b>Detected file format: " . $_FILES['uploadedfile']['type'] . "</b>";
 	    $this->t->set_var('uploadstatus',$uploadstatus);
-	    
+	    $this->t->pfp('uploadhandle','upload',True);
 	  } else {
 	    $uploadstatus = "<b><font color=red> There was an error (" . $_FILES['uploadedfile']['error'];
 	    $uploadstatus.= ") uploading the file, please try again! </font></b>";
 	    $this->t->set_var('uploadstatus',$uploadstatus);
+	    $this->t->pfp('uploadhandle','upload',True);
 	  }
 	}
       else

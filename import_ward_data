@@ -135,9 +135,7 @@ sub update_eq_aaronic_table
 #| name        | varchar(60)      | YES  |     | NULL    |                |
 #| phone       | varchar(12)      | YES  |     | NULL    |                |
 #| ppi_pri     | int(10) unsigned | YES  |     | 1       |                |
-#| visit_pri   | int(10) unsigned | YES  |     | 1       |                |
 #| ppi_notes   | varchar(128)     | YES  |     | NULL    |                |
-#| visit_notes | varchar(128)     | YES  |     | NULL    |                |
 #| valid       | tinyint(1)       | YES  |     | NULL    |                |
 #+-------------+------------------+------+-----+---------+----------------+
 sub update_eq_elder_table
@@ -165,7 +163,7 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone','1','1','','',1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone','1','',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it
@@ -354,6 +352,8 @@ sub update_eq_companionship_table
 #| name          | varchar(30)      | YES  |     | NULL    |       |
 #| name_id       | varchar(30)      | YES  |     | NULL    |       |
 #| companionship | int(16) unsigned | YES  |     | NULL    |       |
+#| visit_pri     | int(10) unsigned | YES  |     | 1       |       |
+#| visit_notes   | varchar(128)     | YES  |     | NULL    |       |
 #| valid         | tinyint(1)       | YES  |     | NULL    |       |
 #+---------------+------------------+------+-----+---------+-------+
 sub update_eq_family_table
@@ -386,7 +386,7 @@ sub update_eq_family_table
 		if($rows == 0) {
 		    # No existing records found for this family, make a new entry
 		    print "   Adding new Family: $family_name\n";
-		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0',1)");
+		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0',1,1,'')");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this family, update it
@@ -475,11 +475,14 @@ sub update_eq_parent_table
 		}
 
 		# Find the family id for this parent's HofH_ID.
-		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id'");
+		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id' and valid=1");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		$sqlhashref = $sth->fetchrow_hashref();
-		$family_id = $sqlhashref->{'family'};
-
+		my @family_data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
+		my $family_rows = scalar @family_data;
+		if($family_rows > 0) { $family_id = $family_data[0]->{'family'}; }
+		else { $family_id = 0; }
+		
 		# Find out how many parents match this parent's name
 		$sth = $dbh->prepare("select * from eq_parent where name='$parent_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -487,12 +490,12 @@ sub update_eq_parent_table
 		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
 		my $rows = scalar @data;
 		
-		if($rows == 0) {
+		if($rows == 0 && $family_rows > 0) {
 		    # No existing records found for this parent, make a new entry
 		    print "   Adding new Parent: $parent_name\n";
 		    $sth = $dbh->prepare("insert into eq_parent values (NULL,$family_id,'$parent_name','$year-$month-$day','$phone','$address','$id',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows == 1) {
+		} elsif($rows == 1 && $family_rows > 0) {
 		    # An existing record was found for this parent, update it
 		    print "   Updating existing parent: $parent_name\n";
 		    $sth = $dbh->prepare("update eq_parent set family='$family_id' where name='$parent_name'");
@@ -549,11 +552,14 @@ sub update_eq_child_table
 		$hofh_id = $membership_data{$index}{'HofH ID'};
 
 		# Find the family id for this child's HofH_ID.
-		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id'");
+		$sth = $dbh->prepare("select * from eq_family where hofh_id='$hofh_id' and valid=1");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		$sqlhashref = $sth->fetchrow_hashref();
-		$family_id = $sqlhashref->{'family'};
-
+		my @family_data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
+		my $family_rows = scalar @family_data;
+		if($family_rows > 0) { $family_id = $family_data[0]->{'family'}; }
+		else { $family_id = 0; }
+		
 		# Find out how many children have the same name for the same family
 		$sth = $dbh->prepare("select * from eq_child where name='$child_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -561,12 +567,12 @@ sub update_eq_child_table
 		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
 		my $rows = scalar @data;
 		
-		if($rows == 0) {
+		if($rows == 0 && $family_rows > 0) {
 		    # No existing records found for this child, make a new entry
 		    print "   Adding new Child: $child_name\n";
 		    $sth = $dbh->prepare("insert into eq_child values (NULL,$family_id,'$child_name','$year-$month-$day','$id',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows == 1) {
+		} elsif($rows == 1 && $family_rows > 0) {
 		    # An existing record was found for this child, update it
 		    print "   Updating existing child: $child_name\n";
 		    $sth = $dbh->prepare("update eq_child set family='$family_id' where name='$child_name'");

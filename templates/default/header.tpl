@@ -29,9 +29,16 @@
                                         <a href="{link_org}">{lang_org}</a>
 					&nbsp;
                                         &nbsp;
+                                        <a href="{link_schedule}">{lang_schedule}</a>
+					&nbsp;
+                                        &nbsp;
                                         <a href="{link_admin}">{lang_admin}</a>
 					</b></font></td>
 
 			</tr>
 		</table>
 	</center>
+
+
+
+

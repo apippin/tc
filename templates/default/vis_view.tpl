@@ -1,6 +1,12 @@
 <hr>
 
 <center>
+
+	<a href="{vis_link}">{vis_link_title}</a>
+	&nbsp; | &nbsp;
+	<a href="{schedule_vis_link}">{schedule_vis_link_title}</a>
+	<br><br>
+
 	<h3>Presidency Visits</h3>
         <table border="0" cellspacing="2" cellpadding="2">
                 <tr>
