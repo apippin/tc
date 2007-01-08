@@ -351,6 +351,7 @@ sub update_eq_companionship_table
 #| hofh_id       | int(16) unsigned | YES  |     | NULL    |       |
 #| name          | varchar(30)      | YES  |     | NULL    |       |
 #| name_id       | varchar(30)      | YES  |     | NULL    |       |
+#| elder_id      | int(16) unsigned | YES  |     | NULL    |       |
 #| companionship | int(16) unsigned | YES  |     | NULL    |       |
 #| visit_pri     | int(10) unsigned | YES  |     | 1       |       |
 #| visit_notes   | varchar(128)     | YES  |     | NULL    |       |
@@ -386,7 +387,7 @@ sub update_eq_family_table
 		if($rows == 0) {
 		    # No existing records found for this family, make a new entry
 		    print "   Adding new Family: $family_name\n";
-		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0',1,1,'')");
+		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0','0',1,1,'')");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this family, update it
@@ -399,6 +400,17 @@ sub update_eq_family_table
 		    # More than one record was found. Error! This shouldn't happen.
 		    print "   -E- More than one record found ($rows) for family name: $family_name\n";
 		}
+
+                # Now update the elder_id field for this family
+		$sth = $dbh->prepare("select * from eq_elder WHERE name='$family_name'");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		while($sqlhashref = $sth->fetchrow_hashref) {
+		    $elder_id = $sqlhashref->{elder};
+		    print "   Updating family elder_id: $family_name -> $elder_id\n";
+		    $sth = $dbh->prepare("update eq_family set elder_id=$elder_id where name_id='$name_id'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		}
+		
 		# Now update the hometeaching field for this family
 		foreach $index (keys %hometeaching_data)
 		{

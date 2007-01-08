@@ -1191,7 +1191,7 @@ class eq
       $appt_table_data = ""; 
 
       // create the family id -> family name mapping
-      $sql = "SELECT * FROM eq_family where valid=1 and companionship != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $family_id = NULL;
@@ -1247,7 +1247,7 @@ class eq
 
       
       // VISIT SCHEDULING TABLE
-      $sql = "SELECT * FROM eq_family where valid=1 and companionship != 0 ORDER BY visit_pri ASC";
+      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY visit_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       $total_families=0; $families_with_yearly_visit=0;
@@ -2496,7 +2496,7 @@ class eq
 	}
       array_multisort($elder_name, $elder_id);
 
-      $sql = "SELECT * FROM eq_family where valid=1 and companionship != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2680,7 +2680,10 @@ class eq
 	{	 
 	  $target_path = $this->upload_target_path . basename( $_FILES['uploadedfile']['name']);
 	  
-	  if((($_FILES['uploadedfile']['type'] == "application/zip") || ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed")) &&
+	  if((($_FILES['uploadedfile']['type'] == "application/zip") ||
+	      ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed") ||
+	      ($_FILES['uploadedfile']['type'] == "application/x-zip") ||
+	      ($_FILES['uploadedfile']['type'] == "application/octet-stream")) &&
 	     (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))) {
 	    $uploadstatus = "<b>The following file was uploaded successfully: </b><br><br>";
 	    $uploadstatus.= "Filename : " . $_FILES['uploadedfile']['name'] . "<br>";
@@ -2762,7 +2765,9 @@ class eq
 	    print "</pre></td></tr></table>";
 	    
 	  } else if(($_FILES['uploadedfile']['type'] != "application/zip") &&
-		    ($_FILES['uploadedfile']['type'] != "application/x-zip-compressed")) {
+		    ($_FILES['uploadedfile']['type'] != "application/x-zip-compressed") &&
+		    ($_FILES['uploadedfile']['type'] != "application/x-zip") &&
+		    ($_FILES['uploadedfile']['type'] != "application/octet-stream")) {
 	    $uploadstatus = "<b><font color=red>The file format must be a .zip file, please try again! </font></b>";
 	    $uploadstatus.= "<br><br><b>Detected file format: " . $_FILES['uploadedfile']['type'] . "</b>";
 	    $this->t->set_var('uploadstatus',$uploadstatus);
