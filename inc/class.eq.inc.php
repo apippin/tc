@@ -1033,6 +1033,14 @@ class eq
 	    $sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " AND eqpresppi=1 ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
+	    $link_data['menuaction'] = 'eq.eq.ppi_update';
+	    $link_data['elder'] = $id;
+	    $link_data['aaronic'] = 0;
+	    $link_data['name'] = $name;
+	    $link_data['ppi'] = '';
+	    $link_data['eqpresppi'] = 1;
+	    $link_data['action'] = 'add';
+	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 	    $table_data.= "<td align=center>$phone</td>";
 	    //$table_data.= "<td align=center>$ppi_pri</td>";
@@ -1297,6 +1305,12 @@ class eq
 	    $sql = "SELECT * FROM eq_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
+	    $link_data['menuaction'] = 'eq.eq.vis_update';
+	    $link_data['visit'] = '';
+	    $link_data['family'] = $id;
+	    $link_data['name'] = $name;
+	    $link_data['action'] = 'add';
+	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
 	    $table_data.= "<td align=center>$phone</td>";
 	    $table_data.= "<td align=center>";
