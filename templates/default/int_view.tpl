@@ -6,11 +6,6 @@
 		</tr>
 	</table>
 
-	<a href="{ppi_link}">{ppi_link_title}</a>
-	&nbsp; | &nbsp;
-	<a href="{schedule_ppi_link}">{schedule_ppi_link_title}</a>
-	<br><br>
-
 	<form action="{filterurl}" method="POST">
 	<table width="40%" border="0" cellspacing="2" cellpadding="2" align=center>
 	<tr>
@@ -43,7 +38,7 @@
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>Total PPIs</b></font>
+			<font face="{font}"><b>Total Interviews</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
