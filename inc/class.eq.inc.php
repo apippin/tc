@@ -884,7 +884,7 @@ class eq
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
 
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched&action=save'));
-      $this->t->set_var('title','EQ President Yearly PPIs Scheduler');
+      $this->t->set_var('title','Yearly PPIs Scheduler');
 
       $elder_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
       $table_width=$elder_width + $phone_width + $pri_width + $notes_width + $ppi_date_width;
