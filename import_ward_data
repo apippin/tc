@@ -387,7 +387,7 @@ sub update_eq_family_table
 		if($rows == 0) {
 		    # No existing records found for this family, make a new entry
 		    print "   Adding new Family: $family_name\n";
-		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0','0',1,1,'')");
+		    $sth = $dbh->prepare("insert into eq_family values (NULL,$id,'$family_name','$name_id','0','0','1','',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this family, update it
@@ -522,9 +522,11 @@ sub update_eq_parent_table
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_parent set indiv_id='$id' where name='$parent_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-	    } else {
+		} elsif($rows > 1) {
 		    # More than one record was found. Error! This shouldn't happen.
-		    print "   -E- More than one record found with same parent name: $parent_name\n";
+		    print "   -E- More than one record found with same parent name: $parent_name with hofh_id: $hofh_id\n";
+		} else {
+		    print "   -E- Unable to find a family to attach this parent to: $parent_name with hofh_id: $hofh_id\n";
 		}
 		$sth->finish();
 	    }
