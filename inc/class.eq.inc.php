@@ -2345,6 +2345,10 @@ class eq
 
   function att_view()
     {
+      $monthnum['Jan']=1; $monthnum['Feb']=2; $monthnum['Mar']=3; $monthnum['Apr']=4;
+      $monthnum['May']=5; $monthnum['Jun']=6; $monthnum['Jul']=7; $monthnum['Aug']=8;
+      $monthnum['Sep']=9; $monthnum['Oct']=10; $monthnum['Nov']=11; $monthnum['Dec']=12;
+
       $this->t->set_file(array('att_view_t' => 'att_view.tpl'));
       $this->t->set_block('att_view_t','act_list','list');
 
@@ -2438,6 +2442,7 @@ class eq
 	$this->t->set_var('year',$sunday_list[$i]['year']);
 	$this->t->fp('list2','header_list',True);
 	$total_width += $att_width;
+	$attendance[$monthnum[$sunday_list[$i]['month']]]=0;
       }
 
       for ($i=0; $i < count($elder_id); $i++) {
@@ -2456,8 +2461,8 @@ class eq
 	    $cur_month = $sunday_list[$j]['month'];
 	    if($attended[$i][$cur_month] != 1) { 
 	      $attended[$i][$cur_month]=1;
-	      $attendance[$cur_month]++;
-	    }
+	      $attendance[$monthnum[$cur_month]]++;
+	    } 
 	    $att_table .= '<td align=center><img src="checkmark.gif"></td>';
 	  } else {
 	    $att_table .= '<td>&nbsp;</td>';
@@ -2477,6 +2482,7 @@ class eq
       $avenonattendance_str = "";
       $num_months=0;
       $ave_total_attended=0;
+      ksort($attendance);
       foreach($attendance as $att => $value) {
 	$total_attended = $attendance[$att];
 	$ave_total_attended += $attendance[$att]; $num_months++;
