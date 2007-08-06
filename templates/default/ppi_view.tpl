@@ -27,7 +27,6 @@
 
 	<form action="{actionurl}" method="POST">
 
-<!-- BEGIN district_list -->
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
@@ -39,14 +38,5 @@
 		{stat_data}
 	</table>
 	<br><br>
-<!-- END district_list -->
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
-		<tr>
-			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>Total PPIs</b></font>
-			</td>
-		</tr>
-		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
-		{totals}
-	</table>
+
 </center>
