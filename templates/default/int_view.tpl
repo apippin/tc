@@ -6,6 +6,11 @@
 		</tr>
 	</table>
 
+	<a href="{int_link}">{int_link_title}</a>
+	&nbsp; | &nbsp;
+	<a href="{schedule_int_link}">{schedule_int_link_title}</a>
+	<br><br>
+
 	<form action="{filterurl}" method="POST">
 	<table width="40%" border="0" cellspacing="2" cellpadding="2" align=center>
 	<tr>

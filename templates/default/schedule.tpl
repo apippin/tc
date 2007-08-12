@@ -9,6 +9,8 @@
 	<a href="{schedule_vis_link}">{schedule_vis_link_title}</a>
 	&nbsp; | &nbsp;
 	<a href="{schedule_ppi_link}">{schedule_ppi_link_title}</a>
+	&nbsp; | &nbsp;
+	<a href="{schedule_int_link}">{schedule_int_link_title}</a>
 	<br><br>
 
 <!-- BEGIN presidency_list -->
