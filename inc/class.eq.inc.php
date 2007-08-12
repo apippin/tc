@@ -2041,14 +2041,13 @@ class eq
       $this->t->set_block('int_view_t','district_list','list');
 
       $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
-      $num_months = get_var('num_months',array('GET','POST'));
-      if($num_months == '') { $num_months = $this->default_int_num_months; }
-      $this->t->set_var('num_months',$num_months);
-      if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
-      else {  $this->t->set_var('lang_num_months','Months of History'); }
+      $num_quarters = get_var('num_quarters',array('GET','POST'));
+      if($num_quarters == '') { $num_quarters = $this->default_int_num_quarters; }
+      $this->t->set_var('num_quarters',$num_quarters);
+      if($num_quarters == 1) { $this->t->set_var('lang_num_quarters','Quarter of History'); }
+      else {  $this->t->set_var('lang_num_quarters','Quarters of History'); }
       $this->t->set_var('lang_filter','Filter');
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
-
+      
       $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
       $this->t->set_var('int_link_title','Hometeaching Interviews'); 
       
@@ -2056,6 +2055,13 @@ class eq
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
       
       $this->t->set_var('title','Hometeaching Interviews'); 
+
+      $num_months = $num_quarters * 3 - 1;
+      $current_month = $this->current_month;
+      if($current_month >= 1 && $current_month <= 3) { $current_month=3; }
+      else if($current_month >= 4 && $current_month <= 6) { $current_month=6; }
+      else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
+      else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
       $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -2152,7 +2158,7 @@ class eq
 	      // Find out how many times Interviews were performed in the past $num_months for this Elder
 	      $header_row="<th width=$comp_width><font size=-2>Companionship</th>";
 	      for($m=$num_months; $m >= 0; $m--) {
-		$month = $this->current_month - $m;
+		$month = $current_month - $m;
 		$year = $this->current_year;
 		if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
 		if($month < 10) { $month = "0"."$month"; }
@@ -2195,7 +2201,7 @@ class eq
 	$stat_data = "<tr><td><b><font size=-2>$num_companionships Companionships<br>Interview Quarterly Totals:</font></b></td>";
 
 	for($m=$num_months; $m >=0; $m--) {
-	  $month = $this->current_month - $m;
+	  $month = $current_month - $m;
 	  if(($month % 3) == 1) { $quarter_total = $ints[$m]; }
 	  else { $quarter_total += $ints[$m]; }
 	  $percent = ceil(($quarter_total / $num_companionships)*100);
@@ -2214,7 +2220,7 @@ class eq
       $quarter_total = 0;
       $totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Quarterly Totals:</font></b></td>";
       for($m=$num_months; $m >=0; $m--) {
-	$month = $this->current_month - $m;
+	$month = $current_month - $m;
 	if(($month % 3) == 1) { $quarter_total = $total_ints[$m]; }
 	else { $quarter_total += $total_ints[$m]; }
 	$percent = ceil(($quarter_total / $total_companionships)*100);
