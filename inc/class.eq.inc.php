@@ -63,7 +63,7 @@ class eq
       $this->default_int_num_quarters = 1;
       $this->default_int_num_months = 3;
       $this->default_int_num_years = 0;
-      $this->default_att_num_quarters = 3;
+      $this->default_att_num_quarters = 1;
       $this->default_att_num_months = 3;
       $this->upload_target_path = "/home/users/eqpres/eq_data/";
       $this->script_path = "/usr/share/phpgroupware/eq/";
@@ -2573,13 +2573,20 @@ class eq
       $this->t->set_block('att_view_t','elder_list','list3');
       
       $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_view'));
-      $num_months = get_var('num_months',array('GET','POST'));
-      if($num_months == '') { $num_months = $this->default_att_num_months; }
-      $this->t->set_var('num_months',$num_months);
+      $num_quarters = get_var('num_quarters',array('GET','POST'));
+      if($num_quarters == '') { $num_quarters = $this->default_att_num_quarters; }
+      $this->t->set_var('num_quarters',$num_quarters);
       $this->t->set_var('lang_filter','Filter');
-      if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
-      else {  $this->t->set_var('lang_num_months','Months of History'); }
-         
+      if($num_quarters == 1) { $this->t->set_var('lang_num_quarters','Quarter of History'); }
+      else { $this->t->set_var('lang_num_quarters','Quarters of History'); }
+
+      $num_months = $num_quarters * 3;
+      $current_month = $this->current_month;
+      if($current_month >= 1 && $current_month <= 3) { $current_month=3; }
+      else if($current_month >= 4 && $current_month <= 6) { $current_month=6; }
+      else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
+      else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
+      
       $sql = "SELECT * FROM eq_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
@@ -2590,13 +2597,12 @@ class eq
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
-
       
       // Create a list of sunday dates for a window of 3 months back and current month
       $i=0; 
       $last_time = 0; 
       $found_sunday = 0;
-      $sunday_list[0]['date'] = date("Y-m-d", mktime(0, 0, 0, date("m")-$num_months, 1, date("y")));
+      $sunday_list[0]['date'] = date("Y-m-d", mktime(0, 0, 0, $current_month-$num_months, 1, date("y")));
       $last_date = explode("-",$sunday_list[0]['date']);
       $last_time = mktime(0, 0, 0, $last_date[1], $last_date[2], $last_date[0]);
       $time_limit = mktime(0, 0, 0, date("m"), date("t"), date("y"));
@@ -2604,7 +2610,7 @@ class eq
       {
         $day = date("w",$last_time);
         if(date("w",$last_time) == 0) {
-  	  $sunday_list[$i]['date'] = date("Y-m-d", $last_time); 
+  	  $sunday_list[$i]['date'] = date("Y-m-d", $last_time);
 	  $last_date = explode("-",$sunday_list[$i]['date']);
 	  $last_time = mktime(0, 0, 0, $last_date[1], $last_date[2], $last_date[0]);
 	  $sunday_list[$i]['day'] = $last_date[2];
