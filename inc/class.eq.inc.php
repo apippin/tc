@@ -22,9 +22,10 @@ class eq
   var $default_ht_num_months;
   var $default_ppi_num_months;
   var $default_ppi_num_years;
-  var $default_int_num_months;
+  var $default_int_num_quarters;
   var $default_int_num_years;
-  var $default_att_num_months;
+  var $default_vis_num_years;
+  var $default_att_num_quarters;
   var $current_year;
   var $current_month;
   var $upload_target_path;
@@ -61,10 +62,9 @@ class eq
       $this->default_ppi_num_months = 3;
       $this->default_ppi_num_years = 0;
       $this->default_int_num_quarters = 1;
-      $this->default_int_num_months = 3;
       $this->default_int_num_years = 0;
       $this->default_att_num_quarters = 1;
-      $this->default_att_num_months = 3;
+      $this->default_vis_num_years = 1;
       $this->upload_target_path = "/home/users/eqpres/eq_data/";
       $this->script_path = "/usr/share/phpgroupware/eq/";
       
@@ -2378,9 +2378,19 @@ class eq
       
       $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
+
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $num_years = get_var('num_years',array('GET','POST'));
+      if($num_years == '') { $num_years = $this->default_vis_num_years; }
+      $this->t->set_var('num_years',$num_years);
+      if($num_years == 1) { $this->t->set_var('lang_num_years','Year of History'); }
+      else {  $this->t->set_var('lang_num_years','Years of History'); }
+      $this->t->set_var('lang_filter','Filter');
       
+      $year = date('Y') - $num_years + 1;
+      $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
       
-      $sql = "SELECT * FROM eq_visit WHERE companionship=0 ORDER BY date DESC";
+      $sql = "SELECT * FROM eq_visit WHERE companionship=0 and date > '$year_start' ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -2785,6 +2795,7 @@ class eq
 	{
 	  $elder_name[$i] = $this->db->f('name');
 	  $elder_id[$i] = $this->db->f('elder');
+	  $elder_attending[$elder_id[$i]] = $this->db->f('attending');
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
@@ -2861,6 +2872,8 @@ class eq
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $value = $elder_id[$i] . "-" . $sunday_list[$j]['date'];
 	  if($this->db->next_record()) {
+	    $att_table .= '<td align=center><input type="checkbox" name="elders_attended[]" value="'.$value.'" checked></td>';
+	  } else if($elder_attending[$elder_id[$i]] == 1) {
 	    $att_table .= '<td align=center><input type="checkbox" name="elders_attended[]" value="'.$value.'" checked></td>';
 	  } else {
 	    $att_table .= '<td align=center><input type="checkbox" name="elders_attended[]" value="'.$value.'"></td>';

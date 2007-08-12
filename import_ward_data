@@ -138,6 +138,7 @@ sub update_eq_aaronic_table
 #| ppi_notes   | varchar(128)     | YES  |     | NULL    |                |
 #| int_pri     | int(10) unsigned | YES  |     | 1       |                |
 #| int_notes   | varchar(128)     | YES  |     | NULL    |                |
+#| attending   | tinyint(1)       | YES  |     | 0       |                |
 #| valid       | tinyint(1)       | YES  |     | NULL    |                |
 #+-------------+------------------+------+-----+---------+----------------+
 sub update_eq_elder_table
@@ -153,8 +154,16 @@ sub update_eq_elder_table
 	$hashref = $membership_data{$index};
 	foreach $key (keys %$hashref) {
 	    if($key =~ /Priesthood/i && $membership_data{$index}{$key} =~ /Elder/i) {
+		$id = $membership_data{$index}{'Indiv ID'};
 		$elder_name = $membership_data{$index}{'Preferred Name'};
 		$phone = $membership_data{$index}{'Phone 1'};
+		$organization = $organization_by_id{$id};
+		$attending = 0;
+		if(($organization =~ /Elders/) ||
+		   ($organization =~ /Young Men/) ||
+		   ($organization =~ /Sunday School/) ||
+		   ($organization =~ /Primary/)
+		   ) { $attending = 1; }
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$sth = $dbh->prepare("select * from eq_elder where name='$elder_name'");
@@ -165,7 +174,7 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone','1','','1','',1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone','1','','1','',$attending,1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it
@@ -177,6 +186,8 @@ sub update_eq_elder_table
 		    } else {
 			$sth = $dbh->prepare("update eq_elder set phone=NULL where name='$elder_name'");
 		    }
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_elder set attending='$attending' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
@@ -217,6 +228,8 @@ sub update_eq_calling_table()
 	$name = $organization_data{$index}{'Indiv Name'};
 	$name =~ s/\'/\\'/g; #'
 	$organization = $organization_data{$index}{'Organization'};
+	$organization_by_name{$name} = $organization;
+	$organization_by_id{$indiv_id} = $organization;
 	$position = $organization_data{$index}{'Position'};
 	$sequence = $organization_data{$index}{'Org Seq'};
 	$sustained = $organization_data{$index}{'Sustained'};
@@ -689,6 +702,8 @@ print "\n-> Processing all ward data files in $datadir\n";
 &csv_to_hash("$datadir/Membership.csv",\%membership_data);
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
 &csv_to_hash("$datadir/Organization.csv",\%organization_data);
+%organization_by_name = ();
+%organization_by_id = ();
 
 if($opt_v) {
     print "-> Membership Data Dump\n\n";
@@ -702,6 +717,7 @@ if($opt_v) {
 if($opt_s) { $dbh->disconnect(); exit; }
 
 # Now update the various eq DB tables
+&update_eq_calling_table();
 &update_eq_elder_table();
 &update_eq_aaronic_table();
 &update_eq_district_table();
@@ -709,7 +725,6 @@ if($opt_s) { $dbh->disconnect(); exit; }
 &update_eq_family_table();
 &update_eq_parent_table();
 &update_eq_child_table();
-&update_eq_calling_table();
 
 ###################################################
 # Disconnect from the database

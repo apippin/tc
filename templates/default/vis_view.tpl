@@ -7,6 +7,20 @@
 	<a href="{schedule_vis_link}">{schedule_vis_link_title}</a>
 	<br><br>
 
+	<form action="{filterurl}" method="POST">
+	<table width="70%" border="0" cellspacing="2" cellpadding="2" align=center>
+	<tr>
+		<td align=center>
+		Showing <input type=text size="2" name="num_years" value="{num_years}">
+		{lang_num_years}
+		</td>
+		<td align=center>	
+		<font face="{font}"><input type="submit" name="filter" value="{lang_filter}"></font>
+		</td>
+	</tr>
+	</table>
+	</form>
+
 	<h3>Presidency Visits</h3>
         <table border="0" cellspacing="2" cellpadding="2">
                 <tr>
