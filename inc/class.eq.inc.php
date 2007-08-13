@@ -3466,7 +3466,11 @@ class eq
 	      if($this->db3->next_record()) {
 		$phone = $this->db3->f('phone');
 	      }
-	      $location="";
+	      $sql = "SELECT * FROM eq_parent where family='$family'";
+	      $this->db3->query($sql,__LINE__,__FILE__);
+	      if($this->db3->next_record()) {
+		$location=$this->db3->f('address');
+	      }
 	      $duration = 2700; // 45 minutes
 	    }
 	  }
