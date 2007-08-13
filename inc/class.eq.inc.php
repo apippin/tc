@@ -53,7 +53,9 @@ class eq
      'dir_view'   => True,
      'org_view'   => True,
      'schedule'   => True,
-     'admin'      => True
+     'admin'      => True,
+     'email_appt' => True,
+     'send_ical_appt' => True
      );
  
   function eq()
@@ -917,6 +919,9 @@ class eq
 			      " elder='" . $elder . "'" .
 			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
+	     // Email the appointment
+	     $this->email_appt($appointment);
+
 	   }
 	  
 	  // Save any changes made to the ppi notes table
@@ -1203,6 +1208,8 @@ class eq
 			      " elder='" . $elder . "'" .
 			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
+	     // Email the appointment
+	     $this->email_appt($appointment);
 	   }
 	  
 	  // Save any changes made to the int notes table
@@ -1535,12 +1542,14 @@ class eq
 	   {
 	     $family = $entry['family'];
 	     $appointment = $entry['appointment'];
-
+	     
 	     // Perform database save actions here
 	     $this->db->query("UPDATE eq_appointment set " .
 			      " family='" . $family . "'" .
 			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
+	     // Email the appointment
+	     $this->email_appt($appointment);
 	   }
 	  
 	  // Save any changes made to the visit notes table
@@ -3040,6 +3049,7 @@ class eq
 		 $family = $entry['family'];
 		 if($pm) { $hour = $hour + 12; }
 		 $time = $hour.':'.$minute.':'.'00';
+		 $uid = 0;
 
 		 // Update an existing appointment
 		 if($appointment != 0)
@@ -3051,7 +3061,8 @@ class eq
 			      " ,time='" . $time . "'" .
 			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
-		     //print "updating entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";		     
+		     // Email the appointment
+		     $this->email_appt($appointment);
 		   }
 		 
 		 // Add a new appointment
@@ -3059,7 +3070,7 @@ class eq
 		   {
 		     $this->db->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time) "
 			   . "VALUES ('" . $appointment . "','" . $presidency . "','" . $family . "','"
-			   . $elder . "','" . $date . "','" . $time  ."')",__LINE__,__FILE__);
+			   . $elder . "','" . $date . "','" . $time  . "','" . $uid ."')",__LINE__,__FILE__);
 		     
 		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";		     
 		   }
@@ -3384,7 +3395,171 @@ class eq
       
       $this->save_sessiondata();   
     }
-  
+
+  function email_appt($appointment)
+    {
+      //print "Emailing notification of appointment: $appointment <br>";
+
+      $sql = "SELECT * FROM eq_appointment where appointment='$appointment'";
+      $this->db->query($sql,__LINE__,__FILE__);
+	
+      while ($this->db->next_record())
+	{
+	  $appointment = $this->db->f('appointment');
+	  $presidency = $this->db->f('presidency');
+	  $interviewer = "";
+	  $email = "";
+	  $elder = $this->db->f('elder');
+	  $elder_name = "";
+	  $family = $this->db->f('family');
+	  $family_name = "";
+	  $appt_name = "";
+	  $phone = "";
+	  $location = "";
+	  $uid = $this->db->f('uid');
+	  	    
+	  // Extract the year, month, day, hours, minutes, seconds from the appointment time
+	  $appt_date = $this->db->f('date');
+	  $date_array = explode("-",$appt_date);
+	  $year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
+	  $appt_time = $this->db->f('time');
+	  $time_array = explode(":",$appt_time);
+	  $hour = $time_array[0]; $minute = $time_array[1]; $seconds = $time_array[2];
+
+	  // Format the appointment time into an iCal UTC equivalent
+	  $dtstamp = gmdate("Ymd"."\T"."His"."\Z");
+	  $dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
+	  
+	  // Set the email address of the person making the appointment
+	  $from = $GLOBALS['phpgw_info']['user']['fullname'] . "<" .
+	          $GLOBALS['phpgw_info']['user']['preferences']['email']['address'] . ">";
+	  
+	  $sql = "SELECT * FROM eq_presidency where presidency='$presidency'";
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  if($this->db2->next_record()) {
+	    $email = $this->db2->f('email');
+	    $interviewer = $this->db2->f('name');
+	  }
+
+	  if($elder > 0) { 
+	    $sql = "SELECT * FROM eq_elder where elder='$elder'";
+	    $this->db2->query($sql,__LINE__,__FILE__);
+	    if($this->db2->next_record()) {
+	      $elder_name = $this->db2->f('name');
+	      $phone = $this->db2->f('phone');
+	      $appt_name = $elder_name . " Interview";
+	      $location = "$interviewer"."'s home";
+	      $duration = 1800; // 30 minutes
+	    }
+	  }
+
+	  if($family > 0) { 
+	    $sql = "SELECT * FROM eq_family where family='$family'";
+	    $this->db2->query($sql,__LINE__,__FILE__);
+	    if($this->db2->next_record()) {
+	      $family_name = $this->db2->f('name');
+	      $phone = $this->db2->f('phone');
+	      $elder_id = $this->db2->f('elder_id');
+	      $appt_name = $family_name . " Family Visit";
+	      $sql = "SELECT * FROM eq_elder where elder='$elder_id'";
+	      $this->db3->query($sql,__LINE__,__FILE__);
+	      if($this->db3->next_record()) {
+		$phone = $this->db3->f('phone');
+	      }
+	      $location="";
+	      $duration = 2700; // 45 minutes
+	    }
+	  }
+
+	  $dtend = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+	  $description = "$appt_name : $phone";
+	  
+	  if(($uid == 0) && ($appt_name != "")) { 
+	    // Create a new calendar item for this appointment, since this must be the first time we
+	    // are sending it out.
+	    print "Sent new appointment to " . $interviewer . " at " . $email . " for " . $appt_name . "<br>";
+	    $uid = rand() . rand(); // Generate a random identifier for this appointment
+	    $subject = "Created: $appt_name";
+	    
+	    $this->db->query("UPDATE eq_appointment set" .
+			     " uid=" . $uid . 
+			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+
+	    $action = "PUBLISH";
+	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+				  $dtend, $location, $appt_name, $description, $uid);
+	    
+	  } else if(($uid != 0) && ($appt_name == "")) {
+	    // Remove the calendar item for this appointment since it has already been sent
+	    // and there is no name we have changed it to.
+	    print "Sent deleted appointment to " . $interviewer . " at " . $email . " for " . $appt_date . " " . $appt_time . "<br>";
+	    $subject = "Canceled: $appt_date $appt_time";
+	    
+	    $this->db->query("UPDATE eq_appointment set" .
+			     " uid=0" . 
+			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+	    
+	    $action = "CANCEL";
+	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+				  $dtend, $location, $appt_name, $description, $uid);
+	    
+	  } else if($uid != 0) {
+	    // Update the existing appointment since we have changed it
+	    print "Sent updated appointment to " . $interviewer . " at " . $email . " for " . $appt_name . "<br>";
+
+	    $subject = "Canceled: $appt_date $appt_time";
+	    $action = "CANCEL";
+	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+				  $dtend, $location, $appt_name, $description, $uid);
+	    
+	    $uid = rand() . rand(); // Generate a random identifier for this appointment
+	    $this->db->query("UPDATE eq_appointment set" .
+			     " uid=" . $uid .
+			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+	    
+	    $subject = "Updated: $appt_name";	    
+	    $action = "PUBLISH";
+	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+				  $dtend, $location, $appt_name, $description, $uid);
+	  }
+	  
+	}
+	  
+      return true;
+    }
+
+  function send_ical_appt($action, $to, $from, $subject, $dtstamp, $dtstart, $dtend, $location, $summary, $description, $uid)
+    {
+      $headers = 'From: ' . "$from" . "\n" .
+	 'Reply-To: ' . "$from" . "\n" .
+	 'X-Mailer: PHP/' . phpversion() . "\n" .
+	 'Content-Type: text/calendar;' . "\n" .
+	 'Content-Transfer-Encoding: 7bit' . "\n";
+      
+      //$message = "phone: $phone date: $date time: $time";
+      $message ="";
+      $message.="BEGIN:VCALENDAR" . "\n";
+      $message.="VERSION:2.0" . "\n";
+      $message.="PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN" . "\n";
+      $message.="METHOD:$action" . "\n";
+      $message.="BEGIN:VEVENT" . "\n";
+      $message.="ORGANIZER:MAILTO:$from". "\n";
+      $message.="DTSTAMP:$dtstamp" . "\n";
+      $message.="DTSTART:$dtstart" . "\n";
+      $message.="DTEND:$dtend" . "\n";
+      $message.="SUMMARY:$summary" . "\n";
+      $message.="DESCRIPTION:$description" . "\n";
+      $message.="LOCATION:$location" . "\n";
+      $message.="UID:$uid" ."\n";
+      $message.="TRANSP:OPAQUE" . "\n";
+      $message.="SEQUENCE:0" . "\n";
+      $message.="CLASS:PUBLIC" . "\n";
+      $message.="END:VEVENT" . "\n";
+      $message.="END:VCALENDAR" . "\n";
+      
+      mail($to, $subject, $message, $headers);
+      
+    }
 }
 
 ?>
