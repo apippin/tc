@@ -1014,32 +1014,56 @@ class eq
       $i = 0;
       while ($this->db->next_record())
 	{
-	  $activity_list[$i]['name'] = $this->db->f('name');
+	  $activity_list[$i]['assignment'] = $this->db->f('assignment');
 	  $activity_list[$i]['date'] = $this->db->f('date');
 	  $activity_list[$i]['activity']  = $this->db->f('activity');
-	  if($activity_list[$i]['date'] == '0000-00-00') { $activity_list[$i]['date']=""; }
 	  $i++;
 	}
 
-      $elder_width=250; $part_width=25; $act_width=50;
+      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while($this->db->next_record())
+	{
+	  $assignment_list[$i]['assignment'] = $this->db->f('assignment');
+	  $assignment_list[$i]['name'] = $this->db->f('name');
+	  $assignment_list[$i]['code'] = $this->db->f('code');
+	  $i++;
+	}
+      
+      $elder_width=270; $part_width=25; $assignment_width=50;
       $total_width=$elder_width+$part_width;
-      for ($i=0; $i < count($activity_list); $i++) {
-	$this->t->set_var('activity_name',$activity_list[$i]['name']);
-	$this->t->set_var('activity_date',$activity_list[$i]['date']);
+      for ($i=0; $i < count($assignment_list); $i++) {
+	$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
+	$this->t->set_var('assignment_code',$assignment_list[$i]['code']);
 	$this->t->fp('list1','header_list',True);
-	$total_width += $act_width;
+	$total_width += $assignment_width;
       }
 
       for ($i=0; $i < count($elder_id); $i++) {
 	$participated=0; $part_table = ''; 
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$this->t->set_var('elder_name',$elder_name[$i]);
-	for ($j=0; $j < count($activity_list); $j++) {
-	  $sql = "SELECT * FROM eq_participation where activity="
-	     . $activity_list[$j]['activity'] . " AND elder=" . $elder_id[$i];
-	  $this->db->query($sql,__LINE__,__FILE__);
-	  if($this->db->next_record()) {
-	    $part_table .= '<td align=center><img src="checkmark.gif"></td>';
+	for ($j=0; $j < count($assignment_list); $j++) {
+	  $date = "0000-00-00"; $checkmark=0; $num_matches=0;
+	  for ($k=0; $k < count($activity_list); $k++) {
+	    if($assignment_list[$j]['assignment'] == $activity_list[$k]['assignment']) { 
+	      $sql = "SELECT * FROM eq_participation where "
+		 . " activity=" . $activity_list[$k]['activity']
+		 . " AND elder=" . $elder_id[$i];
+	      $this->db->query($sql,__LINE__,__FILE__);
+	      while($this->db->next_record()) {
+		if($activity_list[$k]['date'] > $date) { 
+		  $date = $activity_list[$k]['date'];
+		}
+		$checkmark=1;
+		$num_matches++;
+		$participated++;
+	      }
+	    }
+	  }
+	  if($checkmark) {
+	    $part_table .= '<td align=center><img src="checkmark.gif">'.$num_matches.'<br>'.$date.'</td>';
 	    $participated++;
 	  } else {
 	    $part_table .= '<td>&nbsp;</td>';

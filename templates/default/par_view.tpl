@@ -10,7 +10,7 @@
 	<tr bgcolor="#c9c9c9">
 		<th width={elder_width}>Elder</th>
 <!-- BEGIN header_list -->
-		<th width={act_width}><font size=-3>{activity_name}<br>{activity_date}</font></th>
+		<th width={act_width}><font size=-3>{assignment_name}</font></th>
 <!-- END header_list -->
 		<th width={part_width}><font size=-3>Participated</font></th>
 	</tr>
