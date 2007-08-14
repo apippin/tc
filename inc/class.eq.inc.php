@@ -1031,7 +1031,7 @@ class eq
 	  $i++;
 	}
       
-      $elder_width=270; $part_width=25; $assignment_width=50;
+      $elder_width=300; $part_width=25; $assignment_width=50;
       $total_width=$elder_width+$part_width;
       for ($i=0; $i < count($assignment_list); $i++) {
 	$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
@@ -1063,8 +1063,9 @@ class eq
 	    }
 	  }
 	  if($checkmark) {
-	    $part_table .= '<td align=center><img src="checkmark.gif">'.$num_matches.'<br>'.$date.'</td>';
-	    $participated++;
+	    $part_table .= '<td align=center><img src="checkmark.gif">';
+	    $part_table .= '<font size=-2>'.$num_matches.'</font><br>';
+	    $part_table .= '<font size=-2>'.$date.'</font></td>';
 	  } else {
 	    $part_table .= '<td>&nbsp;</td>';
 	  }
