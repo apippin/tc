@@ -55,7 +55,9 @@ class eq
      'schedule'   => True,
      'admin'      => True,
      'email_appt' => True,
-     'send_ical_appt' => True
+     'send_ical_appt' => True,
+     'assign_view'    => True,
+     'assign_update'  => True,
      );
  
   function eq()
@@ -125,6 +127,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.act_list';
       $this->t->set_var('link_activity',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_activity','Activities');
+      $link_data['menuaction'] = 'eq.eq.assign_view';
+      $this->t->set_var('link_assignment',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_assignment','Assignments');
       $link_data['menuaction'] = 'eq.eq.par_view';
       $this->t->set_var('link_participation',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_participation','Participation');
@@ -571,6 +576,7 @@ class eq
       
       $this->t->set_var('lang_name','Activity Name');
       $this->t->set_var('lang_date','Date');
+      $this->t->set_var('lang_notes','Description');
       
       $sql = "SELECT * FROM eq_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -579,9 +585,18 @@ class eq
       $i = 0;
       while ($this->db->next_record())
 	{
-	  $activity_list[$i]['name'] = $this->db->f('name');
-	  $activity_list[$i]['date']  = $this->db->f('date');
 	  $activity_list[$i]['activity']  = $this->db->f('activity');
+	  $activity_list[$i]['assignment'] = $this->db->f('assignment');
+	  $activity_list[$i]['date']  = $this->db->f('date');
+	  $activity_list[$i]['notes']  = $this->db->f('notes');
+
+	  $sql = "SELECT * FROM eq_assignment WHERE assignment='" . $activity_list[$i]['assignment'] . "'";
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  if($this->db2->next_record())
+	    {
+	      $activity_list[$i]['name'] = $this->db2->f('name');
+	      $activity_list[$i]['code'] = $this->db2->f('code');
+	    }
 	  $i++;
 	}
             
@@ -590,6 +605,9 @@ class eq
 	  $this->nextmatchs->template_alternate_row_color(&$this->t);
 	  $this->t->set_var('name',$activity_list[$i]['name']);
 	  $this->t->set_var('date',$activity_list[$i]['date']);
+	  $activity_notes = $activity_list[$i]['notes'];
+	  if(strlen($activity_notes) > 40) { $activity_notes = substr($activity_notes,0,40) . "..."; }
+	  $this->t->set_var('notes',$activity_notes);
 	  
 	  $link_data['menuaction'] = 'eq.eq.act_view';
 	  $link_data['activity'] = $activity_list[$i]['activity'];
@@ -624,13 +642,20 @@ class eq
       $sql = "SELECT * FROM eq_activity WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
       $this->db->next_record();
-      $this->t->set_var('name', $this->db->f('name'));
+      $this->t->set_var('assignment', $this->db->f('assignment'));
       $this->t->set_var('date', $this->db->f('date'));
       $this->t->set_var('notes', $this->db->f('notes'));
-            
+      
+      $sql = "SELECT * FROM eq_assignment WHERE assignment='" . $this->db->f('assignment') . "'";
+      $this->db2->query($sql,__LINE__,__FILE__);
+      if($this->db2->next_record())
+	{
+	  $this->t->set_var('name', $this->db2->f('name'));
+	  $this->t->set_var('code', $this->db2->f('code'));
+	}
       $this->t->set_var('lang_name','Activity Name');
       $this->t->set_var('lang_date','Date');
-      $this->t->set_var('lang_notes','Notes');
+      $this->t->set_var('lang_notes','Description');
       $this->t->set_var('lang_done','Done');
       $this->t->set_var('lang_action','View');
 
@@ -645,7 +670,7 @@ class eq
       $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_edit','Edit');
       $this->t->set_var('cal_date',$this->db->f('date'));
-
+      
       // Now find out which elders participated in this activity
       $sql = "SELECT * FROM eq_participation WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
@@ -691,14 +716,14 @@ class eq
       $action = get_var('action',array('GET','POST'));
       $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.act_list'));
       $activity['activity'] = intval(get_var('activity',array('GET','POST')));
-
+      
       if($action == 'save')
 	{
-	  $activity['name'] = $this->db->db_addslashes(get_var('name',array('POST')));
+	  $activity['assignment'] = $this->db->db_addslashes(get_var('assignment',array('POST')));
 	  $activity['date'] = $this->db->db_addslashes(get_var('date',array('POST')));
 	  $activity['notes']= $this->db->db_addslashes(get_var('notes',array('POST')));
 	  $this->db->query("UPDATE eq_activity set " .
-			   "   name='" . $activity['name'] .
+			   "   assignment='" . $activity['assignment'] .
 			   "', date='" . $activity['date'] . "'" .
 			   ", notes='" . $activity['notes'] . "'" .
 			   " WHERE activity=" . $activity['activity'],__LINE__,__FILE__);
@@ -720,12 +745,28 @@ class eq
 
       if($action == 'insert')
 	{
-	  $activity['name'] = $this->db->db_addslashes(get_var('name',array('POST')));
+	  $activity['assignment'] = $this->db->db_addslashes(get_var('assignment',array('POST')));
 	  $activity['date'] = $this->db->db_addslashes(get_var('date',array('POST')));
 	  $activity['notes']= $this->db->db_addslashes(get_var('notes',array('POST')));
-	  $this->db->query("INSERT INTO eq_activity (name,date,notes) "
-			   . "VALUES ('" . $activity['name'] . "','"
+	  $this->db->query("INSERT INTO eq_activity (assignment,date,notes) "
+			   . "VALUES ('" . $activity['assignment'] . "','"
 			   . $activity['date'] . "','" . $activity['notes'] . "')",__LINE__,__FILE__);
+
+	  $sql = "SELECT * FROM eq_activity WHERE assignment='".$activity['assignment']."' "
+	     . " AND date='".$activity['date']."' AND notes='".$activity['notes']."'";
+	  $this->db->query($sql,__LINE__,__FILE__);
+	  if($this->db->next_record()) {
+	    print "activity: " . $this->db->f('activity') . "<br>";
+	    $activity['activity'] = $this->db->f('activity');
+	  }
+	  
+	  $elders = get_var('elder_name',array('POST'));
+	  foreach ($elders as $elder)
+	    {
+	      $this->db->query("INSERT INTO eq_participation (elder,activity) "
+			       . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
+	    }
+	  
 	  $this->act_list();
 	  return false;
 	}
@@ -734,7 +775,7 @@ class eq
 	{
 	  $activity['activity'] = 0;
 	  $this->t->set_var('cal_date',$this->jscal->input('date','','','','','','',$this->cal_options));
-	  $this->t->set_var('name','');
+	  $this->t->set_var('assignment','');
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
@@ -749,7 +790,8 @@ class eq
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$this->db->f('date'),'','','','','',$this->cal_options));
-	  $this->t->set_var('name', $this->db->f('name'));
+	  $this->t->set_var('assignment', $this->db->f('assignment'));
+	  $assignment = $this->db->f('assignment');
 	  $this->t->set_var('date', $this->db->f('date'));
 	  $this->t->set_var('notes', $this->db->f('notes'));
 	  $this->t->set_var('lang_done','Cancel');
@@ -759,6 +801,30 @@ class eq
 
 	}
 
+      // Create the assignments drop-down list
+      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i = 0;
+      while ($this->db->next_record())
+	{
+	  $assignments[$i]['assignment']  = $this->db->f('assignment');
+	  $assignments[$i]['name'] = $this->db->f('name');
+	  $assignments[$i]['code'] = $this->db->f('code');
+	  $i++;
+	}
+      
+      $assignment_data.= '<select name=assignment>';
+      $assignment_data.= '<option value=0></option>';  
+      for ($j=0; $j < count($assignments); $j++) {
+	$id = $assignments[$j]['assignment'];
+	$name = $assignments[$j]['name'];
+	if($assignments[$j]['assignment'] == $assignment) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	$assignment_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
+      }
+      $assignment_data.='</select>';
+      $this->t->set_var('assignment_data',$assignment_data);
+      
+      // Create elder selection boxes
       $sql = "SELECT * FROM eq_elder";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
@@ -794,6 +860,125 @@ class eq
       
       $this->t->set_var('lang_reset','Clear Form');
       $this->t->set_var('lang_add','Add Activity');
+      $this->t->set_var('lang_save','Save Changes');
+      $this->t->set_var('edithandle','');
+      $this->t->set_var('addhandle','');
+      
+      $this->t->pfp('out','form');
+      if($action == 'edit') { $this->t->pfp('addhandle','edit'); }
+      if($action == 'add') { $this->t->pfp('addhandle','add'); }
+      
+      $this->save_sessiondata();
+    }
+
+    function assign_view()
+    {
+      $this->t->set_file(array('assign_view_t' => 'assign_view.tpl'));
+      $this->t->set_block('assign_view_t','assign_view','list');
+      
+      $this->t->set_var('lang_name','Assignment Name');
+      $this->t->set_var('lang_code','Code');
+      
+      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $total_records = $this->db->num_rows();
+
+      $i = 0;
+      while ($this->db->next_record())
+	{
+	  $assignment_list[$i]['assignment']  = $this->db->f('assignment');
+	  $assignment_list[$i]['name'] = $this->db->f('name');
+	  $assignment_list[$i]['code'] = $this->db->f('code');
+	  $i++;
+	}
+            
+      for ($i=0; $i < count($assignment_list); $i++)
+	{	  
+	  $this->nextmatchs->template_alternate_row_color(&$this->t);
+	  $this->t->set_var('name',$assignment_list[$i]['name']);
+	  $this->t->set_var('code',$assignment_list[$i]['code']);
+	  
+	  $link_data['menuaction'] = 'eq.eq.assign_update';
+	  $link_data['assignment'] = $assignment_list[$i]['assignment'];
+	  $link_data['action'] = 'edit';
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('lang_edit','Edit');
+
+	  $link_data['menuaction'] = 'eq.eq.assign_update';
+	  $link_data['assignment'] = '0';
+	  $link_data['action'] = 'add';
+	  $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/eq/index.php',$link_data)
+                           . '"><input type="submit" name="Add" value="' . 'Add Assignment' .'"></font></form>');
+
+	  $this->t->fp('list','assign_view',True);
+	}
+
+      $this->t->pfp('out','assign_view_t');
+      $this->save_sessiondata();
+    }
+
+    function assign_update()
+    {
+      $this->t->set_file(array('form' => 'assign_update.tpl'));
+      $this->t->set_block('form','add','addhandle');
+      $this->t->set_block('form','edit','edithandle');
+      $this->t->set_var('lang_done','Done');
+
+      $action = get_var('action',array('GET','POST'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.assign_view'));
+      $assignment['assignment'] = intval(get_var('assignment',array('GET','POST')));
+
+      if($action == 'save')
+	{
+	  $assignment['name'] = $this->db->db_addslashes(get_var('name',array('POST')));
+	  $assignment['code'] = $this->db->db_addslashes(get_var('code',array('POST')));
+	  $this->db->query("UPDATE eq_assignment set " .
+			   "  name='" . $assignment['name'] . "'" .
+			   ", code='" . $assignment['code'] . "'" .
+			   " WHERE assignment=" . $assignment['assignment'],__LINE__,__FILE__);
+	  
+	  $this->assign_view();
+	  return false;
+	}
+
+      if($action == 'insert')
+	{
+	  $assignment['name'] = $this->db->db_addslashes(get_var('name',array('POST')));
+	  $assignment['code'] = $this->db->db_addslashes(get_var('code',array('POST')));
+	  $this->db->query("INSERT INTO eq_assignment (name,code) "
+			   . "VALUES ('" . $assignment['name'] . "','"
+			   . $assignment['code'] . "')",__LINE__,__FILE__);
+	  $this->assign_view();
+	  return false;
+	}
+      
+      if($action == 'add')
+	{
+	  $assignment['assignment'] = 0;
+	  $this->t->set_var('name','');
+	  $this->t->set_var('code','');
+	  $this->t->set_var('lang_done','Cancel');
+	  $this->t->set_var('lang_action','Adding New Assignment');
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.assign_update&assignment='
+								. $assignment['assignment'] . '&action=' . 'insert'));
+	}
+
+      if($action == 'edit')
+	{
+	  $sql = "SELECT * FROM eq_assignment WHERE assignment=" . $assignment['assignment'];
+	  $this->db->query($sql,__LINE__,__FILE__);
+	  $this->db->next_record();
+	  $this->t->set_var('name', $this->db->f('name'));
+	  $this->t->set_var('code', $this->db->f('code'));
+	  $this->t->set_var('lang_done','Cancel');
+	  $this->t->set_var('lang_action','Editing Assignment');
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.assign_update&assignment='
+								. $assignment['assignment'] . '&action=' . 'save'));
+
+	}
+      
+      $this->t->set_var('lang_reset','Clear Form');
+      $this->t->set_var('lang_add','Add Assignment');
       $this->t->set_var('lang_save','Save Changes');
       $this->t->set_var('edithandle','');
       $this->t->set_var('addhandle','');

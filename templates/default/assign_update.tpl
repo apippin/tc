@@ -9,27 +9,12 @@
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{lang_action}:&nbsp;{name}</b></font></td>
 		</tr>
 		<tr>
-			<td align="left"><font face="{font}"><b>Name:</b>&nbsp;{assignment_data}</td>
+			<td align="left"><font face="{font}"><b>Name:</b>&nbsp;<input type=text size="60" name="name" value="{name}"</input></td>
 		</tr>
 		<tr>
-			<td align="left"><font face="{font}"><b>Date:</b>&nbsp;{cal_date}</td>
-		</tr>
-		<tr>
-			<td align="left"><font face="{font}"><b>Description:</b></font></td>
-		</tr>
-		<tr>	
-			<td align="left"><font face="{font}" size="{font_size}"><textarea cols="60" rows="10" name="notes" wrap="virtual">{notes}</textarea></font></td>
+			<td align="left"><font face="{font}"><b>Code:</b>&nbsp;<input type=text size="12" name="code" value="{code}"</input></td>
 		</tr>
 	</table>
-
-	<table border="0" width="70%" cellspacing="2" cellpadding="2">
-                <tr bgcolor="#c9c9c9" align=center><td colspan=3><font face="{font}"><b>Elders Attending</b></font></td></tr>
-	        <tr>
-<!-- BEGIN elder_list -->
-		<td width=25% bgcolor={tr_color}><font face="{font}"><input type="checkbox" name="elder_name[]" value="{elder}" {checked}>{elder_name}</font>{table_sep}
-<!-- END elder_list -->
-		</tr>
-        </table>
 
 <!-- BEGIN add -->
 	<table width="70%" border="0" cellspacing="2" cellpadding="2" align=left>
