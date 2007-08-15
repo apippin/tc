@@ -1124,13 +1124,17 @@ class eq
 
 	     //print "elder: $elder appointment: $appointment <br>";
 	     
-	     // Perform database save actions here
-	     $this->db->query("UPDATE eq_appointment set " .
-			      " elder='" . $elder . "'" .
-			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
-
-	     // Email the appointment
-	     $this->email_appt($appointment);
+	     //Only perform a database update if we have made a change to this appointment
+	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+	     $this->db->query($sql,__LINE__,__FILE__);
+	     if(!$this->db->next_record()) {
+	       // Perform database save actions here
+	       $this->db->query("UPDATE eq_appointment set " .
+				" elder='" . $elder . "'" .
+				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
+	       // Email the appointment
+	       $this->email_appt($appointment);
+	     }
 
 	   }
 	  
@@ -1412,14 +1416,18 @@ class eq
 	     $appointment = $entry['appointment'];
 
 	     //print "elder: $elder appointment: $appointment <br>";
-	     
-	     // Perform database save actions here
-	     $this->db->query("UPDATE eq_appointment set " .
-			      " elder='" . $elder . "'" .
-			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
-
-	     // Email the appointment
-	     $this->email_appt($appointment);
+	     //Only perform a database update if we have made a change to this appointment
+	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+	     $this->db->query($sql,__LINE__,__FILE__);
+	     if(!$this->db->next_record()) {
+	       // Perform database save actions here
+	       $this->db->query("UPDATE eq_appointment set " .
+				" elder='" . $elder . "'" .
+				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
+	       
+	       // Email the appointment
+	       $this->email_appt($appointment);
+	     }
 	   }
 	  
 	  // Save any changes made to the int notes table
@@ -1752,14 +1760,20 @@ class eq
 	   {
 	     $family = $entry['family'];
 	     $appointment = $entry['appointment'];
-	     
-	     // Perform database save actions here
-	     $this->db->query("UPDATE eq_appointment set " .
-			      " family='" . $family . "'" .
-			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
-	     // Email the appointment
-	     $this->email_appt($appointment);
+	     //Only perform a database update if we have made a change to this appointment
+	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family'";
+	     $this->db->query($sql,__LINE__,__FILE__);
+	     if(!$this->db->next_record()) {
+
+	       // Perform database save actions here
+	       $this->db->query("UPDATE eq_appointment set " .
+				" family='" . $family . "'" .
+				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
+	       
+	       // Email the appointment
+	       $this->email_appt($appointment);
+	     }
 	   }
 	  
 	  // Save any changes made to the visit notes table
@@ -3264,21 +3278,33 @@ class eq
 		 // Update an existing appointment
 		 if($appointment != 0)
 		   {
-		     $this->db->query("UPDATE eq_appointment set" .
-			      " family=" . $family . 
-			      " ,elder=" . $elder . 
-			      " ,date='" . $date . "'" .
-			      " ,time='" . $time . "'" .
-			      " WHERE appointment=" . $appointment,__LINE__,__FILE__);
-
-		     // Email the appointment
-		     $this->email_appt($appointment);
+		     //Only perform a database update if we have made a change to this appointment
+		     $sql = "SELECT * FROM eq_appointment where " .
+			"appointment='$appointment'" .
+			"and elder='$elder'" .
+			"and family='$family'" .
+			"and date='$date'" .
+			"and time='$time'";
+		     $this->db->query($sql,__LINE__,__FILE__);
+		     if(!$this->db->next_record()) {
+		       $this->db->query("UPDATE eq_appointment set" .
+					" family=" . $family . 
+					" ,elder=" . $elder . 
+					" ,date='" . $date . "'" .
+					" ,time='" . $time . "'" .
+					" WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		       
+		       // Email the appointment
+		       if(($date != "") && ($time != "")) { 
+			 $this->email_appt($appointment);
+		       }
+		     }
 		   }
 		 
 		 // Add a new appointment
 		 else if(($appointment == 0) && ($date != "") && ($time != ""))
 		   {
-		     $this->db->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time) "
+		     $this->db->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,uid) "
 			   . "VALUES ('" . $appointment . "','" . $presidency . "','" . $family . "','"
 			   . $elder . "','" . $date . "','" . $time  . "','" . $uid ."')",__LINE__,__FILE__);
 		     
