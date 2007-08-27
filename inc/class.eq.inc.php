@@ -55,6 +55,8 @@ class eq
      'schedule'   => True,
      'admin'      => True,
      'email_appt' => True,
+     'willing_view'   => True,
+     'willing_update' => True,
      'send_ical_appt' => True,
      'assign_view'    => True,
      'assign_update'  => True,
@@ -127,6 +129,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.act_list';
       $this->t->set_var('link_activity',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_activity','Activities');
+      $link_data['menuaction'] = 'eq.eq.willing_view';
+      $this->t->set_var('link_willing',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_willing','Willingness');
       $link_data['menuaction'] = 'eq.eq.assign_view';
       $this->t->set_var('link_assignment',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_assignment','Assignments');
@@ -1082,9 +1087,214 @@ class eq
       $this->t->pfp('out','par_view_t');
       $this->save_sessiondata(); 
     }
-  
-  function ppi_sched()
+
+    function willing_view()
     {
+      $this->t->set_file(array('willing_view_t' => 'willing_view.tpl'));
+      $this->t->set_block('willing_view_t','header_list','list1');
+      $this->t->set_block('willing_view_t','elder_list','list2');
+
+      $sql = "SELECT * FROM eq_elder where valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $elder_name[$i] = $this->db->f('name');
+	  $elder_id[$i] = $this->db->f('elder');
+	  $i++;
+	}
+      array_multisort($elder_name, $elder_id);
+
+      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while($this->db->next_record())
+	{
+	  $assignment_list[$i]['assignment'] = $this->db->f('assignment');
+	  $assignment_list[$i]['name'] = $this->db->f('name');
+	  $assignment_list[$i]['code'] = $this->db->f('code');
+	  $i++;
+	}
+      
+      $elder_width=300; $willing_width=40; $assignment_width=50;
+      $total_width=$elder_width+$willing_width;
+      
+      for ($i=0; $i < count($assignment_list); $i++) {
+	$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
+	$this->t->set_var('assignment_code',$assignment_list[$i]['code']);
+	$this->t->fp('list1','header_list',True);
+	$total_width += $assignment_width;
+	$total_willing[$i] = 0;
+      }
+
+      for ($i=0; $i < count($elder_id); $i++) {
+	$willing_table = ''; 
+	$this->nextmatchs->template_alternate_row_color(&$this->t);
+	$this->t->set_var('elder_name',$elder_name[$i]);
+	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&elder_id='
+							    . $elder_id[$i] . '&action=' . 'edit'));
+	for ($j=0; $j < count($assignment_list); $j++) {
+	  $found_willingness=0;
+	  $sql = "SELECT * FROM eq_willingness where "
+	     . " assignment=" . $assignment_list[$j]['assignment']
+	     . " AND elder=" . $elder_id[$i];
+	  $this->db->query($sql,__LINE__,__FILE__);
+	  while($this->db->next_record()) {
+	    $found_willingness=1;
+	    if($this->db->f('willing') == 'y') {
+	      $total_willing[$j]++;
+	      $willing_table .= '<td align=center><img src="checkmark.gif"></td>';
+	    }
+	    else if($this->db->f('willing') == 'n') {
+	      $willing_table .= '<td align=center><img src="x.gif"></td>';
+	    }
+	    else {
+	      $willing_table .= "<td>&nbsp;</td>";
+	    }
+	  }
+	  if(!$found_willingness) {
+	    $willing_table .= "<td>&nbsp;</td>";
+	  }
+	}
+	$this->t->set_var('willing_table',$willing_table);
+	$this->t->fp('list2','elder_list',True);
+      }
+
+      $stat_table = '<td><b>Total Willing to Serve</b></td>';
+      for ($j=0; $j < count($assignment_list); $j++) {
+	$stat_table .= "<td><b>".$total_willing[$j]."</b></td>";
+      }
+      $this->t->set_var('stat_table',$stat_table);
+      
+      $this->t->set_var('total_width',$total_width);
+      $this->t->set_var('elder_width',$elder_width);
+      $this->t->set_var('willing_width',$willing_width);
+      $this->t->pfp('out','willing_view_t');
+      $this->save_sessiondata(); 
+    }
+    
+  function willing_update()
+    {
+      //print "<font color=red>Willingness Update Under Constrcution</font>";
+      //$this->willing_view();
+      //return false;
+      
+      $this->t->set_file(array('willing_update_t' => 'willing_update.tpl'));
+      $this->t->set_block('willing_update_t','assignment_list','list');
+      $this->t->set_block('willing_update_t','save','savehandle');
+      
+      $elder_id = get_var('elder_id',array('GET','POST'));
+      $this->t->set_var('elder_id',$elder_id);
+      $action = get_var('action',array('GET','POST'));
+      
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&action=save'));
+      $this->t->set_var('lang_done','Cancel');
+      $this->t->set_var('title','Willingness Update ');
+      
+      if($action == 'save')
+	{
+	  // Delete all the previous willingness entries for this elder
+	  $this->db->query("DELETE from eq_willingness where elder=" . $elder_id ,__LINE__,__FILE__);
+	      
+	  // Now, add the assignment willingness that is checked for this elder
+	  $new_data = get_var('willingness',array('POST'));
+	  foreach ($new_data as $data)
+	    {
+	      $data_array = explode("/",$data);
+	      $assignment = $data_array[0];
+	      $willing = $data_array[1];
+	      //print "elder_id: $elder_id assignment: $assignment willing: $willing<br>";
+	      $this->db->query("INSERT INTO eq_willingness (elder,assignment,willing) "
+			       . "VALUES (" . $elder_id .",". $assignment .",'". $willing . "')",__LINE__,__FILE__);
+	    }      
+	  $this->willing_view();
+	  return false;
+	}
+      
+      $assignment_width=300; $willing_width=25; $table_width=$assignment_width + $willing_width;
+      $table_data=""; 
+
+      // Find out the elder's name
+      $sql = "SELECT * FROM eq_elder WHERE elder=".$elder_id." AND valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      if($this->db->next_record()) {
+	$elder_name = $this->db->f('name');
+	$this->t->set_var('elder_name',$elder_name);
+      }
+      
+      // Select all the assignments
+      $sql = "SELECT * FROM eq_assignment ORDER by name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      
+      while ($this->db->next_record())
+	{
+	  $assignment = $this->db->f('assignment');
+	  $assignment_name = $this->db->f('name');
+	  $assignment_code = $this->db->f('code');
+
+	  $this->nextmatchs->template_alternate_row_color(&$this->t);
+	  $table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$assignment_name</td>";
+	  
+	  $header_row="<th width=$comp_width><font size=-2>Assignments</th><th>Willingness</th>";
+	  $sql = "SELECT * FROM eq_willingness WHERE elder=".$elder_id." AND assignment=".$assignment;
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  $value = $assignment;
+	     
+	  if($this->db2->next_record()) {
+	      if($this->db2->f('willing') == 'y') {
+		$table_data .= '<td width=100 align=center>';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/y" checked>Y';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/n">N';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/"> ';
+		$table_data .= '</td>';
+	      } else if($this->db2->f('willing') == 'n') {
+		$table_data .= '<td width=100 align=center>';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/y">Y';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/n" checked>N';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/">';
+		$table_data .= '</td>';
+	      } else {
+		$table_data .= '<td width=100 align=center>';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/y">Y';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/n">N';
+		$table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/" checked> ';
+		$table_data .= '</td>';
+	      }
+	    }
+	  else {
+	    $table_data .= '<td width=100 align=center>';
+	    $table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/y">Y';
+	    $table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/n">N';
+	    $table_data .= '<input type="radio" name="willingness['.$assignment.']" value="'.$value.'/" checked> ';
+	    $table_data .= '</td>';
+	  }
+	  
+	  $table_data .= "\n";
+	  $table_data .= "</tr>"; 
+	  $table_data .= "<tr><td colspan=20></td></tr>";
+	}
+      
+      $table_data .= "<tr><td colspan=20><hr></td></tr>";
+      
+      $this->t->set_var('table_width',$table_width);
+      $this->t->set_var('header_row',$header_row);
+      $this->t->set_var('table_data',$table_data);
+      $this->t->fp('list','assignment_list',True);
+
+      $this->t->set_var('lang_reset','Clear Form');
+      $this->t->set_var('lang_save','Save Changes');
+      $this->t->set_var('savehandle','');
+      
+      $this->t->pfp('out','willing_update_t');
+      $this->t->pfp('addhandle','save');
+      
+      $this->save_sessiondata();
+    }
+    
+    
+    function ppi_sched()
+      {
       $this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
       $this->t->set_block('ppi_sched_t','elder_list','elderlist');
       $this->t->set_block('ppi_sched_t','appt_list','apptlist');

@@ -24,12 +24,15 @@
 					&nbsp;
                                         &nbsp;  
 					<br>					
-                                        <a href="{link_activity}">{lang_activity}</a>
+                                        <a href="{link_willing}">{lang_willing}</a>
 					&nbsp;
 					&nbsp;
 					<a href="{link_participation}">{lang_participation}</a>
 					&nbsp;
                                         &nbsp;
+                                        <a href="{link_activity}">{lang_activity}</a>
+					&nbsp;
+					&nbsp;
 					<a href="{link_assignment}">{lang_assignment}</a>
 					&nbsp;
                                         &nbsp;
