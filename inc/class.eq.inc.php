@@ -1162,7 +1162,7 @@ class eq
 
       $stat_table = '<td><b>Total Willing to Serve</b></td>';
       for ($j=0; $j < count($assignment_list); $j++) {
-	$stat_table .= "<td><b>".$total_willing[$j]."</b></td>";
+	$stat_table .= "<td align=center><b>".$total_willing[$j]."</b></td>";
       }
       $this->t->set_var('stat_table',$stat_table);
       
