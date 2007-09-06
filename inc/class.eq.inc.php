@@ -1116,7 +1116,7 @@ class eq
 	  $i++;
 	}
       
-      $elder_width=300; $willing_width=40; $assignment_width=50;
+      $elder_width=230; $willing_width=40; $assignment_width=50;
       $total_width=$elder_width+$willing_width;
       
       for ($i=0; $i < count($assignment_list); $i++) {
