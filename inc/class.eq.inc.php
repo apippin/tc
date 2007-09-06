@@ -30,6 +30,7 @@ class eq
   var $current_month;
   var $upload_target_path;
   var $script_path;
+  var $max_appointments;
   
   var $public_functions = array
     (
@@ -71,6 +72,7 @@ class eq
       $this->default_int_num_years = 0;
       $this->default_att_num_quarters = 1;
       $this->default_vis_num_years = 1;
+      $this->max_appointments = 32768;
       $this->upload_target_path = "/home/users/eqpres/eq_data/";
       $this->script_path = "/usr/share/phpgroupware/eq/";
       
@@ -1101,6 +1103,7 @@ class eq
 	{
 	  $elder_name[$i] = $this->db->f('name');
 	  $elder_id[$i] = $this->db->f('elder');
+	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
@@ -1115,8 +1118,21 @@ class eq
 	  $assignment_list[$i]['code'] = $this->db->f('code');
 	  $i++;
 	}
+
+      $sql = "SELECT * FROM eq_activity ORDER BY date DESC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $total_records = $this->db->num_rows();
+
+      $i = 0;
+      while ($this->db->next_record())
+	{
+	  $activity_list[$i]['assignment'] = $this->db->f('assignment');
+	  $activity_list[$i]['date'] = $this->db->f('date');
+	  $activity_list[$i]['activity']  = $this->db->f('activity');
+	  $i++;
+	}
       
-      $elder_width=230; $willing_width=40; $assignment_width=50;
+      $elder_width=275; $willing_width=40; $assignment_width=50;
       $total_width=$elder_width+$willing_width;
       
       for ($i=0; $i < count($assignment_list); $i++) {
@@ -1131,6 +1147,7 @@ class eq
 	$willing_table = ''; 
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$this->t->set_var('elder_name',$elder_name[$i]);
+	$this->t->set_var('elder_phone',$elder_phone[$elder_id[$i]]);
 	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&elder_id='
 							    . $elder_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
@@ -1141,9 +1158,26 @@ class eq
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  while($this->db->next_record()) {
 	    $found_willingness=1;
+	    $date_part="";
+	    $sql = "SELECT * FROM eq_activity where "
+	       . " assignment=". $assignment_list[$j]['assignment']
+	       . " ORDER by date DESC";
+	    $this->db2->query($sql,__LINE__,__FILE__);
+	    if($this->db2->next_record()) {
+	      $activity = $this->db2->f('activity');
+	      $date = $this->db2->f('date');
+	      $sql = "SELECT * FROM eq_participation where "
+		 . " activity=" . $activity
+		 . " AND elder=". $elder_id[$i];
+	      $this->db3->query($sql,__LINE__,__FILE__);
+	      if($this->db3->next_record()) {
+		$date_part = $date;
+	      } 
+	    }
+	      
 	    if($this->db->f('willing') == 'y') {
 	      $total_willing[$j]++;
-	      $willing_table .= '<td align=center><img src="checkmark.gif"></td>';
+	      $willing_table .= '<td align=center><img src="checkmark.gif"><br><font size=-2>'.$date_part.'</font></td></td>';
 	    }
 	    else if($this->db->f('willing') == 'n') {
 	      $willing_table .= '<td align=center><img src="x.gif"></td>';
@@ -3486,7 +3520,7 @@ class eq
 		 $uid = 0;
 
 		 // Update an existing appointment
-		 if($appointment < 2048)
+		 if($appointment < $this->max_appointments)
 		   {
 		     //Only perform a database update if we have made a change to this appointment
 		     $sql = "SELECT * FROM eq_appointment where " .
@@ -3512,7 +3546,7 @@ class eq
 		   }
 		 
 		 // Add a new appointment
-		 else if(($appointment >= 2048) && ($date != "") && ($time != ""))
+		 else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 		   {
 		     $this->db->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,uid) "
 			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','"
@@ -3653,7 +3687,7 @@ class eq
 
 	// Create blank appointment slot
 	for ($b=0; $b < 4; $b++) {
-	  $appointment = 2048 + $b;
+	  $appointment = $this->max_appointments + $b;
 	  $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 
 	  // Date selection

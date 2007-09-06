@@ -15,7 +15,7 @@
 	</tr>
 
 <!-- BEGIN elder_list -->
-	<tr bgcolor="{tr_color}"><td><b><font size=-2><a href={editurl}>{elder_name}</a></b></font></td>{willing_table}</tr>
+	<tr bgcolor="{tr_color}"><td title="{elder_phone}"><b><font size=-2><a href={editurl}>{elder_name}</a></b></font></td>{willing_table}</tr>
 <!-- END elder_list -->
 	<tr bgcolor="#c9c9c9">
 	{stat_table}
