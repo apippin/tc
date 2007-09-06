@@ -3486,7 +3486,7 @@ class eq
 		 $uid = 0;
 
 		 // Update an existing appointment
-		 if($appointment != 0)
+		 if($appointment < 2048)
 		   {
 		     //Only perform a database update if we have made a change to this appointment
 		     $sql = "SELECT * FROM eq_appointment where " .
@@ -3512,10 +3512,10 @@ class eq
 		   }
 		 
 		 // Add a new appointment
-		 else if(($appointment == 0) && ($date != "") && ($time != ""))
+		 else if(($appointment >= 2048) && ($date != "") && ($time != ""))
 		   {
 		     $this->db->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,uid) "
-			   . "VALUES ('" . $appointment . "','" . $presidency . "','" . $family . "','"
+			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','"
 			   . $elder . "','" . $date . "','" . $time  . "','" . $uid ."')",__LINE__,__FILE__);
 		     
 		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";		     
@@ -3652,59 +3652,64 @@ class eq
 	  }
 
 	// Create blank appointment slot
-	$appointment = 0;
-	$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+	for ($b=0; $b < 4; $b++) {
+	  $appointment = 2048 + $b;
+	  $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 
-        // Date selection
-	$table_data.= '<td align=left>';
-	$table_data.= $this->jscal->input('sched['.$presidency.']['.$appointment.'][date]','','','','','','',$this->cal_options);
-	$table_data.= '</td>';
+	  // Date selection
+	  $table_data.= '<td align=left>';
+	  $table_data.= $this->jscal->input('sched['.$presidency.']['.$appointment.'][date]','','','','','','',$this->cal_options);
+	  $table_data.= '</td>';
 	
-	// Time selection
-	$table_data.= "<td align=center>";
-	$table_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
-	$table_data.= '<option value=""></option>';
-	foreach(range(1,12) as $num) {
-	  $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	}
-	$table_data.= '</select>';
-	$table_data.= '&nbsp;:&nbsp;';
-	$table_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
-	$table_data.= '<option value=""></option>';
-	foreach(range(0,3) as $num) {
-	  $num = $num * 15; if($num == 0) { $num = "00"; }
-	  $table_data.= '<option value='.$num.'>'.$num.'</option>';
-	}
-	$table_data.= '</select>';
-	$table_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
-	$table_data.= '<option value=""></option>';
-	$table_data.= '<option value=0>am</option>';
-	$table_data.= '<option value=1>pm</option>';
-	$table_data.= '</select>';
-	$table_data.= "</td>";
-	
-	// Elder drop down list
-	$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder]>';
-	$table_data.= '<option value=0></option>';  
-	for ($j=0; $j < count($elder_id); $j++) {
-	  $id = $elder_id[$j];
-	  $name = $elder_name[$j];
-	  $table_data.= '<option value='.$id.'>'.$name.'</option>';
-	}
-	$table_data.='</select></td>';
-	
-	// Family drop down list
-	$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family]>';
-	$table_data.= '<option value=0></option>';  	    
-	for ($j=0; $j < count($elder_id); $j++) {
-	  $id = $family_id[$j];
-	  $name = $family_name[$j];
-	  $table_data.= '<option value='.$id.'>'.$name.' Family</option>';
-	}
-	$table_data.='</select></td>';
+	  // Time selection
+	  $table_data.= "<td align=center>";
+	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
+	  $table_data.= '<option value=""></option>';
+	  foreach(range(1,12) as $num) {
+	    $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+	  }
+	  $table_data.= '</select>';
+	  $table_data.= '&nbsp;:&nbsp;';
+	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
+	  $table_data.= '<option value=""></option>';
+	  foreach(range(0,3) as $num) {
+	    $num = $num * 15; if($num == 0) { $num = "00"; }
+	    $table_data.= '<option value='.$num.'>'.$num.'</option>';
+	  }
+	  $table_data.= '</select>';
+	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
+	  $table_data.= '<option value=""></option>';
+	  $table_data.= '<option value=0>am</option>';
+	  $table_data.= '<option value=1>pm</option>';
+	  $table_data.= '</select>';
+	  $table_data.= "</td>";
+	  
+	  // Elder drop down list
+	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder]>';
+	  $table_data.= '<option value=0></option>';  
+	  for ($j=0; $j < count($elder_id); $j++) {
+	    $id = $elder_id[$j];
+	    $name = $elder_name[$j];
+	    $table_data.= '<option value='.$id.'>'.$name.'</option>';
+	  }
+	  $table_data.='</select></td>';
+	  
+	  // Family drop down list
+	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family]>';
+	  $table_data.= '<option value=0></option>';  	    
+	  for ($j=0; $j < count($elder_id); $j++) {
+	    $id = $family_id[$j];
+	    $name = $family_name[$j];
+	    $table_data.= '<option value='.$id.'>'.$name.' Family</option>';
+	  }
+	  $table_data.='</select></td>';
+	  
+	  $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
+	  $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
 
-	$table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
-	$table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
+	  $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	  $this->t->set_var('tr_color',$tr_color);
+	}
 	
 	$this->t->set_var('table_data',$table_data);
 	$this->t->set_var('header_row',$header_row);
