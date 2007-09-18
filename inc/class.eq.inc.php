@@ -726,9 +726,9 @@ class eq
       
       if($action == 'save')
 	{
-	  $activity['assignment'] = $this->db->db_addslashes(get_var('assignment',array('POST')));
-	  $activity['date'] = $this->db->db_addslashes(get_var('date',array('POST')));
-	  $activity['notes']= $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $activity['assignment'] = get_var('assignment',array('POST'));
+	  $activity['date'] = get_var('date',array('POST'));
+	  $activity['notes']= get_var('notes',array('POST'));
 	  $this->db->query("UPDATE eq_activity set " .
 			   "   assignment='" . $activity['assignment'] .
 			   "', date='" . $activity['date'] . "'" .
@@ -752,9 +752,9 @@ class eq
 
       if($action == 'insert')
 	{
-	  $activity['assignment'] = $this->db->db_addslashes(get_var('assignment',array('POST')));
-	  $activity['date'] = $this->db->db_addslashes(get_var('date',array('POST')));
-	  $activity['notes']= $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $activity['assignment'] = get_var('assignment',array('POST'));
+	  $activity['date'] = get_var('date',array('POST'));
+	  $activity['notes']= get_var('notes',array('POST'));
 	  $this->db->query("INSERT INTO eq_activity (assignment,date,notes) "
 			   . "VALUES ('" . $activity['assignment'] . "','"
 			   . $activity['date'] . "','" . $activity['notes'] . "')",__LINE__,__FILE__);
@@ -937,8 +937,8 @@ class eq
 
       if($action == 'save')
 	{
-	  $assignment['name'] = $this->db->db_addslashes(get_var('name',array('POST')));
-	  $assignment['code'] = $this->db->db_addslashes(get_var('code',array('POST')));
+	  $assignment['name'] = get_var('name',array('POST'));
+	  $assignment['code'] = get_var('code',array('POST'));
 	  $this->db->query("UPDATE eq_assignment set " .
 			   "  name='" . $assignment['name'] . "'" .
 			   ", code='" . $assignment['code'] . "'" .
@@ -950,8 +950,8 @@ class eq
 
       if($action == 'insert')
 	{
-	  $assignment['name'] = $this->db->db_addslashes(get_var('name',array('POST')));
-	  $assignment['code'] = $this->db->db_addslashes(get_var('code',array('POST')));
+	  $assignment['name'] = get_var('name',array('POST'));
+	  $assignment['code'] = get_var('code',array('POST'));
 	  $this->db->query("INSERT INTO eq_assignment (name,code) "
 			   . "VALUES ('" . $assignment['name'] . "','"
 			   . $assignment['code'] . "')",__LINE__,__FILE__);
@@ -2201,7 +2201,7 @@ class eq
 	    $families_with_yearly_visit++;
 	    $date = $this->db2->f('date');
 	    $vis_notes = $this->db2->f('notes');
-	    if(strlen($vis_notes) > 40) { $vis_notes = substr($vis_notes,0,40) . "..."; }
+	    if(strlen($vis_notes) > 40) { $vis_notes = stripslashes(substr($vis_notes,0,40) . "..."); }
 	    $completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
 	    $completed_data.= "<td align=center>$phone</td>";
 	    $completed_data.= "<td align=center><a href=".$link.">$date</a></td>";
@@ -2423,7 +2423,7 @@ class eq
       
       if($action == 'save')
 	{
-	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("UPDATE eq_ppi set " .
 			   "   ppi='" . $ppi . "'" .
 		    ", interviewer='" . $interviewer . "'" .
@@ -2438,7 +2438,7 @@ class eq
 
       if($action == 'insert')
 	{
-	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,date,notes,eqpresppi) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','"
 			   . $date . "','" . $notes . "','" . $eqpresppi  ."')",__LINE__,__FILE__);
@@ -2752,7 +2752,7 @@ class eq
       
       if($action == 'save')
 	{
-	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("UPDATE eq_interview set " .
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
@@ -2767,7 +2767,7 @@ class eq
 
       if($action == 'insert')
 	{
-	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("INSERT INTO eq_interview (interviewer,elder,aaronic,date,notes) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
 			   . $date . "','" . $notes ."')",__LINE__,__FILE__);
@@ -2965,7 +2965,7 @@ class eq
       
       if($action == 'save')
 	{
-	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("UPDATE eq_visit set " .
 			   "  date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
@@ -2976,7 +2976,7 @@ class eq
 
       if($action == 'insert')
 	{
-	  $notes = $this->db->db_addslashes(get_var('notes',array('POST')));
+	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("INSERT INTO eq_visit (family,companionship,date,notes) "
 			   . "VALUES ('" . $family . "','" . $companionship . "','"
 			   . $date . "','" . $notes . "')",__LINE__,__FILE__);
