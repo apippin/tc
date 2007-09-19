@@ -1683,6 +1683,7 @@ class eq
 	     $elder_name = $entry['elder_name'];
 	     $int_pri = $entry['pri'];
 	     $aaronic = $entry['aaronic'];
+	     //print "int_notes: $int_notes elder_name: $elder_name aaronic: $aaronic <Br>";
 	     if($aaronic == 0) { 
 	       // Perform database save actions here
 	       $this->db->query("UPDATE eq_elder set " .
@@ -1886,20 +1887,24 @@ class eq
 		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 		$table_data.= "<td align=center>$phone</td>";
 		$table_data.= "<td align=center>";
-		$table_data.= '<select name=int_notes['.$i.'][pri]>';
-		foreach(range(0,6) as $num) {
-		  if($num == 0) { $num = 1; } else {$num = $num*5; }
-		  if($int_pri == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
-		  $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+		if($aaronic == 0) { 
+		  $table_data.= '<select name=int_notes['.$i.'][pri]>';
+		  foreach(range(0,6) as $num) {
+		    if($num == 0) { $num = 1; } else {$num = $num*5; }
+		    if($int_pri == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
+		    $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+		  }
+		  $table_data.= '</select></td>';
 		}
-		$table_data.= '</select></td>';
 		$table_data.= "<td align=center>$date</td>";
-		$table_data.= '<td><input type=text size="50" maxlength="128" name="int_notes['.$i.'][notes]" value="'.$int_notes.'">';
+		if($aaronic == 0) { 
+		  $table_data.= '<td><input type=text size="50" maxlength="128" name="int_notes['.$i.'][notes]" value="'.$int_notes.'">';
+		}
 		$table_data.= '<input type=hidden name="int_notes['.$i.'][elder_id]" value="'.$id.'">';
 		$table_data.= '<input type=hidden name="int_notes['.$i.'][elder_name]" value="'.$name.'">';
 		$table_data.= '<input type=hidden name="int_notes['.$i.'][aaronic]" value="'.$aaronic.'">';
 		$table_data.= '</td>';
-		$table_data.= '</tr>';
+		$table_data.= '</tr>'."\n";
 		$i++;
 	      } else {
 		$link_data['menuaction'] = 'eq.eq.int_update';
@@ -2212,7 +2217,7 @@ class eq
 	  }
       }
 
-      $name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
+      $name_width=190; $phone_width=100; $date_width=100; $notes_width=300;
       $completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
       $completed_header_row = "<th width=$name_width><font size=-2>Family Name</th>";
       $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
