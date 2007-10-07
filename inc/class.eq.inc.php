@@ -763,7 +763,7 @@ class eq
 	     . " AND date='".$activity['date']."' AND notes='".$activity['notes']."'";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
-	    print "activity: " . $this->db->f('activity') . "<br>";
+	    //print "activity: " . $this->db->f('activity') . "<br>";
 	    $activity['activity'] = $this->db->f('activity');
 	  }
 	  
@@ -3524,40 +3524,64 @@ class eq
 		 $time = $hour.':'.$minute.':'.'00';
 		 $uid = 0;
 
+		 // Zero out the family or elder if date = NULL
+		 if($date == "") {
+		   $elder = 0;
+		   $family = 0;
+		 }
+		 
 		 // Update an existing appointment
 		 if($appointment < $this->max_appointments)
 		   {
 		     //Only perform a database update if we have made a change to this appointment
 		     $sql = "SELECT * FROM eq_appointment where " .
 			"appointment='$appointment'" .
-			"and elder='$elder'" .
-			"and family='$family'" .
-			"and date='$date'" .
-			"and time='$time'";
+			" and presidency='$presidency'" .
+			" and elder='$elder'" .
+			" and family='$family'" .
+			" and date='$date'" .
+			" and time='$time'";
 		     $this->db->query($sql,__LINE__,__FILE__);
 		     if(!$this->db->next_record()) {
-		       $this->db->query("UPDATE eq_appointment set" .
+		       $old_date = $this->db->f('date');
+		       $old_time = $this->db->f('time');
+		       $this->db2->query("UPDATE eq_appointment set" .
 					" family=" . $family . 
 					" ,elder=" . $elder . 
 					" ,date='" . $date . "'" .
 					" ,time='" . $time . "'" .
+					" ,presidency='" . $presidency . "'" .
 					" WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		       
 		       // Email the appointment
-		       if(($date != "") && ($time != "")) { 
-			 $this->email_appt($appointment);
-		       }
+		       $this->email_appt($appointment);
 		     }
 		   }
 		 
 		 // Add a new appointment
 		 else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 		   {
-		     $this->db->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,uid) "
+		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";
+		     $this->db2->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,uid) "
 			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','"
 			   . $elder . "','" . $date . "','" . $time  . "','" . $uid ."')",__LINE__,__FILE__);
-		     
-		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";		     
+
+		     // Now reselect this entry from the database to see if we need
+		     // to send an appointment out for it.
+		     $sql = "SELECT * FROM eq_appointment where " .
+			"elder='$elder'" .
+			" and family='$family'" .
+			" and presidency='$presidency'" .
+			" and date='$date'" .
+			" and time='$time'" .
+			" and uid='$uid'";
+		     $this->db3->query($sql,__LINE__,__FILE__);
+		     if($this->db3->next_record()) {
+		       // Email the appointment if warranted
+		       if(($date != "") && ($time != "") && (($elder > 0) || $family > 0)) { 
+			 $this->email_appt($this->db3->f('appointment'));
+		       }
+		     }
 		   }
 	       }
 	   }
