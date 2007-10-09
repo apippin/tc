@@ -2407,25 +2407,14 @@ class eq
       $notes = get_var('notes',array('GET','POST'));
       $eqpresppi = get_var('eqpresppi',array('GET','POST'));
       
-      $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      while ($this->db->next_record())
-	{
-	  $supervisor = $this->db->f('supervisor');
-	  $sql = "SELECT * FROM eq_elder WHERE elder=" . $supervisor;
-	  $this->db2->query($sql,__LINE__,__FILE__);
-	  $this->db2->next_record();
-	  $interviewer_name = $this->db2->f('name');
-	  
-	  if($supervisor == $interviewer) { 
-	    $this->t->set_var('interviewer',$supervisor . ' selected');
-	  } else {
-	    $this->t->set_var('interviewer',$interviewer);
-	  }
-	  $this->t->set_var('interviewer_name',$interviewer_name);
-	  $this->t->fp('int_list','interviewer_list',True);
-	}
-      
+      $sql = "SELECT * FROM eq_elder WHERE elder=" . $interviewer;
+      $this->db2->query($sql,__LINE__,__FILE__);
+      $this->db2->next_record();
+      $interviewer_name = $this->db2->f('name');
+      $this->t->set_var('interviewer',$interviewer . ' selected');
+      $this->t->set_var('interviewer_name',$interviewer_name);
+      $this->t->fp('int_list','interviewer_list',True);
+    
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
