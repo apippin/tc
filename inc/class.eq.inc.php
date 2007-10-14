@@ -1096,6 +1096,23 @@ class eq
       $this->t->set_block('willing_view_t','header_list','list1');
       $this->t->set_block('willing_view_t','elder_list','list2');
 
+      $this->t->set_var('lang_filter','Filter');
+      $this->t->set_var('lang_filter_unwilling','Filter out unwilling Elders:');
+
+      $filter_unwilling = get_var('filter_unwilling',array('POST'));
+      $this->t->set_var('filter_unwilling',$filter_unwilling);
+      
+      if($filter_unwilling == 'y' || $filter_unwilling == '') { 
+	$filter_input = "<input type=\"radio\" name=\"filter_unwilling\" value=\"y\" checked>Y";
+	$filter_input.= "<input type=\"radio\" name=\"filter_unwilling\" value=\"n\">N";
+	$filter_input.= "&nbsp;&nbsp;";
+      } else {
+	$filter_input = "<input type=\"radio\" name=\"filter_unwilling\" value=\"y\">Y";
+	$filter_input.= "<input type=\"radio\" name=\"filter_unwilling\" value=\"n\" checked>N";
+	$filter_input.= "&nbsp;&nbsp;";
+      }
+      $this->t->set_var('filter_input',$filter_input);
+      
       $sql = "SELECT * FROM eq_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
@@ -1145,13 +1162,12 @@ class eq
 
       for ($i=0; $i < count($elder_id); $i++) {
 	$willing_table = ''; 
-	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$this->t->set_var('elder_name',$elder_name[$i]);
 	$this->t->set_var('elder_phone',$elder_phone[$elder_id[$i]]);
 	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&elder_id='
 							    . $elder_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
-	  $found_willingness=0;
+	  $found_willingness=0; $elder_willing=0;
 	  $sql = "SELECT * FROM eq_willingness where "
 	     . " assignment=" . $assignment_list[$j]['assignment']
 	     . " AND elder=" . $elder_id[$i];
@@ -1177,21 +1193,27 @@ class eq
 	      
 	    if($this->db->f('willing') == 'y') {
 	      $total_willing[$j]++;
+	      $elder_willing=1;
 	      $willing_table .= '<td align=center><img src="checkmark.gif"><br><font size=-2>'.$date_part.'</font></td></td>';
 	    }
 	    else if($this->db->f('willing') == 'n') {
 	      $willing_table .= '<td align=center><img src="x.gif"></td>';
 	    }
 	    else {
+	      $elder_willing=1;
 	      $willing_table .= "<td>&nbsp;</td>";
 	    }
 	  }
 	  if(!$found_willingness) {
+	    $elder_willing=1;
 	    $willing_table .= "<td>&nbsp;</td>";
 	  }
 	}
-	$this->t->set_var('willing_table',$willing_table);
-	$this->t->fp('list2','elder_list',True);
+	if(($elder_willing == 1) || ($filter_unwilling == 'n')) { 
+	  $this->t->set_var('willing_table',$willing_table);
+	  $this->t->fp('list2','elder_list',True);
+	  $this->nextmatchs->template_alternate_row_color(&$this->t);
+	} 
       }
 
       $stat_table = '<td><b>Total Willing to Serve</b></td>';
@@ -1409,6 +1431,7 @@ class eq
 	$president_name = $this->db->f('name');
 	$president_id = $this->db->f('elder');
 	$presidency_id = $this->db->f('presidency');
+	$interviewer = $this->db->f('elder');
 	$district_number = '*';
 	$district_name = $president_name;
       } else {
@@ -1531,6 +1554,7 @@ class eq
 	    $link_data['ppi'] = '';
 	    $link_data['eqpresppi'] = 1;
 	    $link_data['action'] = 'add';
+	    $link_data['interviewer'] = $interviewer;
 	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
@@ -1883,6 +1907,7 @@ class eq
 		$link_data['name'] = $name;
 		$link_data['interview'] = '';
 		$link_data['action'] = 'add';
+		$link_data['interviewer'] = $districts[$d]['supervisor'];
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 		$table_data.= "<td align=center>$phone</td>";
