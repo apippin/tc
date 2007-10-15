@@ -1161,13 +1161,13 @@ class eq
       }
 
       for ($i=0; $i < count($elder_id); $i++) {
-	$willing_table = ''; 
+	$willing_table = ''; $elder_willing=0;
 	$this->t->set_var('elder_name',$elder_name[$i]);
 	$this->t->set_var('elder_phone',$elder_phone[$elder_id[$i]]);
 	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&elder_id='
 							    . $elder_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
-	  $found_willingness=0; $elder_willing=0;
+	  $found_willingness=0; 
 	  $sql = "SELECT * FROM eq_willingness where "
 	     . " assignment=" . $assignment_list[$j]['assignment']
 	     . " AND elder=" . $elder_id[$i];
