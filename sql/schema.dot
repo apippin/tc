@@ -1,0 +1,110 @@
+digraph schema {
+  graph [
+    rankdir = "LR"
+  ];
+  family   [
+    label = "<f> family||<c> companionship|<n> name_id|<i> hofh_id|<e> elder_id|<vp> visit_pri|<vn> visit_notes|<v> valid"
+    shape = "record"
+  ];
+  elder   [
+    label = "<e> elder||<n> name|<p> phone|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
+    shape = "record"
+  ];
+  companionship   [
+    label = "<c> companionship||<e> elder|<a> aaronic|<d> district|<v> valid"
+    shape = "record"
+  ];
+  visit   [
+    label = "<v> visit||<f> family|<c> companionship|<t> date|<n> notes|<v> visited"
+    shape = "record"
+  ];
+  ppi   [
+    label = "<p> ppi||<i> interviewer|<e> elder|<t> date|<n> notes|<p> eqpresppi"
+    shape = "record"
+  ];
+  activity   [
+    label = "<a> activity||<s> assignment|<t> date|<n> notes"
+    shape = "record"
+  ];
+  participation   [
+    label = "participation||<e> elder|<a> activity"
+    shape = "record"
+  ];
+  attendance   [
+    label = "attendance||<e> elder|<d> date"
+    shape = "record"
+  ];
+  child	[
+    label = "<c> child||<f> family|<i> indiv_id|<n> name|<b> birthday|<v> valid"
+    shape = "record"
+  ]; 
+  parent	[
+    label = "<p> parent||<f> family|<n> name|<b> birthday|<p> phone|<a> address|<i>indiv_id|<v> valid"
+    shape = "record"
+  ]; 
+  aaronic       [
+    label = "<a> aaronic||<n> name|<p> phone|<v> valid"
+    shape = "record"
+  ];
+  appointment   [
+    label = "<a> appointment||<p> presidency|<f> family|<e> elder |<d> date|<t> time|<u> uid"
+    shape = "record"
+  ];
+  assignment    [
+    label = "<a> assignment||<n> name|<c> code"
+    shape = "record"
+  ];
+  calling       [
+    label = "calling||<i> indiv_id|<n> name|<o> organization|<p> position|<s> sequence|<t> sustained"
+    shape = "record"
+  ];
+  district      [
+    label = "<d> district||<n> name|<s> supervisor|<v> valid"
+    shape = "record"
+  ];
+  interview     [
+    label = "<i> interview||<in> interviewer|<e> elder|<a> aaronic|<d> date|<n> notes"
+    shape = "record"
+  ];
+  presidency    [
+    label = "<p> presidency||<e> elder|<d> district|<n> name|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+    shape = "record"
+  ];
+  willingness   [
+    label = "<e> elder||<a> assignment|<w> willing"
+    shape = "record"
+  ];
+
+  family:c        -> companionship:c
+  companionship:e -> elder:e
+  companionship:a -> aaronic:a
+
+  appointment:e   -> elder:e
+  appointment:f   -> family:f
+
+  interview:e     -> elder:e
+  interview:in    -> elder:e
+  interview:a     -> aaronic:a
+
+  presidency:e    -> elder:e
+  presidency:d    -> district:d
+
+  willingness:e   -> elder:e
+  willingness:a   -> assignment:a
+
+  activity:s      -> assignment:a
+
+  visit:c         -> companionship:c
+  visit:f         -> family:f
+
+  ppi:i           -> elder:e
+  ppi:e           -> elder:e
+
+  participation:e -> elder:e
+  participation:a -> activity:a
+
+  attendance:e    -> elder:e
+
+  child:f         -> family:f
+  parent:f        -> family:f
+}

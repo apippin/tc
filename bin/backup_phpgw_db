@@ -1,0 +1,13 @@
+#!/bin/bash
+
+MNTPNT="/backup"
+DSTDIR="/backup/mysql/"
+DBNAME=phpgroupware
+DBUSER=phpgroupware
+DBPASS=phpgroupware
+
+mount -w -o remount $MNTPNT 
+/usr/bin/mysqldump --databases $DBNAME -u $DBUSER --password=$DBPASS -c > $DSTDIR/mysql_phpgw_backup.sql
+ls -l $DSTDIR/mysql_phpgw_backup.sql
+mount -r -o remount $MNTPNT
+

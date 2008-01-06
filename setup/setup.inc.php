@@ -29,7 +29,24 @@
 	$setup_info['eq']['maintainer_email'] = 'apippin@pippins.net';
 	
 	/* The tables this app creates */
-	/* $setup_info['eq']['tables']    = Array('eq'); */
+	$setup_info['eq']['tables'][] = 'eq_aaronic';
+	$setup_info['eq']['tables'][] = 'eq_activity';
+	$setup_info['eq']['tables'][] = 'eq_appointment';
+	$setup_info['eq']['tables'][] = 'eq_assignment';
+	$setup_info['eq']['tables'][] = 'eq_attendance';
+	$setup_info['eq']['tables'][] = 'eq_calling';
+	$setup_info['eq']['tables'][] = 'eq_child';
+	$setup_info['eq']['tables'][] = 'eq_companionship';
+	$setup_info['eq']['tables'][] = 'eq_district';
+	$setup_info['eq']['tables'][] = 'eq_elder';
+	$setup_info['eq']['tables'][] = 'eq_family';
+	$setup_info['eq']['tables'][] = 'eq_interview';
+	$setup_info['eq']['tables'][] = 'eq_parent';
+	$setup_info['eq']['tables'][] = 'eq_participation';
+	$setup_info['eq']['tables'][] = 'eq_ppi';
+	$setup_info['eq']['tables'][] = 'eq_presidency';
+	$setup_info['eq']['tables'][] = 'eq_visit';
+	$setup_info['eq']['tables'][] = 'eq_willingness';
 
 	/* The hooks this app includes, needed for hooks registration */
 	$setup_info['eq']['hooks'] = Array(

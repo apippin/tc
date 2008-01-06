@@ -8,7 +8,7 @@
   *  Free Software Foundation; either version 2 of the License, or (at your  *
   *  option) any later version.                                              *
   \**************************************************************************/
-	/* $Id: class.eq.inc.php,v 1.1.1.1 2001/05/20 07:40:32 seek3r Exp $ */
+      /* $Id: class.eq.inc.php,v 1.1.1.1 2005/07/20 07:40:32 ajp Exp $ */
 
 class eq
 {
@@ -26,11 +26,13 @@ class eq
   var $default_int_num_years;
   var $default_vis_num_years;
   var $default_att_num_quarters;
+  var $max_num_districts;
   var $current_year;
   var $current_month;
   var $upload_target_path;
   var $script_path;
   var $max_appointments;
+  var $max_presidency_members;
   
   var $public_functions = array
     (
@@ -65,6 +67,9 @@ class eq
  
   function eq()
     {
+      // LOCAL CONFIGURATION. PLEASE UPDATE AS APPROPRIATE.
+      $this->upload_target_path = "/home/users/eqpres/eq_data/";
+      $this->script_path = "/usr/share/phpgroupware/eq/bin/";
       $this->default_ht_num_months = 3;
       $this->default_ppi_num_months = 3;
       $this->default_ppi_num_years = 0;
@@ -72,9 +77,10 @@ class eq
       $this->default_int_num_years = 0;
       $this->default_att_num_quarters = 1;
       $this->default_vis_num_years = 1;
+      $this->max_num_districts = 4;
+      $this->max_presidency_members = 99;
       $this->max_appointments = 32768;
-      $this->upload_target_path = "/home/users/eqpres/eq_data/";
-      $this->script_path = "/usr/share/phpgroupware/eq/";
+      // END LOCAL CONFIGURATION
       
       $this->db		= $GLOBALS['phpgw']->db;
       $this->db2	= $this->db;
@@ -91,7 +97,7 @@ class eq
                                 mondayFirst : false,
                                 weekNumbers : false';
        
-      $GLOBALS['phpgw_info']['flags']['app_header'] = 'Elders Quorum Tools';
+      $GLOBALS['phpgw_info']['flags']['app_header'] = 'Elders Quorum Tools - The 3rd Counselor';
       $GLOBALS['phpgw']->common->phpgw_header();
 
       $this->current_day = `date '+%d'`;
@@ -313,10 +319,10 @@ class eq
 		if($this->db2->next_record()) {
 		  if($this->db2->f('visited') == 'y') {
 		    $visits[$m]++; $total_visits[$m]++;		  
-		    $table_data .= '<td align=center><a href="'.$link.'"><img src="checkmark.gif"></a></td>';
+		    $table_data .= '<td align=center><a href="'.$link.'"><img src="images/checkmark.gif"></a></td>';
 		  }
 		  else if($this->db2->f('visited') == 'n') {
-		    $table_data .= '<td align=center><a href="'.$link.'"><img src="x.gif"></a></td>';
+		    $table_data .= '<td align=center><a href="'.$link.'"><img src="images/x.gif"></a></td>';
 		  }
 		  else {
 		    $visits[$m]++; $total_visits[$m]++;
@@ -1070,14 +1076,14 @@ class eq
 	    }
 	  }
 	  if($checkmark) {
-	    $part_table .= '<td align=center><img src="checkmark.gif">';
+	    $part_table .= '<td align=center><img src="images/checkmark.gif">';
 	    $part_table .= '<font size=-2>'.$num_matches.'</font><br>';
 	    $part_table .= '<font size=-2>'.$date.'</font></td>';
 	  } else {
 	    $part_table .= '<td>&nbsp;</td>';
 	  }
 	}
-	if($participated) { $part_table .= '<td align=center><img src="checkmark.gif">'.$participated.'</td>'; }
+	if($participated) { $part_table .= '<td align=center><img src="images/checkmark.gif">'.$participated.'</td>'; }
 	else { $part_table .= '<td>&nbsp;</td>'; }
 	$this->t->set_var('part_table',$part_table);
 	$this->t->fp('list2','elder_list',True);
@@ -1194,10 +1200,10 @@ class eq
 	    if($this->db->f('willing') == 'y') {
 	      $total_willing[$j]++;
 	      $elder_willing=1;
-	      $willing_table .= '<td align=center><img src="checkmark.gif"><br><font size=-2>'.$date_part.'</font></td></td>';
+	      $willing_table .= '<td align=center><img src="images/checkmark.gif"><br><font size=-2>'.$date_part.'</font></td></td>';
 	    }
 	    else if($this->db->f('willing') == 'n') {
-	      $willing_table .= '<td align=center><img src="x.gif"></td>';
+	      $willing_table .= '<td align=center><img src="images/x.gif"></td>';
 	    }
 	    else {
 	      $elder_willing=1;
@@ -2079,7 +2085,7 @@ class eq
       $appt_table_data = ""; 
 
       // Find out what the EQ Presidency ID is
-      $sql = "SELECT * FROM eq_presidency where president=0 and counselor=0 and secretary=0 and valid=1";
+      $sql = "SELECT * FROM eq_presidency where eqpres=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$presidency_name = $this->db->f('name');
@@ -2387,7 +2393,7 @@ class eq
 	    $month = $date_array[1];
 	    $day   = $date_array[2];
 	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
-	    $table_data .= '<td align=center><a href='.$link.'><img src="checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
+	    $table_data .= '<td align=center><a href='.$link.'><img src="images/checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
 	  }
 	  else { $table_data .= "<td>&nbsp;</td>"; }
 	}
@@ -2684,7 +2690,7 @@ class eq
 		  $month = $date_array[1];
 		  $day   = $date_array[2];
 		  $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
-		  $table_data .= '<td align=center><a href='.$link.'><img src="checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
+		  $table_data .= '<td align=center><a href='.$link.'><img src="images/checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
 		}
 		else { $table_data .= "<td>&nbsp;</td>"; }
 	      }
@@ -3191,7 +3197,7 @@ class eq
 	      $attended[$i][$cur_month]=1;
 	      $attendance[$monthnum[$cur_month]]++;
 	    } 
-	    $att_table .= '<td align=center><img src="checkmark.gif"></td>';
+	    $att_table .= '<td align=center><img src="images/checkmark.gif"></td>';
 	  } else {
 	    $att_table .= '<td>&nbsp;</td>';
 	  }
@@ -3805,13 +3811,27 @@ class eq
       $this->t->set_block('admin_t','upload','uploadhandle');
       $this->t->set_block('admin_t','admin','adminhandle');
       $this->t->set_block('admin_t','cmd','cmdhandle');
+      $this->t->set_block('admin_t','presidency','presidencyhandle');
       
       $this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.admin&action=upload'));
+      $this->t->set_var('presidency_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.admin&action=presidency'));
       
       $action = get_var('action',array('GET','POST'));
 
       $this->t->pfp('out','admin_t');
-      
+
+      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $elder_id[$i] = $this->db->f('elder');
+	  $elder_name[$i] = $this->db->f('name');
+	  $elder2name[$elder_id[$i]] = $elder_name[$i];
+	  $i++;
+	}
+      array_multisort($elder_name, $elder_id);
+
       if($action == 'upload')
 	{	 
 	  $target_path = $this->upload_target_path . basename( $_FILES['uploadedfile']['name']);
@@ -3915,12 +3935,238 @@ class eq
 	    $this->t->pfp('uploadhandle','upload',True);
 	  }
 	}
+      else if($action == "presidency")
+	{
+	  $new_data = get_var('eqpres',array('POST'));
+	  foreach ($new_data as $entry)
+	   {
+	     $id = $entry['id'];
+	     $email = $entry['email'];
+	     $elder = $entry['elder'];
+	     $name = $entry['name'];
+	     $district = $entry['district'];
+	     $president = $entry['president'];
+	     $counselor = $entry['counselor'];
+	     $secretary = $entry['secretary'];
+	     $eqpresidency = $entry['eqpresidency'];
+	     // Set the elder id to 0 for EQ Presidency tagged entry
+	     if($eqpresidency == 1) { $elder="0"; }
+	     // Re-look up the elder name for the ID if we aren't an EQ Presidency tagged entry
+	     else { $name = $elder2name[$elder]; }
+	     //print "id=$id elder=$elder name=$name email=$email district=$district president=$president ";
+	     //print "counselor=$counselor secretary=$secretary eqpres=$eqpresidency<br>";
+
+	     if(($elder > 0) || ($name != "")) {
+	       if($id < $this->max_presidency_members) {
+		 //print "Updating Existing Entry<br>";
+		 $this->db2->query("UPDATE eq_presidency set" .
+				   " elder=" . $elder . 
+				   " ,district=" . $district . 
+				   " ,name='" . $name . "'" .
+				   " ,email='" . $email . "'" .
+				   " ,president='" . $president . "'" .
+				   " ,counselor='" . $counselor . "'" .
+				   " ,secretary='" . $secretary . "'" .
+				   " ,eqpres='" . $eqpresidency . "'" .
+				   " WHERE presidency=" . $id,__LINE__,__FILE__);
+		 
+	       } else {
+		 //print "Adding New Entry<br>";
+		 $this->db2->query("INSERT INTO eq_presidency (presidency,elder,district,name,"
+				   . "email,president,counselor,secretary,eqpres,valid) "
+				   . "VALUES (NULL,'" . $elder . "','" . $district . "','"
+				   . $name . "','" . $email . "','" . $president  . "','"
+				   . $counselor . "','" . $secretary . "','" . $eqpres  . "','1'"
+				   .")",__LINE__,__FILE__);
+	       }
+	     } else {
+	       //print "Ignoring Blank Entry<br>";
+	     }
+	   }
+
+	  // Now update the eq_district table appropriately
+	  
+	  // Delete all the previous district entries from the table
+	  $this->db->query("DELETE from eq_district where valid=1",__LINE__,__FILE__);
+	  $this->db->query("DELETE from eq_district where valid=0",__LINE__,__FILE__);
+
+	  // Always add a "District 0" assigned to the High Priests Group
+	  $district = 0;
+	  $name = "High Priests";
+	  $elder = 0;
+	  $valid = 0;
+	  $this->db2->query("INSERT INTO eq_district (district,name,supervisor,valid) "
+			    . "VALUES ('" . $district . "','" . $name . "','"
+			    . $elder . "','" . $valid . "'"
+			    .")",__LINE__,__FILE__);
+	  
+	  
+	  // Requery the eq_presidency table
+	  $sql = "SELECT * FROM eq_presidency where valid=1";
+	  $this->db->query($sql,__LINE__,__FILE__);
+	  while ($this->db->next_record())
+	    {
+	      // Extract the data for each presidency record
+	      $id = $this->db->f('presidency');
+	      $elder = $this->db->f('elder');
+	      $name = $this->db->f('name');
+	      $district = $this->db->f('district');
+	      $name = $this->db->f('name');
+	      $valid = 1;
+
+	      // If we have a valid district, add it to the district table
+	      if($district > 0) {
+		$this->db2->query("INSERT INTO eq_district (district,name,supervisor,valid) "
+				  . "VALUES ('" . $district . "','" . $name . "','"
+ 				  . $elder . "','" . $valid . "'"
+				  .")",__LINE__,__FILE__);
+	      }
+	      
+	    }
+	  
+	  $this->t->set_var('adminhandle','');
+	  $this->t->pfp('adminhandle','admin'); 
+	}
       else
 	{
 	  $this->t->set_var('adminhandle','');
 	  $this->t->pfp('adminhandle','admin'); 
 	}
+
+      // Now save off the data needed for an EQ Presidency Table Update
       
+      $sql = "SELECT * FROM eq_presidency where valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $table_data = "";
+      $header_row = "<th>Elder</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th><th>EQ Presidency</th>";
+      while ($this->db->next_record())
+	{
+	  // Extract the data for each presidency record
+	  $id = $this->db->f('presidency');
+	  $elder = $this->db->f('elder');
+	  $district = $this->db->f('district');
+	  $name = $this->db->f('name');
+	  $email = $this->db->f('email');
+	  $president = $this->db->f('president');
+	  $counselor = $this->db->f('counselor');
+	  $secretary = $this->db->f('secretary');
+	  $eqpresidency = $this->db->f('eqpres');
+
+	  // Create the forms needed in the table
+	  $table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+	  
+	  // Presidency ID
+	  $table_data .= '<input type=hidden name="eqpres['.$id.'][id]" value="'.$id.'">';
+	  
+	  // Elder
+	  if($eqpresidency == 0) { 
+	    $table_data.= '<td align=center><select name="eqpres['.$id.'][elder]">';
+	    $table_data.= '<option value=0></option>';  
+	    for ($j=0; $j < count($elder_id); $j++) {
+	      $tmp_id = $elder_id[$j];
+	      $name = $elder_name[$j];
+	      if($elder_id[$j] == $elder) { $eldername = $name; $selected = 'selected="selected"'; } else { $selected = ''; }
+	      $table_data.= '<option value='.$tmp_id.' '.$selected.'>'.$name.'</option>';
+	    }
+	    $table_data.='</select></td>';
+	    $table_data.='<input type=hidden name="eqpres['.$id.'][name]" value="'.$eldername.'">';
+	  } else {
+	    $table_data.= '<td align=left><input type=text size="20" name="eqpresname" value="EQ Presidency"></td>';
+	    $table_data.= '<input type=hidden name="eqpres['.$id.'][name]" value="EQ Presidency">';
+	  }
+	    
+	  // Email Address
+	  $table_data .= '<td><input type="text" size="50" name="eqpres['.$id.'][email]" value="'.$email.'"></td>';
+	  
+	  // District
+	  $table_data.= '<td align=center><select name="eqpres['.$id.'][district]">';
+	  $table_data.= '<option value=0></option>';
+	  for ($j=0; $j <= $this->max_num_districts; $j++) {
+	    if($district == $j) { $selected = 'selected="selected"'; } else { $selected = ''; }
+	    $table_data.= '<option value='.$j.' '.$selected.'>'.$j.'</option>';
+	  }
+	  $table_data.='</select></td>';
+	  
+	  // President
+	  $table_data.= '<td align=center><select name="eqpres['.$id.'][president]">';
+	  if($president == 1) { $table_data .= '<option value=0>0</option><option value=1 selected="selected">1</option>'; }
+	  else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
+	  $table_data.='</select></td>';
+	  
+	  // Counselor
+	  $table_data.= '<td align=center><select name="eqpres['.$id.'][counselor]">';
+	  if($counselor == 1) { $table_data .= '<option value=0>0</option><option value=1 selected="selected">1</option>'; }
+	  else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
+	  $table_data.='</select></td>';
+
+	  // Secretary
+	  $table_data.= '<td align=center><select name="eqpres['.$id.'][secretary]">';
+	  if($secretary == 1) { $table_data .= '<option value=0>0</option><option value=1 selected="selected">1</option>'; }
+	  else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
+	  $table_data.='</select></td>';
+
+	  // EQ Presidency
+	  $table_data.= '<td align=center><select name="eqpres['.$id.'][eqpresidency]">';
+	  if($eqpresidency == 1) { $table_data .= '<option value=0>0</option><option value=1 selected="selected">1</option>'; }
+	  else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
+	  $table_data.='</select></td>';
+
+	  // End of ROW
+	  $table_data .= "</tr>\n";
+	  $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+	  $this->t->set_var('tr_color',$tr_color);
+	}
+
+      // Now create 1 blank row to always have a line available to add a new elder with
+      $id = $this->max_presidency_members;
+      $table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+      // Presidency ID
+      $table_data .= '<input type=hidden name="eqpres['.$id.'][id]" value="'.$id.'">';
+      // Elder
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][elder]">';
+      $table_data.= '<option value=0></option>';  
+      for ($j=0; $j < count($elder_id); $j++) {
+	$tmp_id = $elder_id[$j];
+	$name = $elder_name[$j];
+	$table_data.= '<option value='.$tmp_id.'>'.$name.'</option>';
+      }
+      $table_data.='</select></td>';
+      $table_data.='<input type=hidden name="eqpres['.$id.'][name]" value="">';
+      // Email Address
+      $table_data.='<td><input type="text" size="50" name="eqpres['.$id.'][email]" value=""></td>';
+      // District
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][district]">';
+      $table_data.= '<option value=0></option>';
+      for ($j=0; $j <= $this->max_num_districts; $j++) {
+	if($j == 0) { $selected = 'selected="selected"'; } else { $selected = ''; }
+	$table_data.= '<option value='.$j.' '.$selected.'>'.$j.'</option>';
+      }
+      $table_data.='</select></td>';
+      // President
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][president]">';
+      $table_data.= '<option value=0>0</option><option value=1>1</option>';
+      $table_data.='</select></td>';
+      // Counselor
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][counselor]">';
+      $table_data.= '<option value=0>0</option><option value=1>1</option>';
+      $table_data.='</select></td>';
+      // Secretary
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][secretary]">';
+      $table_data.= '<option value=0>0</option><option value=1>1</option>';
+      $table_data.='</select></td>';
+      // EQ Presidency
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][eqpresidency]">';
+      $table_data.= '<option value=0>0</option><option value=1>1</option>';
+      $table_data.='</select></td>';
+      // End of ROW
+      $table_data .= "</tr>\n";
+      $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
+      $this->t->set_var('tr_color',$tr_color);
+      
+      $this->t->set_var('header_row',$header_row);
+      $this->t->set_var('table_data',$table_data);
+      $this->t->pfp('presidencyhandle','presidency',True);
+
       $this->save_sessiondata();   
     }
 
