@@ -126,11 +126,6 @@ CREATE TABLE `eq_district` (
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`district`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-LOCK TABLES `eq_district` WRITE;
-/*!40000 ALTER TABLE `eq_district` DISABLE KEYS */;
-INSERT INTO `eq_district` (`district`, `name`, `supervisor`, `valid`) VALUES (0,'High Priests',0,0);
-/*!40000 ALTER TABLE `eq_district` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `eq_elder`
