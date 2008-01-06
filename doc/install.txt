@@ -3,7 +3,7 @@ Elders Quorum Installation Guide
 
 Alan Pippin <apippin@pippins.net>
 
-   v1.0, 19 May 2005
+   v1.0, 05 Jan 2008
    
    Steps for installing Elders Quroum app
    _________________________________________________________________
@@ -20,17 +20,19 @@ Downloading
 
 Installing
 
-   1) Setup the mysql table structures for the EQ application
+   1) Download the eq.tar file and extract it or GIT pull the archive into 
+      your base phpgroupware directory (like /usr/share/phpgroupware/).
+   2) Setup the mysql table structures for the EQ application
       cd eq/setup/ and run mysql -u <dbuser> -p <dbpass> < eq.sql
-   2) Point your browser to: http://www.yourdomain.com/phpgroupware/setup 
+   3) Point your browser to: http://www.yourdomain.com/phpgroupware/setup 
       The setup prog will autodetect this application. From there you will 
       need to assign this app to the users you want to have be able to use it.
-   3) Edit the LOCAL CONFIGURATION section of eq/inc/class.eq.inc.php
+   4) Edit the LOCAL CONFIGURATION section of eq/inc/class.eq.inc.php
       Make sure you update the path locations for:
       upload_target_path & script_path
-   4) A graphical representation of the mysql schema used by this application can 
+   5) A graphical representation of the mysql schema used by this application can 
       be found here: eq/sql/eq.jpg
-   5) Click on the Admin tool in the EQ app to import your initial set of ward data
+   6) Click on the Admin tool in the EQ app to import your initial set of ward data
 
 Requirements
 
