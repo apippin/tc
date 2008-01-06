@@ -21,7 +21,7 @@
 	    Choose the MLS data file to upload (.zip): <input name="uploadedfile" type="file" size=40><br>
             It must contain the following files from MLS: Membership.csv, Hometeaching.csv, Organization.csv
             <br><br>
-	    <input type="submit" value="Import Data File"> &nbsp; (Import can take up to 30 seconds)
+	    <input type="submit" value="Import Data File"> &nbsp; (Import can take up to 60 seconds)
 	    </form>
 	  </td>
         </tr>
