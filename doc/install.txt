@@ -22,17 +22,21 @@ Installing
 
    1) Download the eq.tar file and extract it or GIT pull the archive into 
       your base phpgroupware directory (like /usr/share/phpgroupware/).
-   2) Setup the mysql table structures for the EQ application
-      cd eq/setup/ and run mysql -u <dbuser> -p <dbpass> < eq.sql
+   2) Setup the mysql table structures for the EQ application:
+      mysql -u <dbuser> -p <dbpass> < eq/sql/eq.sql
    3) Point your browser to: http://www.yourdomain.com/phpgroupware/setup 
       The setup prog will autodetect this application. From there you will 
       need to assign this app to the users you want to have be able to use it.
    4) Edit the LOCAL CONFIGURATION section of eq/inc/class.eq.inc.php
-      Make sure you update the path locations for:
+      Make sure you update the path locations for your specific:
       upload_target_path & script_path
    5) A graphical representation of the mysql schema used by this application can 
       be found here: eq/sql/eq.jpg
-   6) Click on the Admin tool in the EQ app to import your initial set of ward data
+   6) Click on the Admin tool and update the EQ Presidency Table appropriately.
+      The most important thing at this point is to get your district leaders added 
+      for each district you have in your quorum.
+   7) Click on the Admin tool in the EQ app to import your initial set of ward data
+      obtained from MLS into the EQ application.
 
 Requirements
 
