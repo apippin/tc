@@ -1,0 +1,17 @@
+
+Packaging tips
+
+Alan Pippin <apippin@pippins.net>
+
+   v1.0, 19 July 2005
+   
+   How to build RPM and DEB packages...
+     _________________________________________________________________
+   
+RPM
+
+   Run these two commands:
+   
+   tar c eq | bzip2 > eq-0.0.1.00.tar.bz2
+   
+   rpm -tb eq-0.0.1.000.tar.bz2

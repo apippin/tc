@@ -1,0 +1,62 @@
+
+Elders Quorum Installation Guide
+
+Alan Pippin <apippin@pippins.net>
+
+   v1.0, 19 May 2005
+   
+   Steps for installing Elders Quroum app
+     _________________________________________________________________
+   
+Getting and Installing
+
+Downloading
+
+   Can be downloaded from some url.
+     _________________________________________________________________
+   
+Installing
+
+   1) Setup the mysql table structures for the EQ application
+      cd eq/setup/ and run mysql -u <dbuser> -p <dbpass> < eq.sql
+   2) Point your browser to: http://www.yourdomain.com/phpgroupware/setup 
+      The setup prog will autodetect this application. From there you will 
+      need to assign this app to the users you want to have be able to use it.
+   3) Edit the LOCAL CONFIGURATION section of eq/inc/class.eq.inc.php
+      Make sure you update the path locations for:
+      upload_target_path & script_path
+   4) A graphical representation of the mysql schema used by this application can 
+      be found here: eq/sql/eq.jpg
+
+Requirements
+
+   The following csv files must be obtained from MLS (or a stripped down version
+   of each csv with the fields indicated must be manually created). These files
+   should be placed in 1 .zip file and uplodaed to the application via the Admin
+   section of the EQ Tools application.
+
+   Membership.csv:
+     Preferred Name
+     Phone 1
+     Indiv ID
+     HofH ID
+     Street 1
+     Street 2
+     Birth
+     Full Name
+    
+   Hometeaching.csv:
+     Home Teacher 1
+     Home Teacher 2
+     Comp ID
+     HT District
+     Household
+       
+   Organization.csv:
+     Indiv ID
+     Indiv Name
+     Organization
+     Position
+     Org Seq
+     Sustained
+   

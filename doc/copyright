@@ -1,0 +1,37 @@
+This package was debianized by Alan Pippin <apippin@pippins.net> on
+Sat, 12 Jul 2005 22:14:43 +0200.
+
+It was downloaded from http://www.phpgroupware.org/.
+
+Upstream Authors: PHPGroupware Team <phpgroupware-developers at gnu.org>.
+                  Please see the phpgroupware web page
+		  for individual contributors.
+
+Most files are (C) 1999, 2000, 2001, 2002, 2003, 2004 by the
+Free Software Foundation, otherwise copyright statements can be found
+in the respective files. (As php scripts, they are distributed as source.)
+
+Most of this package is licensed under the GNU General Public License.
+Some parts are licensed differently, e.g. under the GNU LGPL, please see
+the information in the documentation directory of individual modules and the
+headers of the source packages.
+
+Copyright:
+
+   This package is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 dated June, 1991.
+
+   This package is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this package; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+   02111-1307, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+
