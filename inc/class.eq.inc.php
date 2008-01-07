@@ -587,7 +587,7 @@ class eq
       $this->t->set_file(array('act_list_t' => 'act_list.tpl'));
       $this->t->set_block('act_list_t','act_list','list');
       
-      $this->t->set_var('lang_name','Activity Name');
+      $this->t->set_var('lang_name','Assignment');
       $this->t->set_var('lang_date','Date');
       $this->t->set_var('lang_notes','Description');
       
@@ -666,7 +666,7 @@ class eq
 	  $this->t->set_var('name', $this->db2->f('name'));
 	  $this->t->set_var('code', $this->db2->f('code'));
 	}
-      $this->t->set_var('lang_name','Activity Name');
+      $this->t->set_var('lang_name','Assignment');
       $this->t->set_var('lang_date','Date');
       $this->t->set_var('lang_notes','Description');
       $this->t->set_var('lang_done','Done');
