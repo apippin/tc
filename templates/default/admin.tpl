@@ -59,8 +59,8 @@
             <br>- If a member of the presidency is not a District Leader, make sure to set their "District=0".
             <br>- If a district leader is not a member of the presidency, add them without setting any other flags except the district.
             <br>- You can only add 1 new presidency member at a time (1 per each update request to the table).
-	    <br>- Make sure you have at least 1 EQ Presidency member that is marked with "EQ Presidency=1",
-            <br>this entry is used to email the entire presidency, and its email address should cause that to happen.
+	    <br>- Make sure you have at least 1 EQ Presidency member that is marked as EQ Presidency=1 with no Elder selected.
+            <br>This entry is used to email the entire presidency, and its email address should cause that to happen.
 	    <br><br>
 	    <input type="submit" value="Update EQ Presidency Table">
 	    </form>
