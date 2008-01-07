@@ -12,7 +12,7 @@
 			<td align="left"><font face="{font}"><b>Name:</b>&nbsp;<input type=text size="60" name="name" value="{name}"</input></td>
 		</tr>
 		<tr>
-			<td align="left"><font face="{font}"><b>Code:</b>&nbsp;<input type=text size="12" name="code" value="{code}"</input></td>
+			<td align="left"><font face="{font}"><b>Code:</b>&nbsp;<input type=text size="12" name="code" value="{code}"</input>&nbsp;This is a 2 or 3 letter abbreviation that uniquely identifies this assignment.</td>
 		</tr>
 	</table>
 

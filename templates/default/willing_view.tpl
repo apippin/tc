@@ -18,7 +18,7 @@
 	</tr>
 	</table>
 	</form>
-
+	This table shows what assignments each Elder is willing to fulfill, and when they last did so.
 	<form action="{actionurl}" method="POST">
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
 	<tr bgcolor="#c9c9c9">

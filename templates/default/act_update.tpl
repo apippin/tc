@@ -9,7 +9,7 @@
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{lang_action}:&nbsp;{name}</b></font></td>
 		</tr>
 		<tr>
-			<td align="left"><font face="{font}"><b>Name:</b>&nbsp;{assignment_data}</td>
+			<td align="left"><font face="{font}"><b>Name:</b>&nbsp;{assignment_data}&nbsp;Assignment</td>
 		</tr>
 		<tr>
 			<td align="left"><font face="{font}"><b>Date:</b>&nbsp;{cal_date}</td>

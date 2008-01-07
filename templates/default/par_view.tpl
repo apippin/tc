@@ -5,7 +5,9 @@
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Elder Participation Table</b></font></td>
 		</tr>
 	</table>
-	<br><br>
+	<br>
+	This table shows how many times each Elder has participated in each assignment and when they last did so.
+        <br>
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
 	<tr bgcolor="#c9c9c9">
 		<td width={elder_width}><b><center>Elder</center></b></td>

@@ -9,7 +9,10 @@
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Elder Attendance Table</b></font></td>
 		</tr>
 	</table>
-	<br><br>
+	<br>
+	<b>Note:</b> All Elders serving in the EQ Presidency, Young Men, Sunday School, or Primary
+	<br>have been automarked as attending. Feel free to adjust this accordingly.
+	<br>
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
 	<tr bgcolor="#c9c9c9">
 		<th>&nbsp;</th>
