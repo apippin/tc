@@ -222,6 +222,7 @@ CREATE TABLE `eq_presidency` (
   `president` tinyint(1) default '0',
   `counselor` tinyint(1) default '0',
   `secretary` tinyint(1) default '0',
+  `eqpres` tinyint(1) default '0',
   `valid` tinyint(1) default '1',
   KEY `presidency` (`presidency`),
   KEY `elder` (`elder`)

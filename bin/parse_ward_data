@@ -2,13 +2,16 @@
 
 use DBI;
 use Getopt::Std;
+
 ###################################################
 # GLOBALS
 $dbname = "phpgroupware";
-$dbhost = "192.168.0.2";
+$dbhost = "192.168.0.2"; # This can be an IP address or a name
 $dbport = 3306;
-$dbuser = "phpgroupware";
-$dbpass = "phpgroupware";
+$dbuser = "phpgroupware"; # This may require an additional '\@localhost'
+$dbpass = "phpgroupware"; 
+###################################################
+
 %hometeaching_data = ();
 %membership_data = ();
 getopts('vsn:o:b');
@@ -91,7 +94,7 @@ sub print_birthdays
 
 ###################################################
 # Open a connection to the database
-$dbh=DBI->connect("dbi:mysql:dbname=$dbname;host=$dbhost port=$dbport",$dbuser,$dbpass,{
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname;host=$dbhost;port=$dbport",$dbuser,$dbpass,{
     AutoCommit=>0,
     PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
 

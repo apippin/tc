@@ -68,8 +68,8 @@ class eq
   function eq()
     {
       // LOCAL CONFIGURATION. PLEASE UPDATE AS APPROPRIATE.
-      $this->upload_target_path = "/home/users/eqpres/eq_data/";
-      $this->script_path = "/usr/share/phpgroupware/eq/bin/";
+      $this->upload_target_path = "/home/users/eqpres/eq_data";
+      $this->script_path = "/usr/share/phpgroupware/eq/bin";
       $this->default_ht_num_months = 3;
       $this->default_ppi_num_months = 3;
       $this->default_ppi_num_years = 0;
@@ -3834,13 +3834,21 @@ class eq
 
       if($action == 'upload')
 	{	 
-	  $target_path = $this->upload_target_path . basename( $_FILES['uploadedfile']['name']);
+	  $target_path = $this->upload_target_path . '/' . basename( $_FILES['uploadedfile']['name']);
 	  
-	  if((($_FILES['uploadedfile']['type'] == "application/zip") ||
-	      ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed") ||
-	      ($_FILES['uploadedfile']['type'] == "application/x-zip") ||
-	      ($_FILES['uploadedfile']['type'] == "application/octet-stream")) &&
-	     (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))) {
+	  if(($_FILES['uploadedfile']['type'] == "application/zip") ||
+	     ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed") ||
+	     ($_FILES['uploadedfile']['type'] == "application/x-zip") ||
+	     ($_FILES['uploadedfile']['type'] == "application/octet-stream")) {
+
+	    if(!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+	      $uploadstatus = "<b><font color=red> -E- Unable to move the uploaded file to ";
+	      $uploadstatus.= "the target path (check the path and permissions) of: $target_path</font></b>";
+	      $this->t->set_var('uploadstatus',$uploadstatus);
+	      $this->t->pfp('uploadhandle','upload',True);
+	      return 0;
+	    }
+	    
 	    $uploadstatus = "<b>The following file was uploaded successfully: </b><br><br>";
 	    $uploadstatus.= "Filename : " . $_FILES['uploadedfile']['name'] . "<br>";
 	    $uploadstatus.= "Type     : " . $_FILES['uploadedfile']['type'] . "<br>";
@@ -3852,9 +3860,9 @@ class eq
 	    
 	    # make a directory for this data to be stored in
 	    $date="data_" . date("Y_m_d");
-	    $data_dir = $this->upload_target_path . $date;
+	    $data_dir = $this->upload_target_path . '/' . $date;
 	    print "-> Making the data directory: $date<br>\n";
-	    exec('mkdir ' . $data_dir . ' 2>&1', $result, $return_code);
+	    exec('mkdir -p ' . $data_dir . ' 2>&1', $result, $return_code);
 	    if($return_code != 0) {
 	      print implode('\n',$result) . "<br>";
 	      print "<b><font color=red>";
@@ -3889,7 +3897,7 @@ class eq
 
 	    # update the data_latest link to point to this new directory
 	    print "-> Updating the latest data dir link<br>\n";
-	    $data_latest = $this->upload_target_path . 'data_latest';
+	    $data_latest = $this->upload_target_path . '/data_latest';
 	    exec('rm ' . $data_latest. '; ln -s ' . $data_dir .' '. $data_latest .' 2>&1', $result, $return_code);
 	    if($return_code != 0) {
 	      print implode('\n',$result) . "<br>";
@@ -3905,8 +3913,8 @@ class eq
 	    ob_flush(); flush(); sleep(1);
 	    $import_log = $this->upload_target_path . '/import.log';
 	    $data_log = $this->upload_target_path . '/data.log';
-	    $import_cmd = $this->script_path . 'import_ward_data ' . $data_latest . ' | tee ' . $import_log;
-	    $parse_cmd = $this->script_path . 'parse_ward_data -v ' . $data_latest . ' > ' . $data_log;
+	    $import_cmd = $this->script_path . '/import_ward_data ' . $data_latest . ' 2>&1 | tee ' . $import_log;
+	    $parse_cmd = $this->script_path . '/parse_ward_data -v ' . $data_latest . ' > ' . $data_log . '2>&1';
 	    #print "import_cmd: $import_cmd<br>";
 	    #print "parse_cmd: $parse_cmd<br>";
 	    ob_start('ob_logstdout', 2);
