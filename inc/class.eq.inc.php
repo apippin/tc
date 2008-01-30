@@ -1389,26 +1389,28 @@ class eq
 	{
 	  // Save any changes made to the appointment table
 	  $new_data = get_var('appt_notes',array('POST'));
-	  foreach ($new_data as $entry)
-	   {
-	     $elder = $entry['elder'];
-	     $appointment = $entry['appointment'];
-
-	     //print "elder: $elder appointment: $appointment <br>";
-	     
-	     //Only perform a database update if we have made a change to this appointment
-	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
-	     $this->db->query($sql,__LINE__,__FILE__);
-	     if(!$this->db->next_record()) {
-	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_appointment set " .
-				" elder='" . $elder . "'" .
-				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
-	       // Email the appointment
-	       $this->email_appt($appointment);
-	     }
-
-	   }
+	  if($new_data != "") { 
+	    foreach ($new_data as $entry)
+	      {
+		$elder = $entry['elder'];
+		$appointment = $entry['appointment'];
+		
+		//print "elder: $elder appointment: $appointment <br>";
+		
+		//Only perform a database update if we have made a change to this appointment
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if(!$this->db->next_record()) {
+		  // Perform database save actions here
+		  $this->db->query("UPDATE eq_appointment set " .
+				   " elder='" . $elder . "'" .
+				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		  // Email the appointment
+		  $this->email_appt($appointment);
+		}
+		
+	      }
+	  }
 	  
 	  // Save any changes made to the ppi notes table
 	  $new_data = get_var('ppi_notes',array('POST'));
@@ -1427,7 +1429,7 @@ class eq
 	   }
 
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // Get the EQ President
@@ -1684,25 +1686,27 @@ class eq
 	{
 	  // Save any changes made to the appointment table
 	  $new_data = get_var('appt_notes',array('POST'));
-	  foreach ($new_data as $entry)
-	   {
-	     $elder = $entry['elder'];
-	     $appointment = $entry['appointment'];
-
-	     //print "elder: $elder appointment: $appointment <br>";
-	     //Only perform a database update if we have made a change to this appointment
-	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
-	     $this->db->query($sql,__LINE__,__FILE__);
-	     if(!$this->db->next_record()) {
-	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_appointment set " .
-				" elder='" . $elder . "'" .
-				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
-	       
-	       // Email the appointment
-	       $this->email_appt($appointment);
-	     }
-	   }
+	  if($new_data != "") { 
+	    foreach ($new_data as $entry)
+	      {
+		$elder = $entry['elder'];
+		$appointment = $entry['appointment'];
+		
+		//print "elder: $elder appointment: $appointment <br>";
+		//Only perform a database update if we have made a change to this appointment
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if(!$this->db->next_record()) {
+		  // Perform database save actions here
+		  $this->db->query("UPDATE eq_appointment set " .
+				   " elder='" . $elder . "'" .
+				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		  
+		  // Email the appointment
+		  $this->email_appt($appointment);
+		}
+	      }
+	  }
 	  
 	  // Save any changes made to the int notes table
 	  $new_data = get_var('int_notes',array('POST'));
@@ -1725,7 +1729,7 @@ class eq
 	   }
 
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // Get the Districts
@@ -2036,25 +2040,27 @@ class eq
 	{
 	  // Save any changes made to the appointment table
 	  $new_data = get_var('appt_notes',array('POST'));
-	  foreach ($new_data as $entry)
-	   {
-	     $family = $entry['family'];
-	     $appointment = $entry['appointment'];
-
-	     //Only perform a database update if we have made a change to this appointment
-	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family'";
-	     $this->db->query($sql,__LINE__,__FILE__);
-	     if(!$this->db->next_record()) {
-
-	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_appointment set " .
-				" family='" . $family . "'" .
-				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
-	       
-	       // Email the appointment
-	       $this->email_appt($appointment);
-	     }
-	   }
+	  if($new_data != "") { 
+	    foreach ($new_data as $entry)
+	      {
+		$family = $entry['family'];
+		$appointment = $entry['appointment'];
+		
+		//Only perform a database update if we have made a change to this appointment
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family'";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if(!$this->db->next_record()) {
+		  
+		  // Perform database save actions here
+		  $this->db->query("UPDATE eq_appointment set " .
+				   " family='" . $family . "'" .
+				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		  
+		  // Email the appointment
+		  $this->email_appt($appointment);
+		}
+	      }
+	  }
 	  
 	  // Save any changes made to the visit notes table
 	  $new_data = get_var('vis_notes',array('POST'));
@@ -2073,7 +2079,7 @@ class eq
 	   }
 
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // APPOINTMENT TABLE
@@ -3607,7 +3613,7 @@ class eq
 	   }
 	  
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       $sql = "SELECT * FROM eq_presidency where valid=1";
