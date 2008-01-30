@@ -667,7 +667,7 @@ sub check_for_changed_ids
 
 ###################################################
 # Open a connection to the database
-$dbh=DBI->connect("dbi:mysql:dbname=$dbname;host=$dbhost;port=$dbport",$dbuser,$dbpass,{
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$dbpass,{
     AutoCommit=>0,
     PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
 

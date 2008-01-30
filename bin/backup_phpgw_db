@@ -1,13 +1,14 @@
 #!/bin/bash
 
 MNTPNT="/backup"
+MOUNTIT=1
 DSTDIR="/backup/mysql/"
 DBNAME=phpgroupware
 DBUSER=phpgroupware
 DBPASS=phpgroupware
 
-mount -w -o remount $MNTPNT 
+[ $MOUNTIT == 1 ] && mount -w -o remount $MNTPNT 
 /usr/bin/mysqldump --databases $DBNAME -u $DBUSER --password=$DBPASS -c > $DSTDIR/mysql_phpgw_backup.sql
 ls -l $DSTDIR/mysql_phpgw_backup.sql
-mount -r -o remount $MNTPNT
+[ $MOUNTIT == 1 ] && mount -r -o remount $MNTPNT
 
