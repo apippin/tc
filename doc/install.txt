@@ -32,8 +32,8 @@ Installing
    4) Edit the LOCAL CONFIGURATION section of eq/inc/class.eq.inc.php
       Make sure you update the path locations for your specific:
       upload_target_path & script_path
-   5) Edit the GLOBALS section of the eq/bin/import_ward_data script
-   6) Edit the GLOBALS section of the eq/bin/parse_ward_data script
+   5) Edit the GLOBALS section of the eq/bin/import_ward_data script and fix the permissions
+   6) Edit the GLOBALS section of the eq/bin/parse_ward_data script and fix the permissions
    7) Try to run eq/bin/import_ward_data & parse_ward_data scripts from the commandline
       to check for any missing perl library dependencies and mysql connection. 
       Just run them without command line args.
