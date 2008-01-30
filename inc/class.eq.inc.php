@@ -91,7 +91,7 @@ class eq
       $this->grants     = $GLOBALS['phpgw']->acl->get_grants('eq');
       $this->grants[$this->account] = PHPGW_ACL_READ + PHPGW_ACL_ADD + PHPGW_ACL_EDIT + PHPGW_ACL_DELETE;
        
-      $this->jscal = CreateObject('phpgwapi.jscalendar');   // before phpgw_header() !!!
+      $this->jscal = CreateObject('eq.jscalendar');   // before phpgw_header() !!!
       $this->cal_options = 'daFormat    : "%Y-%m-%d",
                                 ifFormat    : "%Y-%m-%d",
                                 mondayFirst : false,
