@@ -63,6 +63,7 @@ class eq
      'send_ical_appt' => True,
      'assign_view'    => True,
      'assign_update'  => True,
+     'get_time_selection_form' => True,
      );
  
   function eq()
@@ -78,6 +79,10 @@ class eq
       $this->default_att_num_quarters = 1;
       $this->default_vis_num_years = 1;
       $this->max_num_districts = 4;
+      $this->time_drop_down_lists = 1;
+      $this->time_drop_down_list_inc = 15;
+      $this->default_visit_appt_duration = 45;
+      $this->default_ppi_appt_duration = 30;
       $this->max_presidency_members = 99;
       $this->max_appointments = 32768;
       // END LOCAL CONFIGURATION
@@ -3690,24 +3695,7 @@ class eq
 	    
 	    // Hour & Minutes selection
 	    $table_data.= "<td align=center>";
-	    $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
-	    foreach(range(1,12) as $num) {
-	      if($hour == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
-	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	    }
-	    $table_data.= '</select>';
-	    $table_data.= '&nbsp;:&nbsp;';
-	    $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
-	    foreach(range(0,3) as $num) {
-	      $num = $num * 15; if($num == 0) { $num = "00"; }
-	      if($minute == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
-	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	    }
-	    $table_data.= '</select>';
-	    $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
-	    if($pm == 0) { $table_data.= '<option value=0 selected>am</option>'; $table_data.= '<option value=1>pm</option>'; }
-	    else { $table_data.= '<option value=0>am</option>'; $table_data.= '<option value=1 selected>pm</option>'; }
-	    $table_data.= '</select>';
+	    $table_data .= $this->get_time_selection_form($hour, $minute, $pm, $presidency, $appointment);
 	    $table_data.= "</td>";
 	    
 	    // Elder drop down list (for PPIs)
@@ -3752,25 +3740,7 @@ class eq
 	
 	  // Time selection
 	  $table_data.= "<td align=center>";
-	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
-	  $table_data.= '<option value=""></option>';
-	  foreach(range(1,12) as $num) {
-	    $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	  }
-	  $table_data.= '</select>';
-	  $table_data.= '&nbsp;:&nbsp;';
-	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
-	  $table_data.= '<option value=""></option>';
-	  foreach(range(0,3) as $num) {
-	    $num = $num * 15; if($num == 0) { $num = "00"; }
-	    $table_data.= '<option value='.$num.'>'.$num.'</option>';
-	  }
-	  $table_data.= '</select>';
-	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
-	  $table_data.= '<option value=""></option>';
-	  $table_data.= '<option value=0>am</option>';
-	  $table_data.= '<option value=1>pm</option>';
-	  $table_data.= '</select>';
+	  $table_data .= $this->get_time_selection_form(0, 0, 0, $presidency, $appointment);
 	  $table_data.= "</td>";
 	  
 	  // Elder drop down list
@@ -4238,7 +4208,7 @@ class eq
 	      $phone = $this->db2->f('phone');
 	      $appt_name = $elder_name . " Interview";
 	      $location = "$interviewer"."'s home";
-	      $duration = 1800; // 30 minutes
+	      $duration = $this->default_ppi_appt_duration * 60;
 	    }
 	  }
 
@@ -4260,7 +4230,7 @@ class eq
 	      if($this->db3->next_record()) {
 		$location=$this->db3->f('address');
 	      }
-	      $duration = 2700; // 45 minutes
+	      $duration = $this->default_visit_appt_duration * 60;
 	    }
 	  }
 
@@ -4378,6 +4348,57 @@ class eq
       // Send the message
       mail($to, $subject, $message, $headers);
       
+    }
+
+  function get_time_selection_form($hour, $minute, $pm, $presidency, $appointment)
+    {
+      $form_data = "";
+      $blank = 0;
+      
+      if($hour == 0) { $blank = 1; }
+
+      if($this->time_drop_down_lists == 1) {
+	// Create drop down lists to get the time
+	$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
+	if($blank == 1) { $form_data.= '<option value=""></option>'; }
+	foreach(range(1,12) as $num) {
+	  if($hour == $num) { $selected = 'selected="selected"'; } else { $selected = ''; }
+	  $form_data.= '<option value='.$num.' '.$selected.'>'.$num.'</option>';
+	}
+	$form_data.= '</select>';
+	$form_data.= '&nbsp;:&nbsp;';
+	$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
+	if($blank == 1) { $form_data.= '<option value=""></option>'; }
+	$num = 0;
+	while($num < 60) {
+	  if($num < 10) { $num = "0" . "$num"; }
+	  if($minute == $num) { $selected = 'selected="selected"'; } else { $selected = ''; }
+	  if($blank == 1) { $selected = ""; }
+	  $form_data.= '<option value='.$num.' '.$selected.'>'.$num.'</option>';
+	  $num = $num + $this->time_drop_down_list_inc;
+	}
+	$form_data.= '</select>';
+      } else {
+	// Use free form text fields to get the time
+	if($blank == 1) { $hour = ""; $minute = ""; $ampm = ""; }
+	$form_data.= '<input type=text size=2 name=sched['.$presidency.']['.$appointment.'][hour] value='.$hour.'>';
+	$form_data.= ':';
+	$form_data.= '<input type=text size=2 name=sched['.$presidency.']['.$appointment.'][minute] value='.$minute.'>';
+	$form_data.= '&nbsp;';
+      }
+      // Always use a drop-down select form for am/pm
+      $form_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
+      if($blank == 0) { 
+	if($pm == 0) { $form_data.= '<option value=0 selected>am</option>'; $form_data.= '<option value=1>pm</option>'; }
+	if($pm == 1) { $form_data.= '<option value=0>am</option>'; $form_data.= '<option value=1 selected>pm</option>'; }
+      } else {
+	$form_data.= '<option value=""></option>';
+	$form_data.= '<option value=0>am</option>';
+	$form_data.= '<option value=1>pm</option>';
+      }
+      $form_data.= '</select>';
+      
+      return $form_data;
     }
 }
 
