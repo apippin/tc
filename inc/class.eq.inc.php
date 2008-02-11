@@ -4217,6 +4217,7 @@ class eq
 	  // Format the appointment time into an iCal UTC equivalent
 	  $dtstamp = gmdate("Ymd"."\T"."His"."\Z");
 	  $dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
+	  $dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  
 	  // Set the email address of the person making the appointment
 	  $from = $GLOBALS['phpgw_info']['user']['fullname'] . "<" .
@@ -4264,6 +4265,8 @@ class eq
 	  }
 
 	  $dtend = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+	  $dtendstr = date("g:i A", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+	  $date = $dtstartstr . "-" . $dtendstr;
 	  $description = "$appt_name : $phone";
 	  
 	  if(($uid == 0) && ($appt_name != "")) { 
@@ -4279,7 +4282,7 @@ class eq
 
 	    $action = "PUBLISH";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $appt_name, $description, $uid);
 	    
 	  } else if(($uid != 0) && ($appt_name == "")) {
 	    // Remove the calendar item for this appointment since it has already been sent
@@ -4293,7 +4296,7 @@ class eq
 	    
 	    $action = "CANCEL";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $subject, $subject, $uid);
 	    
 	  } else if($uid != 0) {
 	    // Update the existing appointment since we have changed it
@@ -4302,7 +4305,7 @@ class eq
 	    $subject = "Canceled: $appt_date $appt_time";
 	    $action = "CANCEL";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $subject, $subject, $uid);
 	    
 	    $uid = rand() . rand(); // Generate a random identifier for this appointment
 	    $this->db->query("UPDATE eq_appointment set" .
@@ -4312,7 +4315,7 @@ class eq
 	    $subject = "Updated: $appt_name";	    
 	    $action = "PUBLISH";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $appt_name, $description, $uid);
 	  }
 	  
 	}
@@ -4320,16 +4323,36 @@ class eq
       return true;
     }
 
-  function send_ical_appt($action, $to, $from, $subject, $dtstamp, $dtstart, $dtend, $location, $summary, $description, $uid)
+  function send_ical_appt($action, $to, $from, $subject, $dtstamp, $dtstart, $dtend, $date, $location, $summary, $description, $uid)
     {
-      $headers = 'From: ' . "$from" . "\n" .
-	 'Reply-To: ' . "$from" . "\n" .
-	 'X-Mailer: PHP/' . phpversion() . "\n" .
-	 'Content-Type: text/calendar;' . "\n" .
-	 'Content-Transfer-Encoding: 7bit' . "\n";
+      // Initialize our local variables
+      $boundary = "=MIME_APPOINTMENT_BOUNDARY";
+      $message = "";
+      $headers = "";
+
+      // Form the headers for the email message
+      $headers.="X-Mailer: PHP/" . phpversion() . "\n";
+      $headers.="Mime-Version: 1.0\n";
+      $headers.="Content-Type: multipart/mixed; boundary=\"$boundary\"\n";
+      $headers.="Content-Disposition: inline\n";
+      $headers.="Reply-To: $from\n";
+      $headers.="From: $from\n";
+
+      // Print the plaintext version of the appointment
+      $message.="--$boundary\n";
+      $message.="Content-Type: text/plain; charset=us-ascii\n";
+      $message.="Content-Disposition: inline\n";
+      $message.="\n";
+      $message.="What: $description\n";
+      $message.="When: $date\n";
+      $message.="Where: $location\n";
+      $message.="\n";
       
-      //$message = "phone: $phone date: $date time: $time";
-      $message ="";
+      // Print the .ics attachment version of the appointment
+      $message.="--$boundary\n";
+      $message.="Content-Type: text/calendar; charset=us-ascii\n";
+      $message.="Content-Disposition: attachment; filename=\"appointment.ics\"\n";
+      $message.="\n";
       $message.="BEGIN:VCALENDAR" . "\n";
       $message.="VERSION:2.0" . "\n";
       $message.="PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN" . "\n";
@@ -4348,7 +4371,11 @@ class eq
       $message.="CLASS:PUBLIC" . "\n";
       $message.="END:VEVENT" . "\n";
       $message.="END:VCALENDAR" . "\n";
-      
+
+      // Complete the message
+      $message.="--$boundary\n";
+
+      // Send the message
       mail($to, $subject, $message, $headers);
       
     }
