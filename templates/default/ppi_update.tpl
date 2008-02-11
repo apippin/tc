@@ -17,7 +17,7 @@
 		</tr>
 		<tr>
 			<td align="left"><font face="{font}"><b>Interviewer:</b>&nbsp;
-			<select name="interviewer" disabled>
+			<select name="interviewer">
 <!-- BEGIN interviewer_list -->
 			<option value={interviewer}>{interviewer_name}</option>
 <!-- END interviewer_list -->
