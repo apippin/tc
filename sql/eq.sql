@@ -160,19 +160,6 @@ CREATE TABLE `eq_family` (
 ) ENGINE=MyISAM AUTO_INCREMENT=277 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `eq_interview`
---
-CREATE TABLE `eq_interview` (
-  `interview` int(16) unsigned NOT NULL auto_increment,
-  `interviewer` int(16) unsigned default NULL,
-  `elder` int(16) unsigned default NULL,
-  `aaronic` int(16) unsigned NOT NULL default '0',
-  `date` date default NULL,
-  `notes` text,
-  PRIMARY KEY  (`interview`)
-) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=latin1;
-
---
 -- Table structure for table `eq_parent`
 --
 CREATE TABLE `eq_parent` (
@@ -203,6 +190,7 @@ CREATE TABLE `eq_ppi` (
   `ppi` int(16) unsigned NOT NULL auto_increment,
   `interviewer` int(16) unsigned default NULL,
   `elder` int(16) unsigned default NULL,
+  `aaronic` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
   `notes` text,
   `eqpresppi` tinyint(1) default '0',

@@ -1908,12 +1908,12 @@ class eq
 	      }
 	      
 	      // If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-	      $sql = "SELECT * FROM eq_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
+	      $sql = "SELECT * FROM eq_ppi WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
 		 "AND elder=" . $id;
 	      $this->db2->query($sql,__LINE__,__FILE__);
 	      
 	      if(!$this->db2->next_record()) {
-		$sql = "SELECT * FROM eq_interview WHERE elder=" . $id . " ORDER BY date DESC";
+		$sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
 		$link_data['menuaction'] = 'eq.eq.int_update';
@@ -2464,6 +2464,7 @@ class eq
 			   "   ppi='" . $ppi . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
+			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 	              ", eqpresppi='" . $eqpresppi . "'" .
@@ -2475,8 +2476,8 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,date,notes,eqpresppi) "
-			   . "VALUES ('" . $interviewer . "','" . $elder . "','"
+	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
+			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
 			   . $date . "','" . $notes . "','" . $eqpresppi  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
@@ -2678,7 +2679,7 @@ class eq
 		$month_start = "$year"."-"."$month"."-"."01";
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
-		$sql = "SELECT * FROM eq_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
+		$sql = "SELECT * FROM eq_ppi WHERE date >= '$month_start' AND date <= '$month_end' ".
 		   "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$header_row .= "<th width=$int_width><font size=-2>$month</th>";
@@ -2789,14 +2790,14 @@ class eq
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE eq_interview set " .
-		     "   interview='" . $interview . "'" .
+	  $this->db->query("UPDATE eq_ppi set " .
+		           "   ppi='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
-			   " WHERE interview=" . $interview,__LINE__,__FILE__);
+			   " WHERE ppi=" . $interview,__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2804,7 +2805,7 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_interview (interviewer,elder,aaronic,date,notes) "
+	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
 			   . $date . "','" . $notes ."')",__LINE__,__FILE__);
 	  $this->int_view();
@@ -2829,7 +2830,7 @@ class eq
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM eq_interview WHERE interview=".$interview;
+	  $sql = "SELECT * FROM eq_ppi WHERE ppi=".$interview;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('interview',$interview);
