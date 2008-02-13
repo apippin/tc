@@ -294,12 +294,24 @@ class eq
 		$month_start = "$year"."-"."$month"."-"."01";
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
+		
 		//print "m: $m month: $month year: $year month_start: $month_start month_end: $month_end<br>";
 		// Add this to the query to filter on only visits made by this companionship:
 		// " AND companionship=" . $unique_companionships[$j]['companionship'].
+
+		// First check to see if the currently assigned companionship has visited them
 		$sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
-		       " AND companionship!=0".
- 		       " AND family=". $family_id;
+	           " AND companionship=".$unique_companionships[$j]['companionship'].
+	           " AND family=". $family_id;
+		$query_id = $this->db2->query($sql,__LINE__,__FILE__);
+		if($this->db2->num_rows($query_id) == 0) {
+		  // We did not find any visits made by the currently assigned companionship,
+		  // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
+		  $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+		     " AND companionship!=0".
+		     " AND family=". $family_id;
+		  $query_id = $this->db2->query($sql,__LINE__,__FILE__);
+		}
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$link_data['menuaction'] = 'eq.eq.ht_update';
 		$link_data['date'] = $month_start;
@@ -507,10 +519,21 @@ class eq
 	    $table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$family_name Family</td>";
 	    
 	    $header_row="<th width=$comp_width><font size=-2>Families</th>";
+
+	    // First check to see if the currently assigned companionship has visited them
 	    $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+	           " AND companionship=".$unique_companionships[$j]['companionship'].
+	           " AND family=". $family_id;
+	    $query_id = $this->db2->query($sql,__LINE__,__FILE__);
+	    if($this->db2->num_rows($query_id) == 0) {
+	      // We did not find any visits made by the currently assigned companionship,
+	      // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
+	      $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship!=0".
 	           " AND family=". $family_id;
-	    $this->db2->query($sql,__LINE__,__FILE__);
+	      $query_id = $this->db2->query($sql,__LINE__,__FILE__);
+	    }
+	    
 	    $value = $family_id . "/" . $unique_companionships[$j]['companionship'] . "/" . $date;
 	    $header_row .= "<th width=$visit_width><font size=-2><a href=$link>$month</a></th>";
 	    if(!$total_visits) { $total_visits = 0; }
