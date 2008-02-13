@@ -68,25 +68,15 @@ class eq
  
   function eq()
     {
-      // LOCAL CONFIGURATION. PLEASE UPDATE AS APPROPRIATE.
-      $this->upload_target_path = "/home/users/eqpres/eq_data";
-      $this->script_path = "/usr/share/phpgroupware/eq/bin";
-      $this->default_ht_num_months = 3;
-      $this->default_ppi_num_months = 3;
-      $this->default_ppi_num_years = 0;
-      $this->default_int_num_quarters = 1;
-      $this->default_int_num_years = 0;
-      $this->default_att_num_quarters = 1;
-      $this->default_vis_num_years = 1;
-      $this->max_num_districts = 4;
-      $this->time_drop_down_lists = 1;
-      $this->monthly_hometeaching_interviews = 0;
-      $this->time_drop_down_list_inc = 15;
-      $this->default_visit_appt_duration = 45;
-      $this->default_ppi_appt_duration = 30;
+      if(file_exists('setup/eq_config.local')) {
+	include('setup/eq_config.local');
+      } else {
+	include('setup/eq_config');
+      }
+
+      $this->script_path = "$this->application_path"."/bin";
       $this->max_presidency_members = 99;
       $this->max_appointments = 32768;
-      // END LOCAL CONFIGURATION
       
       $this->db		= $GLOBALS['phpgw']->db;
       $this->db2	= $this->db;
@@ -2719,7 +2709,7 @@ class eq
 	$stat_data = "<tr><td><b><font size=-2>$num_companionships Companionships<br>Interview Quarterly Totals:</font></b></td>";
 
 	// Print the hometeaching interview stats
-	if($this->monthly_hometeaching_interviews == 0) { //Quarterly
+	if($this->monthly_hometeaching_interview_stats == 0) { //Quarterly
 	  for($m=$num_months; $m >=0; $m--) {
 	    $month = $current_month - $m;
 	    if(($month % 3) == 1) { $quarter_total = $ints[$m]; }
@@ -2745,7 +2735,7 @@ class eq
       }
 
       // Display the totals
-      if($this->monthly_hometeaching_interviews == 0) { //Quarterly
+      if($this->monthly_hometeaching_interview_stats == 0) { //Quarterly
 	$quarter_total = 0;
 	$totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Quarterly Totals:</font></b></td>";
 	for($m=$num_months; $m >=0; $m--) {

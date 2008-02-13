@@ -16,7 +16,7 @@ Downloading
    https://eq.pippins.net/eq.tar
 
    It can also be obtained via the GIT revision control system by pulling from here:
-   http://git.pippins.net/eq/
+   http://git.pippins.net/eq/.git
 
 Installing
 
@@ -29,23 +29,22 @@ Installing
       need to assign this app to the users you want to have be able to use it.
       Enable it for each user by going to Site Admin -> User Accounts -> <username> -> edit
       Make sure the "eq" application has a checkmark next to it under "Permissions this user has"
-   4) Edit the LOCAL CONFIGURATION section of eq/inc/class.eq.inc.php
-      Make sure you update the path locations for your specific:
-      upload_target_path & script_path
-   5) Edit the GLOBALS section of the eq/bin/import_ward_data script and fix the permissions
-   6) Edit the GLOBALS section of the eq/bin/parse_ward_data script and fix the permissions
-   7) Try to run eq/bin/import_ward_data & parse_ward_data scripts from the commandline
+   4) Copy the setup/db_config to setup/db_config.local and change the values in .local appropriately. 
+   5) Copy the setup/eq_config to setup/eq_config.local and change the values in .local appropriately.
+      Make sure you update the path locations for your specific installation locations: 
+      upload_target_path & application_path
+   6) Try to run eq/bin/import_ward_data & parse_ward_data scripts from the commandline
       to check for any missing perl library dependencies and mysql connection. 
       Just run them without command line args.
       Install the right perl modules until the scripts run without any errors.
-   8) A graphical representation of the mysql schema used by this application can 
+   7) A graphical representation of the mysql schema used by this application can 
       be found here: eq/sql/eq.jpg
-   9) Click on the Admin tool in the EQ app to import your initial set of ward data
+   8) Click on the Admin tool in the EQ app to import your initial set of ward data
       obtained from MLS into the EQ application.
-  10) Click on the Admin tool and update the EQ Presidency Table appropriately.
+   9) Click on the Admin tool and update the EQ Presidency Table appropriately.
       The most important thing at this point is to get your district leaders added 
       for each district you have in your quorum.
-  11) I highly recommend installing phpmyadmin to view/edit/debug mysql tables related to this tool.
+  10) I highly recommend installing phpmyadmin to view/edit/debug mysql tables related to this tool.
 
 Requirements
 

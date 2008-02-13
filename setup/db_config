@@ -1,0 +1,13 @@
+################################################################################
+# This is a perl module included by the perl scripts for this EQ application.
+# You must modify these values to match your system configuration.
+# Save the resulting file as "db_config.local" in this setup dir.
+# This will prevent your settings from being overwritten by future code updates.
+################################################################################
+
+$dbname = "phpgroupware";
+$dbhost = "192.168.0.2"; # This can be an IP address or name
+$dbport = 3306;
+$dbuser = "phpgroupware"; # This may require an additional '\@localhost'
+$dbpass = "phpgroupware";
+

@@ -3,14 +3,10 @@
 use DBI;
 use Getopt::Std;
 
-###################################################
-# GLOBALS
-$dbname = "phpgroupware";
-$dbhost = "192.168.0.2"; # This can be an IP address or name
-$dbport = 3306;
-$dbuser = "phpgroupware"; # This may require an additional '\@localhost'
-$dbpass = "phpgroupware"; 
-###################################################
+$mydir = `cd \$(dirname $0) 2>/dev/null; pwd`; chomp($mydir);
+unshift @INC,("$mydir/../setup");
+if( -f "$mydir/../setup/db_config.local") { require "db_config.local"; }
+else { require "db_config"; }
 
 ###################################################
 # Connect to the database
