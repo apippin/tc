@@ -51,7 +51,6 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/%{phpgwdirname}
 
 %changelog
-* Sat May 19 2001 Dan Kuykendall <seek3r@phpgroupware.org> 0.0.1.00
-- Created eq app
+- EQ App Update
 
 # end of file
