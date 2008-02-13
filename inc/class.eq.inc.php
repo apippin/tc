@@ -1921,7 +1921,7 @@ class eq
 		$link_data['elder'] = $id;
 		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
-		$link_data['interview'] = '';
+		$link_data['ppi'] = '';
 		$link_data['action'] = 'add';
 		$link_data['interviewer'] = $districts[$d]['supervisor'];
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
@@ -1953,7 +1953,7 @@ class eq
 		$link_data['elder'] = $this->db2->f('elder');
 		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
-		$link_data['interview'] = $this->db2->f('int');
+		$link_data['ppi'] = $this->db2->f('ppi');
 		$link_data['action'] = 'view';
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
 		$comps_with_quarterly_int++;
@@ -2386,7 +2386,7 @@ class eq
 	  $year = date('Y') - $m;
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 	  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id;
+	     "AND elder=" . $id . " AND eqpresppi=1";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  	  
 	  if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2456,6 +2456,7 @@ class eq
       $interviewer_name = $this->db2->f('name');
       $this->t->set_var('interviewer',$interviewer . ' selected');
       $this->t->set_var('interviewer_name',$interviewer_name);
+      $this->t->set_var('eqpresppi_checked','');
       $this->t->fp('int_list','interviewer_list',True);
     
       if($action == 'save')
@@ -2494,6 +2495,7 @@ class eq
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('eqpresppi',$eqpresppi);
+	  $this->t->set_var('eqpresppi_checked','checked');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New PPI');
 	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&ppi='
@@ -2512,6 +2514,7 @@ class eq
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
 	  $this->t->set_var('eqpresppi',$this->db->f('eqpresppi'));
+	  if($this->db->f('eqpresppi') == 1) { $this->t->set_var('eqpresppi_checked','checked'); }
 	}
       
       if($action == 'edit')
@@ -2665,7 +2668,7 @@ class eq
 	      $link_data['elder'] = $elder_id;
 	      $link_data['aaronic'] = $aaronic_id;
 	      $link_data['name'] = $name;
-	      $link_data['interview'] = '';
+	      $link_data['ppi'] = '';
 	      $link_data['action'] = 'add';
 	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -2696,7 +2699,7 @@ class eq
 		  $link_data['elder'] = $elder_id;
 		  $link_data['aaronic'] = $aaronic_id;
 		  $link_data['name'] = $name;
-		  $link_data['interview'] = $this->db2->f('interview');
+		  $link_data['ppi'] = $this->db2->f('ppi');
 		  $link_data['action'] = 'view';
 		  $date = $this->db2->f('date');
 		  $date_array = explode("-",$date);
@@ -2778,16 +2781,18 @@ class eq
       $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
+      $this->t->set_var('eqpresppi_checked','');
       
       $action = get_var('action',array('GET','POST'));
       $companionship = get_var('companionship',array('GET','POST'));
       $interviewer = get_var('interviewer',array('GET','POST'));      
       $name = get_var('name',array('GET','POST'));
-      $interview = get_var('interview',array('GET','POST'));
+      $ppi = get_var('ppi',array('GET','POST'));
       $elder = get_var('elder',array('GET','POST'));
       $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
+      $eqpresppi = get_var('eqpresppi',array('GET','POST'));
       
       $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -2812,13 +2817,14 @@ class eq
 	{
 	  $notes = get_var('notes',array('POST'));
 	  $this->db->query("UPDATE eq_ppi set " .
-		           "   ppi='" . $interview . "'" .
+		           "   ppi='" . $ppi . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
-			   " WHERE ppi=" . $interview,__LINE__,__FILE__);
+		      ", eqpresppi='" . $eqpresppi . "'" .
+			   " WHERE ppi=" . $ppi,__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2826,9 +2832,9 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes) "
+	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
-			   . $date . "','" . $notes ."')",__LINE__,__FILE__);
+			   . $date . "','" . $notes ."','" . $eqpresppi . "')",__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2836,7 +2842,7 @@ class eq
       if($action == 'add')
 	{
 	  $this->t->set_var('cal_date',$this->jscal->input('date','','','','','','',$this->cal_options));
-	  $this->t->set_var('interview', '');
+	  $this->t->set_var('ppi', '');
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('elder',$elder);
@@ -2845,22 +2851,23 @@ class eq
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
-								. $interview . '&action=' . 'insert'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
+								. $ppi . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM eq_ppi WHERE ppi=".$interview;
+	  $sql = "SELECT * FROM eq_ppi WHERE ppi=".$ppi;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
-	  $this->t->set_var('interview',$interview);
+	  $this->t->set_var('ppi',$ppi);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
 	  $this->t->set_var('elder',$this->db->f('elder'));
 	  $this->t->set_var('aaronic',$this->db->f('aaronic'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
+	  if($this->db->f('eqpresppi') == 1) { $this->t->set_var('eqpresppi_checked','checked'); }
 	}
       
       if($action == 'edit')
@@ -2868,8 +2875,8 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
-								. $interview . '&action=' . 'save'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
+								. $ppi . '&action=' . 'save'));
 	}
 
       if($action == 'view')
@@ -2880,8 +2887,8 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
-								. $interview . '&action=' . 'edit'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
+								. $ppi . '&action=' . 'edit'));
 	}
       
       $this->t->set_var('lang_reset','Clear Form');

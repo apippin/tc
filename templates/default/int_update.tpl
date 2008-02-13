@@ -6,7 +6,6 @@
 	<input type=hidden name=elder value={elder}>
 	<input type=hidden name=aaronic value={aaronic}>
 	<input type=hidden name=companionship value={companionship}>
-	<input type=hidden name=eqpresppi value={eqpresppi}>
 	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{lang_action}:&nbsp;{name}</b></font></td>
@@ -17,11 +16,13 @@
 		</tr>
 		<tr>
 			<td align="left"><font face="{font}"><b>Interviewer:</b>&nbsp;
-			<select name="interviewer">
+			<select name="interviewer" {disabled}>
 <!-- BEGIN interviewer_list -->
 			<option value={interviewer}>{interviewer_name}</option>
 <!-- END interviewer_list -->
 			</select>
+			&nbsp; <input type="checkbox" name="eqpresppi" value="1" {eqpresppi_checked} {disabled}>
+			Yearly PPI
 		</tr>
 		<tr>
 			<td align="left"><font face="{font}"><b>Date:</b>&nbsp;
