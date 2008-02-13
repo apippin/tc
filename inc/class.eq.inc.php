@@ -400,16 +400,9 @@ class eq
 	    }
 	  for ($j=0; $j < count($unique_companionships); $j++)
 	    {
-	      // FIXME: We won't be able to go back and edit history on families that have been
-	      // reassigned to a different companionship. The following delete command will not delete
-	      // the history of visits under an older companionship, only the ones for the existing
-	      // companionship. This will lead to duplicate visits being entered for an older
-	      // month for the same family, making it impossible to change the past history once
-	      // a family is reassigned. However, you will be able to view the history just fine.
-
 	      //$comp=$unique_companionships[$j]['companionship'];
 	      //print "deleting from eq_visit where companionship=$comp and date=$date and district=$district<br>";
-	      // Delete all the visits that have taken place for all families for this month
+	      // Delete all the visits that have taken place for all families for this companionsthip for this month
 	      $this->db->query("DELETE from eq_visit where companionship=" . $unique_companionships[$j]['companionship'] .
 			       " AND " . "date='" . $date . "'",__LINE__,__FILE__);
 	    }
@@ -3879,12 +3872,11 @@ class eq
 	    
 	    # unzip the data into this directory
 	    print "-> Unzipping the data<br>\n";
-	    $data_file = $data_dir . '';
-	    exec('unzip ' . $data_dir . '/*.zip -d ' . $data_dir . ' 2>&1', $result, $return_code);
+	    exec($this->unzip_path .' -u '. $data_dir . '/*.zip -d ' . $data_dir . ' 2>&1', $result, $return_code);
 	    if($return_code != 0) {
 	      print implode('\n',$result) . "<br>";
 	      print "<b><font color=red>";
-	      print "-E- Unable to unzip the uploaded file into the data dir. Aborting import.";
+	      print "-E- Unable to unzip the uploaded file into the data dir: $data_dir. Aborting import.";
 	      print "</font></b>";
 	      return 0;
 	    }

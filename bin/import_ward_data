@@ -447,6 +447,16 @@ sub update_eq_family_table
 			    $companionship = $hometeaching_data{$index}{'Comp ID'};
 			    $sth = $dbh->prepare("update eq_family set companionship='$companionship' where name_id='$name_id'");
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+			    
+			    # In addition to changing the hometeaching assignment, update the eq_visit table
+			    # so that all previous visits made by the old hometeaching companionship, get
+			    # updated with the id of the new companionship. This will allow us to go in and
+			    # edit the history as needed for the family being hometaught under their new
+			    # companionship. Otherwise, we will not be able to update this history.
+			    #$family_id = $data[0]->{family};
+			    #print "   update eq_visit set companionship='$companionship' where family='$family_id' and companionship!='0'\n";
+			    #$sth = $dbh->prepare("update eq_visit set companionship='$companionship' where companionship='$old_companionship'");
+			    #$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			}
 		    }
 		}
