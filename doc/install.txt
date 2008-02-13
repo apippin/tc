@@ -13,7 +13,7 @@ Getting and Installing
 Downloading
 
    Can be downloaded from:
-   https://eq.pippins.net/eq.tar
+   https://eq.pippins.net/eq.zip
 
    It can also be obtained via the GIT revision control system by pulling from here:
    http://git.pippins.net/eq/.git
