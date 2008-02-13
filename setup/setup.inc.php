@@ -14,7 +14,7 @@
 	/* Basic information about this app */
 	$setup_info['eq']['name']      = 'eq';
 	$setup_info['eq']['title']     = 'Elders Quorum Tools';
-	$setup_info['eq']['version']   = '0.0.1.001';
+	$setup_info['eq']['version']   = '0.2.0';
 	$setup_info['eq']['app_order'] = 8;
 	$setup_info['eq']['enable']    = 1;
 	

@@ -63,24 +63,20 @@ class eq
      'send_ical_appt' => True,
      'assign_view'    => True,
      'assign_update'  => True,
+     'get_time_selection_form' => True,
      );
  
   function eq()
     {
-      // LOCAL CONFIGURATION. PLEASE UPDATE AS APPROPRIATE.
-      $this->upload_target_path = "/home/users/eqpres/eq_data/";
-      $this->script_path = "/usr/share/phpgroupware/eq/bin/";
-      $this->default_ht_num_months = 3;
-      $this->default_ppi_num_months = 3;
-      $this->default_ppi_num_years = 0;
-      $this->default_int_num_quarters = 1;
-      $this->default_int_num_years = 0;
-      $this->default_att_num_quarters = 1;
-      $this->default_vis_num_years = 1;
-      $this->max_num_districts = 4;
+      if(file_exists('setup/eq_config.local')) {
+	include('setup/eq_config.local');
+      } else {
+	include('setup/eq_config');
+      }
+
+      $this->script_path = "$this->application_path"."/bin";
       $this->max_presidency_members = 99;
       $this->max_appointments = 32768;
-      // END LOCAL CONFIGURATION
       
       $this->db		= $GLOBALS['phpgw']->db;
       $this->db2	= $this->db;
@@ -91,7 +87,7 @@ class eq
       $this->grants     = $GLOBALS['phpgw']->acl->get_grants('eq');
       $this->grants[$this->account] = PHPGW_ACL_READ + PHPGW_ACL_ADD + PHPGW_ACL_EDIT + PHPGW_ACL_DELETE;
        
-      $this->jscal = CreateObject('phpgwapi.jscalendar');   // before phpgw_header() !!!
+      $this->jscal = CreateObject('eq.jscalendar');   // before phpgw_header() !!!
       $this->cal_options = 'daFormat    : "%Y-%m-%d",
                                 ifFormat    : "%Y-%m-%d",
                                 mondayFirst : false,
@@ -298,12 +294,24 @@ class eq
 		$month_start = "$year"."-"."$month"."-"."01";
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
+		
 		//print "m: $m month: $month year: $year month_start: $month_start month_end: $month_end<br>";
 		// Add this to the query to filter on only visits made by this companionship:
 		// " AND companionship=" . $unique_companionships[$j]['companionship'].
+
+		// First check to see if the currently assigned companionship has visited them
 		$sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
-		       " AND companionship!=0".
- 		       " AND family=". $family_id;
+	           " AND companionship=".$unique_companionships[$j]['companionship'].
+	           " AND family=". $family_id;
+		$query_id = $this->db2->query($sql,__LINE__,__FILE__);
+		if($this->db2->num_rows($query_id) == 0) {
+		  // We did not find any visits made by the currently assigned companionship,
+		  // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
+		  $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+		     " AND companionship!=0".
+		     " AND family=". $family_id;
+		  $query_id = $this->db2->query($sql,__LINE__,__FILE__);
+		}
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$link_data['menuaction'] = 'eq.eq.ht_update';
 		$link_data['date'] = $month_start;
@@ -404,16 +412,9 @@ class eq
 	    }
 	  for ($j=0; $j < count($unique_companionships); $j++)
 	    {
-	      // FIXME: We won't be able to go back and edit history on families that have been
-	      // reassigned to a different companionship. The following delete command will not delete
-	      // the history of visits under an older companionship, only the ones for the existing
-	      // companionship. This will lead to duplicate visits being entered for an older
-	      // month for the same family, making it impossible to change the past history once
-	      // a family is reassigned. However, you will be able to view the history just fine.
-
 	      //$comp=$unique_companionships[$j]['companionship'];
 	      //print "deleting from eq_visit where companionship=$comp and date=$date and district=$district<br>";
-	      // Delete all the visits that have taken place for all families for this month
+	      // Delete all the visits that have taken place for all families for this companionsthip for this month
 	      $this->db->query("DELETE from eq_visit where companionship=" . $unique_companionships[$j]['companionship'] .
 			       " AND " . "date='" . $date . "'",__LINE__,__FILE__);
 	    }
@@ -518,10 +519,21 @@ class eq
 	    $table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$family_name Family</td>";
 	    
 	    $header_row="<th width=$comp_width><font size=-2>Families</th>";
+
+	    // First check to see if the currently assigned companionship has visited them
 	    $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+	           " AND companionship=".$unique_companionships[$j]['companionship'].
+	           " AND family=". $family_id;
+	    $query_id = $this->db2->query($sql,__LINE__,__FILE__);
+	    if($this->db2->num_rows($query_id) == 0) {
+	      // We did not find any visits made by the currently assigned companionship,
+	      // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
+	      $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship!=0".
 	           " AND family=". $family_id;
-	    $this->db2->query($sql,__LINE__,__FILE__);
+	      $query_id = $this->db2->query($sql,__LINE__,__FILE__);
+	    }
+	    
 	    $value = $family_id . "/" . $unique_companionships[$j]['companionship'] . "/" . $date;
 	    $header_row .= "<th width=$visit_width><font size=-2><a href=$link>$month</a></th>";
 	    if(!$total_visits) { $total_visits = 0; }
@@ -1389,26 +1401,28 @@ class eq
 	{
 	  // Save any changes made to the appointment table
 	  $new_data = get_var('appt_notes',array('POST'));
-	  foreach ($new_data as $entry)
-	   {
-	     $elder = $entry['elder'];
-	     $appointment = $entry['appointment'];
-
-	     //print "elder: $elder appointment: $appointment <br>";
-	     
-	     //Only perform a database update if we have made a change to this appointment
-	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
-	     $this->db->query($sql,__LINE__,__FILE__);
-	     if(!$this->db->next_record()) {
-	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_appointment set " .
-				" elder='" . $elder . "'" .
-				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
-	       // Email the appointment
-	       $this->email_appt($appointment);
-	     }
-
-	   }
+	  if($new_data != "") { 
+	    foreach ($new_data as $entry)
+	      {
+		$elder = $entry['elder'];
+		$appointment = $entry['appointment'];
+		
+		//print "elder: $elder appointment: $appointment <br>";
+		
+		//Only perform a database update if we have made a change to this appointment
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if(!$this->db->next_record()) {
+		  // Perform database save actions here
+		  $this->db->query("UPDATE eq_appointment set " .
+				   " elder='" . $elder . "'" .
+				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		  // Email the appointment
+		  $this->email_appt($appointment);
+		}
+		
+	      }
+	  }
 	  
 	  // Save any changes made to the ppi notes table
 	  $new_data = get_var('ppi_notes',array('POST'));
@@ -1427,7 +1441,7 @@ class eq
 	   }
 
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // Get the EQ President
@@ -1684,25 +1698,27 @@ class eq
 	{
 	  // Save any changes made to the appointment table
 	  $new_data = get_var('appt_notes',array('POST'));
-	  foreach ($new_data as $entry)
-	   {
-	     $elder = $entry['elder'];
-	     $appointment = $entry['appointment'];
-
-	     //print "elder: $elder appointment: $appointment <br>";
-	     //Only perform a database update if we have made a change to this appointment
-	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
-	     $this->db->query($sql,__LINE__,__FILE__);
-	     if(!$this->db->next_record()) {
-	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_appointment set " .
-				" elder='" . $elder . "'" .
-				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
-	       
-	       // Email the appointment
-	       $this->email_appt($appointment);
-	     }
-	   }
+	  if($new_data != "") { 
+	    foreach ($new_data as $entry)
+	      {
+		$elder = $entry['elder'];
+		$appointment = $entry['appointment'];
+		
+		//print "elder: $elder appointment: $appointment <br>";
+		//Only perform a database update if we have made a change to this appointment
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if(!$this->db->next_record()) {
+		  // Perform database save actions here
+		  $this->db->query("UPDATE eq_appointment set " .
+				   " elder='" . $elder . "'" .
+				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		  
+		  // Email the appointment
+		  $this->email_appt($appointment);
+		}
+	      }
+	  }
 	  
 	  // Save any changes made to the int notes table
 	  $new_data = get_var('int_notes',array('POST'));
@@ -1725,7 +1741,7 @@ class eq
 	   }
 
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // Get the Districts
@@ -1899,19 +1915,19 @@ class eq
 	      }
 	      
 	      // If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-	      $sql = "SELECT * FROM eq_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
+	      $sql = "SELECT * FROM eq_ppi WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
 		 "AND elder=" . $id;
 	      $this->db2->query($sql,__LINE__,__FILE__);
 	      
 	      if(!$this->db2->next_record()) {
-		$sql = "SELECT * FROM eq_interview WHERE elder=" . $id . " ORDER BY date DESC";
+		$sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
 		$link_data['menuaction'] = 'eq.eq.int_update';
 		$link_data['elder'] = $id;
 		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
-		$link_data['interview'] = '';
+		$link_data['ppi'] = '';
 		$link_data['action'] = 'add';
 		$link_data['interviewer'] = $districts[$d]['supervisor'];
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
@@ -1943,7 +1959,7 @@ class eq
 		$link_data['elder'] = $this->db2->f('elder');
 		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
-		$link_data['interview'] = $this->db2->f('int');
+		$link_data['ppi'] = $this->db2->f('ppi');
 		$link_data['action'] = 'view';
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
 		$comps_with_quarterly_int++;
@@ -2036,25 +2052,27 @@ class eq
 	{
 	  // Save any changes made to the appointment table
 	  $new_data = get_var('appt_notes',array('POST'));
-	  foreach ($new_data as $entry)
-	   {
-	     $family = $entry['family'];
-	     $appointment = $entry['appointment'];
-
-	     //Only perform a database update if we have made a change to this appointment
-	     $sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family'";
-	     $this->db->query($sql,__LINE__,__FILE__);
-	     if(!$this->db->next_record()) {
-
-	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_appointment set " .
-				" family='" . $family . "'" .
-				" WHERE appointment=" . $appointment,__LINE__,__FILE__);
-	       
-	       // Email the appointment
-	       $this->email_appt($appointment);
-	     }
-	   }
+	  if($new_data != "") { 
+	    foreach ($new_data as $entry)
+	      {
+		$family = $entry['family'];
+		$appointment = $entry['appointment'];
+		
+		//Only perform a database update if we have made a change to this appointment
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family'";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if(!$this->db->next_record()) {
+		  
+		  // Perform database save actions here
+		  $this->db->query("UPDATE eq_appointment set " .
+				   " family='" . $family . "'" .
+				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+		  
+		  // Email the appointment
+		  $this->email_appt($appointment);
+		}
+	      }
+	  }
 	  
 	  // Save any changes made to the visit notes table
 	  $new_data = get_var('vis_notes',array('POST'));
@@ -2073,7 +2091,7 @@ class eq
 	   }
 
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // APPOINTMENT TABLE
@@ -2374,7 +2392,7 @@ class eq
 	  $year = date('Y') - $m;
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 	  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id;
+	     "AND elder=" . $id . " AND eqpresppi=1";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  	  
 	  if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2444,6 +2462,7 @@ class eq
       $interviewer_name = $this->db2->f('name');
       $this->t->set_var('interviewer',$interviewer . ' selected');
       $this->t->set_var('interviewer_name',$interviewer_name);
+      $this->t->set_var('eqpresppi_checked','');
       $this->t->fp('int_list','interviewer_list',True);
     
       if($action == 'save')
@@ -2453,6 +2472,7 @@ class eq
 			   "   ppi='" . $ppi . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
+			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 	              ", eqpresppi='" . $eqpresppi . "'" .
@@ -2464,8 +2484,8 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,date,notes,eqpresppi) "
-			   . "VALUES ('" . $interviewer . "','" . $elder . "','"
+	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
+			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
 			   . $date . "','" . $notes . "','" . $eqpresppi  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
@@ -2481,6 +2501,7 @@ class eq
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('eqpresppi',$eqpresppi);
+	  $this->t->set_var('eqpresppi_checked','checked');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New PPI');
 	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&ppi='
@@ -2499,6 +2520,7 @@ class eq
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
 	  $this->t->set_var('eqpresppi',$this->db->f('eqpresppi'));
+	  if($this->db->f('eqpresppi') == 1) { $this->t->set_var('eqpresppi_checked','checked'); }
 	}
       
       if($action == 'edit')
@@ -2652,7 +2674,7 @@ class eq
 	      $link_data['elder'] = $elder_id;
 	      $link_data['aaronic'] = $aaronic_id;
 	      $link_data['name'] = $name;
-	      $link_data['interview'] = '';
+	      $link_data['ppi'] = '';
 	      $link_data['action'] = 'add';
 	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -2667,7 +2689,7 @@ class eq
 		$month_start = "$year"."-"."$month"."-"."01";
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
-		$sql = "SELECT * FROM eq_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
+		$sql = "SELECT * FROM eq_ppi WHERE date >= '$month_start' AND date <= '$month_end' ".
 		   "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$header_row .= "<th width=$int_width><font size=-2>$month</th>";
@@ -2683,7 +2705,7 @@ class eq
 		  $link_data['elder'] = $elder_id;
 		  $link_data['aaronic'] = $aaronic_id;
 		  $link_data['name'] = $name;
-		  $link_data['interview'] = $this->db2->f('interview');
+		  $link_data['ppi'] = $this->db2->f('ppi');
 		  $link_data['action'] = 'view';
 		  $date = $this->db2->f('date');
 		  $date_array = explode("-",$date);
@@ -2702,15 +2724,25 @@ class eq
 	$total_companionships += $num_companionships;
 	$stat_data = "<tr><td><b><font size=-2>$num_companionships Companionships<br>Interview Quarterly Totals:</font></b></td>";
 
-	for($m=$num_months; $m >=0; $m--) {
-	  $month = $current_month - $m;
-	  if(($month % 3) == 1) { $quarter_total = $ints[$m]; }
-	  else { $quarter_total += $ints[$m]; }
-	  $percent = ceil(($quarter_total / $num_companionships)*100);
-	  $stat_data .= "<td align=center><font size=-2><b>$quarter_total<br>$percent%</font></b></td>";
+	// Print the hometeaching interview stats
+	if($this->monthly_hometeaching_interview_stats == 0) { //Quarterly
+	  for($m=$num_months; $m >=0; $m--) {
+	    $month = $current_month - $m;
+	    if(($month % 3) == 1) { $quarter_total = $ints[$m]; }
+	    else { $quarter_total += $ints[$m]; }
+	    $percent = ceil(($quarter_total / $num_companionships)*100);
+	    $stat_data .= "<td align=center><font size=-2><b>$quarter_total<br>$percent%</font></b></td>";
+	  }
+	  $stat_data .= "</tr>";
 	}
-	$stat_data .= "</tr>";
-
+	else { // Monthly
+	  for($m=$num_months; $m >=0; $m--) {
+	    $percent = ceil(($ints[$m] / $num_companionships)*100);
+	    $stat_data .= "<td align=center><font size=-2><b>$ints[$m]<br>$percent%</font></b></td>";
+	  }
+	  $stat_data .= "</tr>";
+	}
+	
 	$this->t->set_var('table_width',$table_width);
 	$this->t->set_var('header_row',$header_row);
 	$this->t->set_var('table_data',$table_data);
@@ -2718,17 +2750,27 @@ class eq
 	$this->t->fp('list','district_list',True);
       }
 
-      // Display the totals, cummulative per quarter
-      $quarter_total = 0;
-      $totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Quarterly Totals:</font></b></td>";
-      for($m=$num_months; $m >=0; $m--) {
-	$month = $current_month - $m;
-	if(($month % 3) == 1) { $quarter_total = $total_ints[$m]; }
-	else { $quarter_total += $total_ints[$m]; }
-	$percent = ceil(($quarter_total / $total_companionships)*100);
-	$totals .= "<td align=center><font size=-2><b>$quarter_total<br>$percent%</font></b></td>";
+      // Display the totals
+      if($this->monthly_hometeaching_interview_stats == 0) { //Quarterly
+	$quarter_total = 0;
+	$totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Quarterly Totals:</font></b></td>";
+	for($m=$num_months; $m >=0; $m--) {
+	  $month = $current_month - $m;
+	  if(($month % 3) == 1) { $quarter_total = $total_ints[$m]; }
+	  else { $quarter_total += $total_ints[$m]; }
+	  $percent = ceil(($quarter_total / $total_companionships)*100);
+	  $totals .= "<td align=center><font size=-2><b>$quarter_total<br>$percent%</font></b></td>";
+	}
+	$totals .= "</tr>";
       }
-      $totals .= "</tr>";
+      else { //Monthly
+	$totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Monthly Totals:</font></b></td>";
+	for($m=$num_months; $m >=0; $m--) {
+	  $percent = ceil(($total_ints[$m] / $total_companionships)*100);
+	  $totals .= "<td align=center><font size=-2><b>$total_ints[$m]<br>$percent%</font></b></td>";
+	}
+	$totals .= "</tr>";
+      }
       
       $this->t->set_var('totals',$totals);
       $this->t->pfp('out','int_view_t');
@@ -2745,16 +2787,18 @@ class eq
       $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
+      $this->t->set_var('eqpresppi_checked','');
       
       $action = get_var('action',array('GET','POST'));
       $companionship = get_var('companionship',array('GET','POST'));
       $interviewer = get_var('interviewer',array('GET','POST'));      
       $name = get_var('name',array('GET','POST'));
-      $interview = get_var('interview',array('GET','POST'));
+      $ppi = get_var('ppi',array('GET','POST'));
       $elder = get_var('elder',array('GET','POST'));
       $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
+      $eqpresppi = get_var('eqpresppi',array('GET','POST'));
       
       $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -2778,14 +2822,15 @@ class eq
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE eq_interview set " .
-		     "   interview='" . $interview . "'" .
+	  $this->db->query("UPDATE eq_ppi set " .
+		           "   ppi='" . $ppi . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
-			   " WHERE interview=" . $interview,__LINE__,__FILE__);
+		      ", eqpresppi='" . $eqpresppi . "'" .
+			   " WHERE ppi=" . $ppi,__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2793,9 +2838,9 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_interview (interviewer,elder,aaronic,date,notes) "
+	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
-			   . $date . "','" . $notes ."')",__LINE__,__FILE__);
+			   . $date . "','" . $notes ."','" . $eqpresppi . "')",__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2803,7 +2848,7 @@ class eq
       if($action == 'add')
 	{
 	  $this->t->set_var('cal_date',$this->jscal->input('date','','','','','','',$this->cal_options));
-	  $this->t->set_var('interview', '');
+	  $this->t->set_var('ppi', '');
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('elder',$elder);
@@ -2812,22 +2857,23 @@ class eq
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
-								. $interview . '&action=' . 'insert'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
+								. $ppi . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM eq_interview WHERE interview=".$interview;
+	  $sql = "SELECT * FROM eq_ppi WHERE ppi=".$ppi;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
-	  $this->t->set_var('interview',$interview);
+	  $this->t->set_var('ppi',$ppi);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
 	  $this->t->set_var('elder',$this->db->f('elder'));
 	  $this->t->set_var('aaronic',$this->db->f('aaronic'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
+	  if($this->db->f('eqpresppi') == 1) { $this->t->set_var('eqpresppi_checked','checked'); }
 	}
       
       if($action == 'edit')
@@ -2835,8 +2881,8 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
-								. $interview . '&action=' . 'save'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
+								. $ppi . '&action=' . 'save'));
 	}
 
       if($action == 'view')
@@ -2847,8 +2893,8 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
-								. $interview . '&action=' . 'edit'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
+								. $ppi . '&action=' . 'edit'));
 	}
       
       $this->t->set_var('lang_reset','Clear Form');
@@ -3607,7 +3653,7 @@ class eq
 	   }
 	  
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule');
-	  Header('Location: ' . $take_me_to_url);
+	  //Header('Location: ' . $take_me_to_url);
 	}
 
       $sql = "SELECT * FROM eq_presidency where valid=1";
@@ -3684,24 +3730,7 @@ class eq
 	    
 	    // Hour & Minutes selection
 	    $table_data.= "<td align=center>";
-	    $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
-	    foreach(range(1,12) as $num) {
-	      if($hour == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
-	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	    }
-	    $table_data.= '</select>';
-	    $table_data.= '&nbsp;:&nbsp;';
-	    $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
-	    foreach(range(0,3) as $num) {
-	      $num = $num * 15; if($num == 0) { $num = "00"; }
-	      if($minute == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
-	      $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	    }
-	    $table_data.= '</select>';
-	    $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
-	    if($pm == 0) { $table_data.= '<option value=0 selected>am</option>'; $table_data.= '<option value=1>pm</option>'; }
-	    else { $table_data.= '<option value=0>am</option>'; $table_data.= '<option value=1 selected>pm</option>'; }
-	    $table_data.= '</select>';
+	    $table_data .= $this->get_time_selection_form($hour, $minute, $pm, $presidency, $appointment);
 	    $table_data.= "</td>";
 	    
 	    // Elder drop down list (for PPIs)
@@ -3746,25 +3775,7 @@ class eq
 	
 	  // Time selection
 	  $table_data.= "<td align=center>";
-	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
-	  $table_data.= '<option value=""></option>';
-	  foreach(range(1,12) as $num) {
-	    $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-	  }
-	  $table_data.= '</select>';
-	  $table_data.= '&nbsp;:&nbsp;';
-	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
-	  $table_data.= '<option value=""></option>';
-	  foreach(range(0,3) as $num) {
-	    $num = $num * 15; if($num == 0) { $num = "00"; }
-	    $table_data.= '<option value='.$num.'>'.$num.'</option>';
-	  }
-	  $table_data.= '</select>';
-	  $table_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
-	  $table_data.= '<option value=""></option>';
-	  $table_data.= '<option value=0>am</option>';
-	  $table_data.= '<option value=1>pm</option>';
-	  $table_data.= '</select>';
+	  $table_data .= $this->get_time_selection_form(0, 0, 0, $presidency, $appointment);
 	  $table_data.= "</td>";
 	  
 	  // Elder drop down list
@@ -3834,13 +3845,21 @@ class eq
 
       if($action == 'upload')
 	{	 
-	  $target_path = $this->upload_target_path . basename( $_FILES['uploadedfile']['name']);
+	  $target_path = $this->upload_target_path . '/' . basename( $_FILES['uploadedfile']['name']);
 	  
-	  if((($_FILES['uploadedfile']['type'] == "application/zip") ||
-	      ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed") ||
-	      ($_FILES['uploadedfile']['type'] == "application/x-zip") ||
-	      ($_FILES['uploadedfile']['type'] == "application/octet-stream")) &&
-	     (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))) {
+	  if(($_FILES['uploadedfile']['type'] == "application/zip") ||
+	     ($_FILES['uploadedfile']['type'] == "application/x-zip-compressed") ||
+	     ($_FILES['uploadedfile']['type'] == "application/x-zip") ||
+	     ($_FILES['uploadedfile']['type'] == "application/octet-stream")) {
+
+	    if(!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+	      $uploadstatus = "<b><font color=red> -E- Unable to move the uploaded file to ";
+	      $uploadstatus.= "the target path (check the path and permissions) of: $target_path</font></b>";
+	      $this->t->set_var('uploadstatus',$uploadstatus);
+	      $this->t->pfp('uploadhandle','upload',True);
+	      return 0;
+	    }
+	    
 	    $uploadstatus = "<b>The following file was uploaded successfully: </b><br><br>";
 	    $uploadstatus.= "Filename : " . $_FILES['uploadedfile']['name'] . "<br>";
 	    $uploadstatus.= "Type     : " . $_FILES['uploadedfile']['type'] . "<br>";
@@ -3852,9 +3871,9 @@ class eq
 	    
 	    # make a directory for this data to be stored in
 	    $date="data_" . date("Y_m_d");
-	    $data_dir = $this->upload_target_path . $date;
+	    $data_dir = $this->upload_target_path . '/' . $date;
 	    print "-> Making the data directory: $date<br>\n";
-	    exec('mkdir ' . $data_dir . ' 2>&1', $result, $return_code);
+	    exec('mkdir -p ' . $data_dir . ' 2>&1', $result, $return_code);
 	    if($return_code != 0) {
 	      print implode('\n',$result) . "<br>";
 	      print "<b><font color=red>";
@@ -3876,12 +3895,11 @@ class eq
 	    
 	    # unzip the data into this directory
 	    print "-> Unzipping the data<br>\n";
-	    $data_file = $data_dir . '';
-	    exec('unzip ' . $data_dir . '/*.zip -d ' . $data_dir . ' 2>&1', $result, $return_code);
+	    exec($this->unzip_path .' -u '. $data_dir . '/*.zip -d ' . $data_dir . ' 2>&1', $result, $return_code);
 	    if($return_code != 0) {
 	      print implode('\n',$result) . "<br>";
 	      print "<b><font color=red>";
-	      print "-E- Unable to unzip the uploaded file into the data dir. Aborting import.";
+	      print "-E- Unable to unzip the uploaded file into the data dir: $data_dir. Aborting import.";
 	      print "</font></b>";
 	      return 0;
 	    }
@@ -3889,7 +3907,7 @@ class eq
 
 	    # update the data_latest link to point to this new directory
 	    print "-> Updating the latest data dir link<br>\n";
-	    $data_latest = $this->upload_target_path . 'data_latest';
+	    $data_latest = $this->upload_target_path . '/data_latest';
 	    exec('rm ' . $data_latest. '; ln -s ' . $data_dir .' '. $data_latest .' 2>&1', $result, $return_code);
 	    if($return_code != 0) {
 	      print implode('\n',$result) . "<br>";
@@ -3905,8 +3923,8 @@ class eq
 	    ob_flush(); flush(); sleep(1);
 	    $import_log = $this->upload_target_path . '/import.log';
 	    $data_log = $this->upload_target_path . '/data.log';
-	    $import_cmd = $this->script_path . 'import_ward_data ' . $data_latest . ' | tee ' . $import_log;
-	    $parse_cmd = $this->script_path . 'parse_ward_data -v ' . $data_latest . ' > ' . $data_log;
+	    $import_cmd = $this->script_path . '/import_ward_data ' . $data_latest . ' 2>&1 | tee ' . $import_log;
+	    $parse_cmd = $this->script_path . '/parse_ward_data -v ' . $data_latest . ' > ' . $data_log . '2>&1';
 	    #print "import_cmd: $import_cmd<br>";
 	    #print "parse_cmd: $parse_cmd<br>";
 	    ob_start('ob_logstdout', 2);
@@ -4203,6 +4221,7 @@ class eq
 	  // Format the appointment time into an iCal UTC equivalent
 	  $dtstamp = gmdate("Ymd"."\T"."His"."\Z");
 	  $dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
+	  $dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  
 	  // Set the email address of the person making the appointment
 	  $from = $GLOBALS['phpgw_info']['user']['fullname'] . "<" .
@@ -4223,7 +4242,7 @@ class eq
 	      $phone = $this->db2->f('phone');
 	      $appt_name = $elder_name . " Interview";
 	      $location = "$interviewer"."'s home";
-	      $duration = 1800; // 30 minutes
+	      $duration = $this->default_ppi_appt_duration * 60;
 	    }
 	  }
 
@@ -4245,11 +4264,13 @@ class eq
 	      if($this->db3->next_record()) {
 		$location=$this->db3->f('address');
 	      }
-	      $duration = 2700; // 45 minutes
+	      $duration = $this->default_visit_appt_duration * 60;
 	    }
 	  }
 
 	  $dtend = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+	  $dtendstr = date("g:i A", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+	  $date = $dtstartstr . "-" . $dtendstr;
 	  $description = "$appt_name : $phone";
 	  
 	  if(($uid == 0) && ($appt_name != "")) { 
@@ -4265,7 +4286,7 @@ class eq
 
 	    $action = "PUBLISH";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $appt_name, $description, $uid);
 	    
 	  } else if(($uid != 0) && ($appt_name == "")) {
 	    // Remove the calendar item for this appointment since it has already been sent
@@ -4279,7 +4300,7 @@ class eq
 	    
 	    $action = "CANCEL";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $subject, $subject, $uid);
 	    
 	  } else if($uid != 0) {
 	    // Update the existing appointment since we have changed it
@@ -4288,7 +4309,7 @@ class eq
 	    $subject = "Canceled: $appt_date $appt_time";
 	    $action = "CANCEL";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $subject, $subject, $uid);
 	    
 	    $uid = rand() . rand(); // Generate a random identifier for this appointment
 	    $this->db->query("UPDATE eq_appointment set" .
@@ -4298,7 +4319,7 @@ class eq
 	    $subject = "Updated: $appt_name";	    
 	    $action = "PUBLISH";
 	    $this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				  $dtend, $location, $appt_name, $description, $uid);
+				  $dtend, $date, $location, $appt_name, $description, $uid);
 	  }
 	  
 	}
@@ -4306,16 +4327,36 @@ class eq
       return true;
     }
 
-  function send_ical_appt($action, $to, $from, $subject, $dtstamp, $dtstart, $dtend, $location, $summary, $description, $uid)
+  function send_ical_appt($action, $to, $from, $subject, $dtstamp, $dtstart, $dtend, $date, $location, $summary, $description, $uid)
     {
-      $headers = 'From: ' . "$from" . "\n" .
-	 'Reply-To: ' . "$from" . "\n" .
-	 'X-Mailer: PHP/' . phpversion() . "\n" .
-	 'Content-Type: text/calendar;' . "\n" .
-	 'Content-Transfer-Encoding: 7bit' . "\n";
+      // Initialize our local variables
+      $boundary = "=MIME_APPOINTMENT_BOUNDARY";
+      $message = "";
+      $headers = "";
+
+      // Form the headers for the email message
+      $headers.="X-Mailer: PHP/" . phpversion() . "\n";
+      $headers.="Mime-Version: 1.0\n";
+      $headers.="Content-Type: multipart/mixed; boundary=\"$boundary\"\n";
+      $headers.="Content-Disposition: inline\n";
+      $headers.="Reply-To: $from\n";
+      $headers.="From: $from\n";
+
+      // Print the plaintext version of the appointment
+      $message.="--$boundary\n";
+      $message.="Content-Type: text/plain; charset=us-ascii\n";
+      $message.="Content-Disposition: inline\n";
+      $message.="\n";
+      $message.="What: $description\n";
+      $message.="When: $date\n";
+      $message.="Where: $location\n";
+      $message.="\n";
       
-      //$message = "phone: $phone date: $date time: $time";
-      $message ="";
+      // Print the .ics attachment version of the appointment
+      $message.="--$boundary\n";
+      $message.="Content-Type: text/calendar; charset=us-ascii\n";
+      $message.="Content-Disposition: attachment; filename=\"appointment.ics\"\n";
+      $message.="\n";
       $message.="BEGIN:VCALENDAR" . "\n";
       $message.="VERSION:2.0" . "\n";
       $message.="PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN" . "\n";
@@ -4334,9 +4375,64 @@ class eq
       $message.="CLASS:PUBLIC" . "\n";
       $message.="END:VEVENT" . "\n";
       $message.="END:VCALENDAR" . "\n";
-      
+
+      // Complete the message
+      $message.="--$boundary\n";
+
+      // Send the message
       mail($to, $subject, $message, $headers);
       
+    }
+
+  function get_time_selection_form($hour, $minute, $pm, $presidency, $appointment)
+    {
+      $form_data = "";
+      $blank = 0;
+      
+      if($hour == 0) { $blank = 1; }
+
+      if($this->time_drop_down_lists == 1) {
+	// Create drop down lists to get the time
+	$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
+	if($blank == 1) { $form_data.= '<option value=""></option>'; }
+	foreach(range(1,12) as $num) {
+	  if($hour == $num) { $selected = 'selected="selected"'; } else { $selected = ''; }
+	  $form_data.= '<option value='.$num.' '.$selected.'>'.$num.'</option>';
+	}
+	$form_data.= '</select>';
+	$form_data.= '&nbsp;:&nbsp;';
+	$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
+	if($blank == 1) { $form_data.= '<option value=""></option>'; }
+	$num = 0;
+	while($num < 60) {
+	  if($num < 10) { $num = "0" . "$num"; }
+	  if($minute == $num) { $selected = 'selected="selected"'; } else { $selected = ''; }
+	  if($blank == 1) { $selected = ""; }
+	  $form_data.= '<option value='.$num.' '.$selected.'>'.$num.'</option>';
+	  $num = $num + $this->time_drop_down_list_inc;
+	}
+	$form_data.= '</select>';
+      } else {
+	// Use free form text fields to get the time
+	if($blank == 1) { $hour = ""; $minute = ""; $ampm = ""; }
+	$form_data.= '<input type=text size=2 name=sched['.$presidency.']['.$appointment.'][hour] value='.$hour.'>';
+	$form_data.= ':';
+	$form_data.= '<input type=text size=2 name=sched['.$presidency.']['.$appointment.'][minute] value='.$minute.'>';
+	$form_data.= '&nbsp;';
+      }
+      // Always use a drop-down select form for am/pm
+      $form_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
+      if($blank == 0) { 
+	if($pm == 0) { $form_data.= '<option value=0 selected>am</option>'; $form_data.= '<option value=1>pm</option>'; }
+	if($pm == 1) { $form_data.= '<option value=0>am</option>'; $form_data.= '<option value=1 selected>pm</option>'; }
+      } else {
+	$form_data.= '<option value=""></option>';
+	$form_data.= '<option value=0>am</option>';
+	$form_data.= '<option value=1>pm</option>';
+      }
+      $form_data.= '</select>';
+      
+      return $form_data;
     }
 }
 

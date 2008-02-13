@@ -2,13 +2,12 @@
 
 use DBI;
 use Getopt::Std;
-###################################################
-# GLOBALS
-$dbname = "phpgroupware";
-$dbhost = "192.168.0.2";
-$dbport = 3306;
-$dbuser = "phpgroupware";
-$dbpass = "phpgroupware";
+
+$mydir = `cd \$(dirname $0) 2>/dev/null; pwd`; chomp($mydir);
+unshift @INC,("$mydir/../setup");
+if( -f "$mydir/../setup/db_config.local") { require "db_config.local"; }
+else { require "db_config"; }
+
 %hometeaching_data = ();
 %membership_data = ();
 getopts('vsn:o:');
@@ -664,7 +663,7 @@ sub check_for_changed_ids
 
 ###################################################
 # Open a connection to the database
-$dbh=DBI->connect("dbi:mysql:dbname=$dbname;host=$dbhost port=$dbport",$dbuser,$dbpass,{
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$dbpass,{
     AutoCommit=>0,
     PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
 
@@ -726,20 +725,12 @@ if($opt_s) { $dbh->disconnect(); exit; }
 &update_eq_parent_table();
 &update_eq_child_table();
 
+print "\n-> Import Successful! DONE...\n";
+
 ###################################################
 # Disconnect from the database
 $dbh->disconnect();
 
 ######################################################################
-
-
-
-
-
-
-
-
-
-
 
 

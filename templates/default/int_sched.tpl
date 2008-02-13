@@ -47,6 +47,7 @@
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
 		{table_data}
 		<tr>
+		<tr><td colspan=5 align=center><i>Note: The highest priority is 1, the lowest priority is 30</i></td></tr>
 		<td></td><td></td><td></td><td></td>
 		<td height="50" align="right">
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>

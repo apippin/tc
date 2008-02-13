@@ -38,7 +38,6 @@
 	</table>
 <!-- END appt_list -->
 
-
 <!-- BEGIN family_list -->
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
@@ -49,6 +48,7 @@
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
 		{table_data}
 		<tr>
+		<tr><td colspan=5 align=center><i>Note: The highest priority is 1, the lowest priority is 30</i></td></tr>
 		<td></td><td></td><td></td><td></td>
 		<td height="50" align="right">
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
@@ -59,6 +59,7 @@
 		</tr>
 	</table>
 <!-- END family_list -->
+
 
 	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
