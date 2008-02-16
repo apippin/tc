@@ -22,10 +22,10 @@ $this->unzip_path = "/usr/local/bin/unzip";
 // If set to 1, drop down lists will be used for the hour and minute fields
 $this->time_drop_down_lists = 1;
 
-// Compute hometeaching interview stats per month or per quarter
-// If set to 0, stats will be computed per quarter.
-// If set to 1, stats will be computed per month.
-$this->monthly_hometeaching_interview_stats = 0;
+// Frequency of hometeaching interview stats in months
+// This number must evenly divide 12.
+// Examples: Monthly=1 Quarterly=3 Yearly=12
+$this->monthly_hometeaching_interview_stats = 3;
 
 // Specify the minute interval increment to use in the time drop down lists
 $this->time_drop_down_list_inc = 15;

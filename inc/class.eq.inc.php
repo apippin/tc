@@ -2722,26 +2722,19 @@ class eq
 	  $table_data .= "<tr><td colspan=20><hr></td></tr>";
 	}
 	$total_companionships += $num_companionships;
-	$stat_data = "<tr><td><b><font size=-2>$num_companionships Companionships<br>Interview Quarterly Totals:</font></b></td>";
+	$stat_data = "<tr><td><b><font size=-2>$num_companionships Companionships<br>Interview Totals:</font></b></td>";
 
 	// Print the hometeaching interview stats
-	if($this->monthly_hometeaching_interview_stats == 0) { //Quarterly
-	  for($m=$num_months; $m >=0; $m--) {
-	    $month = $current_month - $m;
-	    if(($month % 3) == 1) { $quarter_total = $ints[$m]; }
-	    else { $quarter_total += $ints[$m]; }
-	    $percent = ceil(($quarter_total / $num_companionships)*100);
-	    $stat_data .= "<td align=center><font size=-2><b>$quarter_total<br>$percent%</font></b></td>";
-	  }
-	  $stat_data .= "</tr>";
+	for($m=$num_months; $m >=0; $m--) {
+	  $month = $current_month - $m;
+	  $month_begins = $month % $this->monthly_hometeaching_interview_stats;
+	  if($this->monthly_hometeaching_interview_stats == 1) { $month_begins = 1; }
+	  if(($month_begins) == 1) { $total = $ints[$m]; }
+	  else { $total += $ints[$m]; }
+	  $percent = ceil(($total / $num_companionships)*100);
+	  $stat_data .= "<td align=center><font size=-2><b>$total<br>$percent%</font></b></td>";
 	}
-	else { // Monthly
-	  for($m=$num_months; $m >=0; $m--) {
-	    $percent = ceil(($ints[$m] / $num_companionships)*100);
-	    $stat_data .= "<td align=center><font size=-2><b>$ints[$m]<br>$percent%</font></b></td>";
-	  }
-	  $stat_data .= "</tr>";
-	}
+	$stat_data .= "</tr>";
 	
 	$this->t->set_var('table_width',$table_width);
 	$this->t->set_var('header_row',$header_row);
@@ -2751,27 +2744,19 @@ class eq
       }
 
       // Display the totals
-      if($this->monthly_hometeaching_interview_stats == 0) { //Quarterly
-	$quarter_total = 0;
-	$totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Quarterly Totals:</font></b></td>";
-	for($m=$num_months; $m >=0; $m--) {
-	  $month = $current_month - $m;
-	  if(($month % 3) == 1) { $quarter_total = $total_ints[$m]; }
-	  else { $quarter_total += $total_ints[$m]; }
-	  $percent = ceil(($quarter_total / $total_companionships)*100);
-	  $totals .= "<td align=center><font size=-2><b>$quarter_total<br>$percent%</font></b></td>";
-	}
-	$totals .= "</tr>";
+      $total = 0;
+      $totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Totals:</font></b></td>";
+      for($m=$num_months; $m >=0; $m--) {
+	$month = $current_month - $m;
+	$month_begins = $month % $this->monthly_hometeaching_interview_stats;
+	if($this->monthly_hometeaching_interview_stats == 1) { $month_begins = 1; }
+	if(($month_begins) == 1) { $total = $total_ints[$m]; }
+	else { $total += $total_ints[$m]; }
+	$percent = ceil(($total / $total_companionships)*100);
+	$totals .= "<td align=center><font size=-2><b>$total<br>$percent%</font></b></td>";
       }
-      else { //Monthly
-	$totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Monthly Totals:</font></b></td>";
-	for($m=$num_months; $m >=0; $m--) {
-	  $percent = ceil(($total_ints[$m] / $total_companionships)*100);
-	  $totals .= "<td align=center><font size=-2><b>$total_ints[$m]<br>$percent%</font></b></td>";
-	}
-	$totals .= "</tr>";
-      }
-      
+      $totals .= "</tr>";
+          
       $this->t->set_var('totals',$totals);
       $this->t->pfp('out','int_view_t');
       $this->save_sessiondata(); 
