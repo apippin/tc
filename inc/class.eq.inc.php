@@ -2727,7 +2727,9 @@ class eq
 	// Print the hometeaching interview stats
 	for($m=$num_months; $m >=0; $m--) {
 	  $month = $current_month - $m;
+	  if($month < 0) { $month = 12 + $month; } // Handle going backwards over a year boundary
 	  $month_begins = $month % $this->monthly_hometeaching_interview_stats;
+	  //print "$month % $this->monthly_hometeaching_interview_stats = $month_begins <br>";
 	  if($this->monthly_hometeaching_interview_stats == 1) { $month_begins = 1; }
 	  if(($month_begins) == 1) { $total = $ints[$m]; }
 	  else { $total += $ints[$m]; }
@@ -2748,6 +2750,7 @@ class eq
       $totals = "<tr><td><b><font size=-2>$total_companionships Total Comps<br>Interview Totals:</font></b></td>";
       for($m=$num_months; $m >=0; $m--) {
 	$month = $current_month - $m;
+	if($month < 0) { $month = 12 + $month; } // Handle going backwards over a year boundary
 	$month_begins = $month % $this->monthly_hometeaching_interview_stats;
 	if($this->monthly_hometeaching_interview_stats == 1) { $month_begins = 1; }
 	if(($month_begins) == 1) { $total = $total_ints[$m]; }
