@@ -68,12 +68,13 @@ class eq
  
   function eq()
     {
-      if(file_exists('setup/eq_config.local')) {
-	include('setup/eq_config.local');
+      $base_path = $_SERVER['DOCUMENT_ROOT'];
+      if(file_exists("$base_path/eq/setup/eq_config.local")) {
+	include("$base_path/eq/setup/eq_config.local");
       } else {
-	include('setup/eq_config');
+	include("$base_path/eq/setup/eq_config");
       }
-
+      
       $this->script_path = "$this->application_path"."/bin";
       $this->max_presidency_members = 99;
       $this->max_appointments = 32768;
