@@ -68,11 +68,10 @@ class eq
  
   function eq()
     {
-      $base_path = $_SERVER['DOCUMENT_ROOT'];
-      if(file_exists("$base_path/eq/setup/eq_config.local")) {
-	include("$base_path/eq/setup/eq_config.local");
+      if(file_exists("setup/eq_config.local")) {
+	include("setup/eq_config.local");
       } else {
-	include("$base_path/eq/setup/eq_config");
+	include("setup/eq_config");
       }
       
       $this->script_path = "$this->application_path"."/bin";
