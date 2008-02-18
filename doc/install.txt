@@ -30,9 +30,11 @@ Installing
       Enable it for each user by going to Site Admin -> User Accounts -> <username> -> edit
       Make sure the "eq" application has a checkmark next to it under "Permissions this user has"
    4) Copy the setup/db_config to setup/db_config.local and change the values in .local appropriately. 
+      Check for syntax errors by running eq/bin/check_config_syntax
    5) Copy the setup/eq_config to setup/eq_config.local and change the values in .local appropriately.
       Make sure you update the path locations for your specific installation locations: 
       upload_target_path & application_path
+      Check for syntax errors by running eq/bin/check_config_syntax
    6) Try to run eq/bin/import_ward_data & parse_ward_data scripts from the commandline
       to check for any missing perl library dependencies and mysql connection. 
       Just run them without command line args.
