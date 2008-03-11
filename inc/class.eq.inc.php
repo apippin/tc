@@ -223,9 +223,9 @@ class eq
 	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
 	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
 	}
-      
-      $total_families = 0;
+
       $this->nextmatchs->template_alternate_row_color(&$this->t);
+      for($m=$num_months; $m >= 0; $m--) { $total_families[$m]=0; }
       for ($i=0; $i < count($districts); $i++) {
 	$this->t->set_var('district_number',$districts[$i]['district']);
 	$this->t->set_var('district_name',$districts[$i]['name']);	
@@ -243,8 +243,8 @@ class eq
 	  }
 
 	$comp_width=450; $visit_width=25; $table_width=$comp_width + $num_months*$visit_width;
-	$table_data=""; $num_companionships = 0; $num_families = 0;
-	for($m=$num_months; $m >= 0; $m--) { $visits[$m] = 0; }
+	$table_data=""; $num_companionships = 0;
+	for($m=$num_months; $m >= 0; $m--) { $visits[$m]=0; $num_families[$m]=0; }
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  $companion_table_entry = "";
 	  // Select all the companions in each companionship
@@ -278,7 +278,6 @@ class eq
 	  $k=0;
 	  while ($this->db->next_record())
 	    {
-	      $num_families++; $total_families++;
 	      $family_name = $this->db->f('name');
 	      $family_id = $this->db->f('family');
 	      $this->nextmatchs->template_alternate_row_color(&$this->t);
@@ -326,19 +325,21 @@ class eq
 		if(!$total_visits[$m]) { $total_visits[$m] = 0; }
 		if($this->db2->next_record()) {
 		  if($this->db2->f('visited') == 'y') {
-		    $visits[$m]++; $total_visits[$m]++;		  
+		    $visits[$m]++; $total_visits[$m]++;
+		    $num_families[$m]++; $total_families[$m]++;
 		    $table_data .= '<td align=center><a href="'.$link.'"><img src="images/checkmark.gif"></a></td>';
 		  }
 		  else if($this->db2->f('visited') == 'n') {
+		    $num_families[$m]++; $total_families[$m]++;
 		    $table_data .= '<td align=center><a href="'.$link.'"><img src="images/x.gif"></a></td>';
 		  }
 		  else {
-		    $visits[$m]++; $total_visits[$m]++;
+		    //$visits[$m]++; $total_visits[$m]++;
 		    $table_data .= "<td>&nbsp;</td>";
 		  }
 		}
 		else {
-		  $visits[$m]++; $total_visits[$m]++;
+		  //$visits[$m]++; $total_visits[$m]++;
 		  $table_data .= "<td>&nbsp;</td>";
 		}
 	      }
@@ -348,11 +349,15 @@ class eq
 	  $table_data .= "<tr><td colspan=20></td></tr>";
 	}
 	$table_data .= "<tr><td colspan=20><hr></td></tr>";
-	$stat_data = "<tr><td><b><font size=-2>$num_families Families<br>Visit Totals:</font></b></td>";
+	$stat_data = "<tr><td><b><font size=-2>Families Hometaught:<br>Hometeaching Percentage:</font></b></td>";
 
 	for($m=$num_months; $m >=0; $m--) {
-	  $percent = ceil(($visits[$m] / $num_families)*100);
-	  $stat_data .= "<td align=center><font size=-2><b>$visits[$m]<br>$percent%</font></b></td>";
+	  if($num_families[$m] > 0) { 
+	    $percent = ceil(($visits[$m] / $num_families[$m])*100);
+	  } else {
+	    $percent = 0;
+	  }
+	  $stat_data .= "<td align=center><font size=-2><b>$visits[$m] / $num_families[$m]<br>$percent%</font></b></td>";
 	}
 	$stat_data .= "</tr>";
 
@@ -363,10 +368,14 @@ class eq
 	$this->t->fp('list','district_list',True);
       }
 
-      $totals = "<tr><td><b><font size=-2>$total_families Total Families<br>Visit Totals:</font></b></td>";
+      $totals = "<tr><td><b><font size=-2>Total Families Hometaught:<br>Total Hometeaching Percentage:</font></b></td>";
       for($m=$num_months; $m >=0; $m--) {
-	$percent = ceil(($total_visits[$m] / $total_families)*100);
-	$totals .= "<td align=center><font size=-2><b>$total_visits[$m]<br>$percent%</font></b></td>";
+	if($total_families[$m] > 0) { 
+	  $percent = ceil(($total_visits[$m] / $total_families[$m])*100);
+	} else {
+	  $percent = 0;
+	}
+	$totals .= "<td align=center><font size=-2><b>$total_visits[$m] / $total_families[$m]<br>$percent%</font></b></td>";
       }
       $totals .= "</tr>";
       
@@ -512,7 +521,6 @@ class eq
 	$this->db->query($sql,__LINE__,__FILE__);
 	while ($this->db->next_record())
 	  {
-	    $num_families++; $total_families++;
 	    $family_name = $this->db->f('name');
 	    $family_id = $this->db->f('family');
 	    $this->nextmatchs->template_alternate_row_color(&$this->t);
@@ -539,13 +547,14 @@ class eq
 	    if(!$total_visits) { $total_visits = 0; }
 	    if($this->db2->next_record()) {
 	      if($this->db2->f('visited') == 'y') {
-		$visits++; $total_visits++;
+		$visits++; $total_visits++; $num_families++;
 		$table_data .= '<td width=100 align=center>';
 		$table_data .= '<input type="radio" name="family_visited['.$family_id.'][]" value="'.$value.'/y" checked>Y';
 		$table_data .= '<input type="radio" name="family_visited['.$family_id.'][]" value="'.$value.'/n">N';
 		$table_data .= '<input type="radio" name="family_visited['.$family_id.'][]" value="'.$value.'/"> ';
 		$table_data .= '</td>';
 	      } else if($this->db2->f('visited') == 'n') {
+		$num_families++;
 		$table_data .= '<td width=100 align=center>';
 		$table_data .= '<input type="radio" name="family_visited['.$family_id.'][]" value="'.$value.'/y">Y';
 		$table_data .= '<input type="radio" name="family_visited['.$family_id.'][]" value="'.$value.'/n" checked>N';
@@ -572,10 +581,10 @@ class eq
 	$table_data .= "<tr><td colspan=20></td></tr>";
       }
       $table_data .= "<tr><td colspan=20><hr></td></tr>";
-      $stat_data = "<tr><td><b><font size=-2>$num_families Families<br>Visit Totals:</font></b></td>";
+      $stat_data = "<tr><td><b><font size=-2>Families Hometaught:<br>Hometeaching Percentage:</font></b></td>";
       
       $percent = ceil(($visits / $num_families)*100);
-      $stat_data .= "<td align=center><font size=-2><b>$visits<br>$percent%</font></b></td>";
+      $stat_data .= "<td align=center><font size=-2><b>$visits / $num_families<br>$percent%</font></b></td>";
       $stat_data .= "</tr>";
       
       $this->t->set_var('table_width',$table_width);
