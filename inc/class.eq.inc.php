@@ -1570,7 +1570,7 @@ class eq
 	  // If this elder has had a yearly PPI this year, don't show him on the schedule list
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 	  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id;
+	     "AND elder=" . $id . " AND eqpresppi=1";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
