@@ -18,6 +18,13 @@ Downloading
    It can also be obtained via the GIT revision control system by pulling from here:
    http://git.pippins.net/eq/.git
 
+Dependencies
+
+   phpgroupware
+   mysql
+   apache (or equivalent webserver)
+   MLS data dumps (required fields shown below)
+
 Installing
 
    1) Download the eq.tar file and extract it or GIT pull the archive into 
