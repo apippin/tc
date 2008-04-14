@@ -1,7 +1,8 @@
 <?php
   /**************************************************************************\
-  * phpGroupWare - eq                                                        *
-  * http://www.phpgroupware.org                                              *
+  * Application: phpGroupWare - eq                                           *
+  * Framework: http://www.phpgroupware.org                                   *
+  * Author: Alan J. Pippin (apippin@pippins.net)                             *
   * -----------------------------------------------                          *
   *  This program is free software; you can redistribute it and/or modify it *
   *  under the terms of the GNU General Public License as published by the   *
@@ -3141,7 +3142,7 @@ class eq
       else if($current_month >= 4 && $current_month <= 6) { $current_month=6; }
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
-      
+
       $sql = "SELECT * FROM eq_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
@@ -3157,10 +3158,10 @@ class eq
       $i=0; 
       $last_time = 0; 
       $found_sunday = 0;
-      $sunday_list[0]['date'] = date("Y-m-d", mktime(0, 0, 0, $current_month-$num_months, 1, date("y")));
+      $sunday_list[0]['date'] = date("Y-m-d", mktime(0, 0, 0, ($current_month-$num_months)+1, 1, date("y")));
       $last_date = explode("-",$sunday_list[0]['date']);
       $last_time = mktime(0, 0, 0, $last_date[1], $last_date[2], $last_date[0]);
-      $time_limit = mktime(0, 0, 0, date("m"), date("t"), date("y"));
+      $time_limit = mktime(0, 0, 0, $current_month, 31, date("y"));
       while($last_time < $time_limit)
       {
         $day = date("w",$last_time);
@@ -3171,7 +3172,8 @@ class eq
 	  $sunday_list[$i]['day'] = $last_date[2];
 	  $sunday_list[$i]['month'] = date("M",$last_time);
 	  $sunday_list[$i]['year'] = $last_date[0];
-	  $found_sunday = 1; 
+	  $found_sunday = 1;
+	  $last_date = $sunday_list[$i]['date'];
 	}
 	$last_time += 90000;
 	if($found_sunday) { $i++; $found_sunday=0; }
