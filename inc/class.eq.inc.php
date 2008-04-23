@@ -58,6 +58,7 @@ class eq
      'org_view'   => True,
      'schedule'   => True,
      'admin'      => True,
+     'email'      => True,
      'email_appt' => True,
      'willing_view'   => True,
      'willing_update' => True,
@@ -167,6 +168,9 @@ class eq
       $link_data['menuaction'] = 'eq.eq.schedule';	
       $this->t->set_var('link_schedule',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_schedule','Scheduling');
+      $link_data['menuaction'] = 'eq.eq.email';	
+      $this->t->set_var('link_email',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('lang_email','Email');
 		
       $this->t->pparse('out','eq_header');
     }
@@ -1406,7 +1410,24 @@ class eq
       $table_data=""; $completed_data=""; $totals_data="";
 
       $year = date('Y');
-      
+
+      // Get the EQ President
+      $sql = "SELECT * FROM eq_presidency where president=1 and valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      if($this->db->next_record()) {
+	$president_name = $this->db->f('name');
+	$president_name_array = explode(",",$president_name);
+	$president_last_name = $president_name_array[0];
+	$president_id = $this->db->f('elder');
+	$presidency_id = $this->db->f('presidency');
+	$interviewer = $this->db->f('elder');
+	$district_number = '*';
+	$district_name = $president_name;
+      } else {
+	print "<hr><font color=red><h3>-E- Unable to locate EQ President in eq_presidency table</h3></font></hr>";
+	return;
+      }
+
       if($action == 'save')
 	{
 	  // Save any changes made to the appointment table
@@ -1416,16 +1437,18 @@ class eq
 	      {
 		$elder = $entry['elder'];
 		$appointment = $entry['appointment'];
-		
-		//print "elder: $elder appointment: $appointment <br>";
+		$location = $entry['location'];
+		if($location == "") { $location = "$president_last_name"." home"; }
+		if($elder == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
 		  $this->db->query("UPDATE eq_appointment set " .
 				   " elder='" . $elder . "'" .
+				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		  // Email the appointment
 		  $this->email_appt($appointment);
@@ -1453,21 +1476,6 @@ class eq
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
-
-      // Get the EQ President
-      $sql = "SELECT * FROM eq_presidency where president=1 and valid=1";
-      $this->db->query($sql,__LINE__,__FILE__);
-      if($this->db->next_record()) {
-	$president_name = $this->db->f('name');
-	$president_id = $this->db->f('elder');
-	$presidency_id = $this->db->f('presidency');
-	$interviewer = $this->db->f('elder');
-	$district_number = '*';
-	$district_name = $president_name;
-      } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ President in eq_presidency table</h3></font></hr>";
-	return;
-      }
       
       // create the elder id -> elder name mapping
       $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY name ASC";
@@ -1484,11 +1492,12 @@ class eq
       array_multisort($elder_name, $elder_id);
 
       // APPOINTMENT TABLE
-      $date_width=150; $time_width=100; $elder_width=200;
-      $appt_table_width=$date_width + $time_width + $elder_width;
+      $date_width=250; $time_width=100; $elder_width=200; $location_width=100;
+      $appt_table_width=$date_width + $time_width + $elder_width + $location_width;
       $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
       $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
       $appt_header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $appt_table_data = ""; 
 
       $total_elders=0; $elders_with_yearly_ppi=0;
@@ -1508,6 +1517,8 @@ class eq
 	{
 	  $appointment = $this->db->f('appointment');
 	  $elder = $this->db->f('elder');
+	  $location = $this->db->f('location');
+	  if(($location == "") && ($elder > 0)) { $location = "$president_last_name"." home"; }
 	  
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
@@ -1531,7 +1542,10 @@ class eq
 	    $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
 	  }
 	  $appt_table_data.='</select></td>';
-
+	  
+	  $appt_table_data.= '<td align=center><input type=text size="35" maxlength="120" ';
+	  $appt_table_data.= 'name="appt_notes['.$appointment.'][location]" value="'.$location.'">';
+	  
 	  $appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][appointment]" value="'.$appointment.'">';
 	  
 	  $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
@@ -1703,7 +1717,22 @@ class eq
       if($month >= 7 && $month <= 9) { $quarter_start=$year."-07-01"; $quarter_end=$year."-10-01"; }
       if($month >= 10 && $month <= 12) { $quarter_start=$year."-10-01"; $quarter_end=$nextyear."-01-01"; }
       //print "year: $year month: $month quarter_start: $quarter_start quarter_end: $quarter_end<br>";
-      
+
+      // create the elder id -> elder name mapping
+      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      $elder_id_data = NULL;
+      $elder_name_data = NULL;
+      while ($this->db->next_record())
+	{
+	  $elder_name_data[$i] = $this->db->f('name');
+	  $elder_id_data[$i] = $this->db->f('elder');
+	  $elderid2name[$elder_id_data[$i]] = $elder_name_data[$i];
+	  $i++;
+	}
+      array_multisort($elder_name_data, $elder_id_data);
+
       if($action == 'save')
 	{
 	  // Save any changes made to the appointment table
@@ -1713,15 +1742,24 @@ class eq
 	      {
 		$elder = $entry['elder'];
 		$appointment = $entry['appointment'];
+		$location = $entry['location'];
+		if($location == "") {
+		  $supervisor = $entry['supervisor'];
+		  $supervisor_array = explode(",", $elderid2name[$supervisor]);
+		  $supervisor_last_name = $supervisor_array[0];
+		  $location = "$supervisor_last_name"." home";
+		}
+		if($elder == 0) { $location = ""; }
 		
 		//print "elder: $elder appointment: $appointment <br>";
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder'";
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
 		  $this->db->query("UPDATE eq_appointment set " .
 				   " elder='" . $elder . "'" .
+				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		  
 		  // Email the appointment
@@ -1772,27 +1810,14 @@ class eq
 	  $i++;
 	}
       
-      // create the elder id -> elder name mapping
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY name ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      $i=0;
-      $elder_id_data = NULL;
-      $elder_name_data = NULL;
-      while ($this->db->next_record())
-	{
-	  $elder_name_data[$i] = $this->db->f('name');
-	  $elder_id_data[$i] = $this->db->f('elder');
-	  $i++;
-	}
-      array_multisort($elder_name_data, $elder_id_data);
-
       // APPOINTMENT TABLE
       $district = 1;
-      $date_width=150; $time_width=100; $elder_width=200;
-      $appt_table_width=$date_width + $time_width + $elder_width;
+      $date_width=250; $time_width=100; $elder_width=200; $location_width=100;
+      $appt_table_width=$date_width + $time_width + $elder_width + $location_width;
       $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
       $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
       $appt_header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $appt_table_data = ""; 
 
       $total_comps=0; $comps_with_quarterly_int=0;
@@ -1803,6 +1828,8 @@ class eq
       $this->t->set_var('district_number',$districts[$d]['district']);
       $this->t->set_var('district_name',$districts[$d]['name']);	
       $supervisor = $districts[$d]['supervisor'];
+      $supervisor_array = explode(",", $supervisor);
+      $supervisor_last_name = $supervisor_array[0];
       $table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": All Elders with Interviews Not Completed";
       $appt_table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": Interview Appointment Slots";
       $this->t->set_var('table_title',$table_title);
@@ -1816,6 +1843,8 @@ class eq
 	{
 	  $appointment = $this->db->f('appointment');
 	  $elder = $this->db->f('elder');
+	  $location = $this->db->f('location');
+	  if(($location == "") && ($elder > 0)) { $location = "$supervisor_last_name"." home"; }
 	  
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
@@ -1840,7 +1869,11 @@ class eq
 	  }
 	  $appt_table_data.='</select></td>';
 
+	  $appt_table_data.= '<td align=center><input type=text size="35" maxlength="120" ';
+	  $appt_table_data.= 'name="appt_notes['.$appointment.'][location]" value="'.$location.'">';
+	  
 	  $appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][appointment]" value="'.$appointment.'">';
+	  $appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][supervisor]" value="'.$supervisor.'">';
 	  
 	  $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	  $this->t->set_var('tr_color',$tr_color);
@@ -2057,7 +2090,26 @@ class eq
       $table_data=""; $completed_data=""; $totals_data="";
 
       $year = date('Y');
-      
+
+      // create the family id -> family name mapping
+      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      $family_id = NULL;
+      while ($this->db->next_record())
+	{
+	  $family_id[$i] = $this->db->f('family');
+	  $family_name[$i] = $this->db->f('name');
+	  $familyid2name[$family_id[$i]] = $family_name[$i];
+	  $sql = "SELECT * FROM eq_parent where family='$family_id[$i]'";
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  if($this->db2->next_record()) {
+	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
+	  }
+	  $i++;
+	}
+      array_multisort($family_name, $family_id);
+
       if($action == 'save')
 	{
 	  // Save any changes made to the appointment table
@@ -2067,15 +2119,23 @@ class eq
 	      {
 		$family = $entry['family'];
 		$appointment = $entry['appointment'];
+		$location = $entry['location'];
+		if($location == "") {
+		  $family_name_array = explode(",", $familyid2name[$family]);
+		  $family_last_name = $family_name_array[0];
+		  $family_address = $familyid2address[$family];
+		  $location = "$family_last_name"." home ($family_address)";
+		}
+		if($family == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family'";
+		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
-		  
 		  // Perform database save actions here
 		  $this->db->query("UPDATE eq_appointment set " .
 				   " family='" . $family . "'" .
+				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		  
 		  // Email the appointment
@@ -2089,14 +2149,14 @@ class eq
 	  foreach ($new_data as $entry)
 	   {
 	     $visit_notes = $entry['notes'];
-	     $family_id = $entry['family_id'];
+	     $family = $entry['family_id'];
 	     $visit_pri = $entry['pri'];
 	     
 	     // Perform database save actions here
 	     $this->db->query("UPDATE eq_family set " .
 			      " visit_notes='" . $visit_notes . "'" .
 			      ",visit_pri='" . $visit_pri . "'" .
-			      " WHERE family=" . $family_id,__LINE__,__FILE__);
+			      " WHERE family=" . $family,__LINE__,__FILE__);
 	     
 	   }
 
@@ -2105,11 +2165,12 @@ class eq
 	}
 
       // APPOINTMENT TABLE
-      $date_width=150; $time_width=100; $family_width=250;
-      $appt_table_width=$date_width + $time_width + $family_width;
+      $date_width=250; $time_width=100; $family_width=250; $location_width=100;
+      $appt_table_width=$date_width + $time_width + $family_width + $location_width;
       $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
       $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
       $appt_header_row.= "<th width=$family_width><font size=-2>Family</th>";
+      $appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $appt_table_data = ""; 
 
       // Find out what the EQ Presidency ID is
@@ -2122,20 +2183,7 @@ class eq
 	print "<hr><font color=red><h3>-E- Unable to locate EQ Presidency in eq_presidency table</h3></font></hr>";
 	return;
       }
-      
-      // create the family id -> family name mapping
-      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      $i=0;
-      $family_id = NULL;
-      while ($this->db->next_record())
-	{
-	  $family_id[$i] = $this->db->f('family');
-	  $family_name[$i] = $this->db->f('name');
-	  $i++;
-	}
-      array_multisort($family_name, $family_id);
-      
+            
       // query the database for all the appointments
       $sql = "SELECT * FROM eq_appointment where presidency=$presidency_id and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -2144,7 +2192,12 @@ class eq
 	{
 	  $appointment = $this->db->f('appointment');
 	  $family = $this->db->f('family');
-
+	  $location = $this->db->f('location');
+	  $family_name_array = explode(",", $familyid2name[$family]);
+	  $family_last_name = $family_name_array[0];
+	  $family_address = $familyid2address[$family];
+	  if(($location == "") && ($family > 0)) { $location = "$family_last_name"." home ($family_address)"; }
+			
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
 	  $year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
@@ -2167,6 +2220,9 @@ class eq
 	    $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.' Family</option>';
 	  }
 	  $appt_table_data.='</select></td>';
+
+	  $appt_table_data.= '<td align=center><input type=text size="35" maxlength="120" ';
+	  $appt_table_data.= 'name="appt_notes['.$appointment.'][location]" value="'.$location.'">';
 
 	  $appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][appointment]" value="'.$appointment.'">';
 	  
@@ -3562,13 +3618,43 @@ class eq
       $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
-      $date_width=150; $time_width=200; $elder_width=200; $family_width=200;
-      $table_width=$date_width + $time_width + $elder_width + $family_width;
+      $date_width=150; $time_width=225; $elder_width=200; $family_width=200; $location_width=100;
+      $table_width=$date_width + $time_width + $elder_width + $family_width + $location_width;
       $header_row = "<th width=$date_width><font size=-2>Date</th>";
       $header_row.= "<th width=$time_width><font size=-2>Time</th>";      
       $header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
       $header_row.= "<th width=$family_width><font size=-2>Family</th>";
+      $header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $table_data = "";
+
+      $sql = "SELECT * FROM eq_presidency where valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $presidency_data[$i]['id'] = $this->db->f('presidency');
+	  $presidency_data[$i]['name'] = $this->db->f('name');
+	  $presidency_data[$i]['elder'] = $this->db->f('elder');
+	  $presidency2name[$presidency_data[$i]['id']] = $presidency_data[$i]['name'];
+	  $i++;
+	}
+      
+      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
+      $this->db->query($sql,__LINE__,__FILE__);
+      $i=0;
+      while ($this->db->next_record())
+	{
+	  $family_id[$i] = $this->db->f('family');
+	  $family_name[$i] = $this->db->f('name');
+	  $familyid2name[$family_id[$i]] = $family_name[$i];
+	  $sql = "SELECT * FROM eq_parent where family='$family_id[$i]'";
+	  $this->db2->query($sql,__LINE__,__FILE__);
+	  if($this->db2->next_record()) {
+	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
+	  }
+	  $i++;
+	}
+      array_multisort($family_name, $family_id);
 
       if($action == 'save')
 	{
@@ -3579,21 +3665,41 @@ class eq
 	       {
 		 $presidency = $entry['presidency'];
 		 $appointment = $entry['appointment'];
+		 $location = $entry['location'];
 		 $date = $entry['date'];
 		 $hour = $entry['hour'];
 		 $minute = $entry['minute'];
 		 $pm = $entry['pm'];
 		 $elder = $entry['elder'];
 		 $family = $entry['family'];
+		 $location = $entry['location'];
 		 if($pm) { $hour = $hour + 12; }
 		 $time = $hour.':'.$minute.':'.'00';
 		 $uid = 0;
 
+		 // Update our location
+		 if($location == "") {
+		   if($family > 0) {
+		     $family_name_array = explode(",", $familyid2name[$family]);
+		     $family_last_name = $family_name_array[0];
+		     $family_address = $familyid2address[$family];
+		     $location = "$family_last_name"." home ($family_address)";
+		   }
+		   else if($elder > 0) {
+		     $supervisor_name_array = explode(",",$presidency2name[$presidency]);
+		     $supervisor_last_name = $supervisor_name_array[0];
+		     $location = "$supervisor_last_name"." home";
+		   }
+		 }
+		 
 		 // Zero out the family or elder if date = NULL
 		 if($date == "") {
 		   $elder = 0;
 		   $family = 0;
+		   $location = "";
 		 }
+
+		 if(($elder == 0) && ($family == 0)) { $location = ""; }
 		 
 		 // Update an existing appointment
 		 if($appointment < $this->max_appointments)
@@ -3605,7 +3711,8 @@ class eq
 			" and elder='$elder'" .
 			" and family='$family'" .
 			" and date='$date'" .
-			" and time='$time'";
+			" and time='$time'" .
+		        " and location='$location'";
 		     $this->db->query($sql,__LINE__,__FILE__);
 		     if(!$this->db->next_record()) {
 		       $old_date = $this->db->f('date');
@@ -3615,6 +3722,7 @@ class eq
 					" ,elder=" . $elder . 
 					" ,date='" . $date . "'" .
 					" ,time='" . $time . "'" .
+					" ,location='" . $location . "'" .
 					" ,presidency='" . $presidency . "'" .
 					" WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		       
@@ -3627,9 +3735,9 @@ class eq
 		 else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 		   {
 		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";
-		     $this->db2->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,uid) "
-			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','"
-			   . $elder . "','" . $date . "','" . $time  . "','" . $uid ."')",__LINE__,__FILE__);
+		     $this->db2->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,location,uid) "
+			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $elder . "','"
+			   . $date . "','" . $time  . "','" . $location . "','" . $uid ."')",__LINE__,__FILE__);
 
 		     // Now reselect this entry from the database to see if we need
 		     // to send an appointment out for it.
@@ -3639,7 +3747,8 @@ class eq
 			" and presidency='$presidency'" .
 			" and date='$date'" .
 			" and time='$time'" .
-			" and uid='$uid'";
+			" and uid='$uid'" .
+			" and location='$location'";
 		     $this->db3->query($sql,__LINE__,__FILE__);
 		     if($this->db3->next_record()) {
 		       // Email the appointment if warranted
@@ -3654,17 +3763,6 @@ class eq
 	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule');
 	  //Header('Location: ' . $take_me_to_url);
 	}
-
-      $sql = "SELECT * FROM eq_presidency where valid=1";
-      $this->db->query($sql,__LINE__,__FILE__);
-      $i=0;
-      while ($this->db->next_record())
-	{
-	  $presidency_data[$i]['id'] = $this->db->f('presidency');
-	  $presidency_data[$i]['name'] = $this->db->f('name');
-	  $presidency_data[$i]['elder'] = $this->db->f('elder');
-	  $i++;
-	}
       
       $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -3677,17 +3775,6 @@ class eq
 	  $i++;
 	}
       array_multisort($elder_name, $elder_id);
-
-      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      $i=0;
-      while ($this->db->next_record())
-	{
-	  $family_id[$i] = $this->db->f('family');
-	  $family_name[$i] = $this->db->f('name');
-	  $i++;
-	}
-      array_multisort($family_name, $family_id);
       
       for ($i=0; $i < count($presidency_data); $i++) {
 	$presidency = $presidency_data[$i]['id'];
@@ -3706,6 +3793,21 @@ class eq
 	    $appointment = $this->db->f('appointment');
 	    $elder = $this->db->f('elder');
 	    $family = $this->db->f('family');
+	    $location = $this->db->f('location');
+
+	    if($location == "") {
+	      if($family > 0) {
+		$family_name_array = explode(",", $familyid2name[$family]);
+		$family_last_name = $family_name_array[0];
+		$family_address = $familyid2address[$family];
+		$location = "$family_last_name"." home ($family_address)";
+	      }
+	      else if($elder > 0) {
+		$supervisor_name_array = explode(",",$presidency2name[$presidency]);
+		$supervisor_last_name = $supervisor_name_array[0];
+		$location = "$supervisor_last_name"." home";
+	      }
+	    }
 	    
 	    $date = $this->db->f('date');
 	    $date_array = explode("-",$date);
@@ -3753,6 +3855,10 @@ class eq
 	      $table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.' Family</option>';
 	    }
 	    $table_data.='</select></td>';
+
+	    // Location text box
+	    $table_data.= '<td align=center><input type=text size="25" maxlength="120" ';
+	    $table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="'.$location.'">';
 	    
 	    $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
 	    $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
@@ -3796,6 +3902,10 @@ class eq
 	    $table_data.= '<option value='.$id.'>'.$name.' Family</option>';
 	  }
 	  $table_data.='</select></td>';
+
+	  // Location text box
+	  $table_data.= '<td align=center><input type=text size="25" maxlength="120" ';
+	  $table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="">';
 	  
 	  $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
 	  $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
@@ -3814,7 +3924,39 @@ class eq
       $this->t->pfp('out','sched_t');
       $this->save_sessiondata();   
     }
-  
+
+  function email()
+    {
+      $this->t->set_file(array('email_t' => 'email.tpl'));
+      $this->t->set_block('email_t','elder_list','list');
+
+      $action = get_var('action',array('GET','POST'));
+      
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email'));
+      $this->t->set_var('title','EQ Email Tool');
+
+      $this->t->set_var('lang_email','Send Email');
+      $this->t->set_var('lang_reset','Cancel');
+      
+      $this->t->set_var('email_member_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=member'));
+      $this->t->set_var('email_member_link_title','Email Quorum Member');
+
+      $this->t->set_var('email_quorum_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=quorum'));
+      $this->t->set_var('email_quorum_link_title','Email Quorum');
+      
+      $this->t->set_var('email_reminder_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=reminder'));
+      $this->t->set_var('email_reminder_link_title','Email Reminders');
+
+      $this->t->set_var('email_edit_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=edit'));
+      $this->t->set_var('email_edit_link_title','Edit Email Addresses');
+
+      $table_width=600;
+      $this->t->set_var('table_width',$table_width);
+      
+      $this->t->pfp('out','email_t');
+      $this->save_sessiondata();   
+    }
+
   function admin()
     {
       $this->t->set_file(array('admin_t' => 'admin.tpl'));
@@ -4198,6 +4340,7 @@ class eq
 	{
 	  $appointment = $this->db->f('appointment');
 	  $presidency = $this->db->f('presidency');
+	  $location = $this->db->f('location');
 	  $interviewer = "";
 	  $email = "";
 	  $elder = $this->db->f('elder');
@@ -4206,7 +4349,6 @@ class eq
 	  $family_name = "";
 	  $appt_name = "";
 	  $phone = "";
-	  $location = "";
 	  $uid = $this->db->f('uid');
 	  	    
 	  // Extract the year, month, day, hours, minutes, seconds from the appointment time
@@ -4240,7 +4382,6 @@ class eq
 	      $elder_name = $this->db2->f('name');
 	      $phone = $this->db2->f('phone');
 	      $appt_name = $elder_name . " Interview";
-	      $location = "$interviewer"."'s home";
 	      $duration = $this->default_ppi_appt_duration * 60;
 	    }
 	  }
@@ -4257,11 +4398,6 @@ class eq
 	      $this->db3->query($sql,__LINE__,__FILE__);
 	      if($this->db3->next_record()) {
 		$phone = $this->db3->f('phone');
-	      }
-	      $sql = "SELECT * FROM eq_parent where family='$family'";
-	      $this->db3->query($sql,__LINE__,__FILE__);
-	      if($this->db3->next_record()) {
-		$location=$this->db3->f('address');
 	      }
 	      $duration = $this->default_visit_appt_duration * 60;
 	    }

@@ -20,22 +20,22 @@
                                         <a href="{link_schedule}">{lang_schedule}</a>
 					&nbsp;
                                         &nbsp;
-                                        <a href="{link_attendance}">{lang_attendance}</a>
-					&nbsp;
-                                        &nbsp;  
-					<br>					
                                         <a href="{link_willing}">{lang_willing}</a>
 					&nbsp;
 					&nbsp;
 					<a href="{link_participation}">{lang_participation}</a>
 					&nbsp;
                                         &nbsp;
+					<br>					
                                         <a href="{link_activity}">{lang_activity}</a>
 					&nbsp;
 					&nbsp;
 					<a href="{link_assignment}">{lang_assignment}</a>
 					&nbsp;
                                         &nbsp;
+                                        <a href="{link_attendance}">{lang_attendance}</a>
+					&nbsp;
+                                        &nbsp;  
                                         <a href="{link_dir}">{lang_dir}</a>
 					&nbsp;
                                         &nbsp;
@@ -43,6 +43,9 @@
 					&nbsp;
                                         &nbsp;
                                         <a href="{link_admin}">{lang_admin}</a>
+					&nbsp;
+                                        &nbsp;  
+                                        <a href="{link_email}">{lang_email}</a>
 					</b></font></td>
 
 			</tr>
