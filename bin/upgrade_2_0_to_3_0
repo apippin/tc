@@ -19,6 +19,10 @@ $dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$
 $sth = $dbh->prepare("ALTER TABLE `eq_elder` ADD `email` VARCHAR( 120 ) NULL AFTER `phone`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Add a new 'indiv_id' field to the eq_elder table
+$sth = $dbh->prepare("ALTER TABLE `eq_elder` ADD `indiv_id` INT( 16 ) UNSIGNED NOT NULL AFTER `elder`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 # Add a new 'location' field to the eq_appointment table
 $sth = $dbh->prepare("ALTER TABLE `eq_appointment` ADD `location` VARCHAR( 120 ) NULL AFTER `time`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";

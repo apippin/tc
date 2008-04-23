@@ -1423,6 +1423,16 @@ class eq
 	$interviewer = $this->db->f('elder');
 	$district_number = '*';
 	$district_name = $president_name;
+	$sql = "SELECT * FROM eq_elder where elder='$president_id'";
+	$this->db2->query($sql,__LINE__,__FILE__);
+	if($this->db2->next_record()) {
+	  $indiv_id = $this->db2->f('indiv_id');
+	}
+	$sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+	$this->db2->query($sql,__LINE__,__FILE__);
+	if($this->db2->next_record()) {
+	  $president_address = $this->db2->f('address');
+	}
       } else {
 	print "<hr><font color=red><h3>-E- Unable to locate EQ President in eq_presidency table</h3></font></hr>";
 	return;
@@ -1438,7 +1448,7 @@ class eq
 		$elder = $entry['elder'];
 		$appointment = $entry['appointment'];
 		$location = $entry['location'];
-		if($location == "") { $location = "$president_last_name"." home"; }
+		if($location == "") { $location = "$president_last_name"." home ($president_address)"; }
 		if($elder == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
@@ -1518,7 +1528,7 @@ class eq
 	  $appointment = $this->db->f('appointment');
 	  $elder = $this->db->f('elder');
 	  $location = $this->db->f('location');
-	  if(($location == "") && ($elder > 0)) { $location = "$president_last_name"." home"; }
+	  if(($location == "") && ($elder > 0)) { $location = "$president_last_name"." home ($president_address)"; }
 	  
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
@@ -1747,7 +1757,17 @@ class eq
 		  $supervisor = $entry['supervisor'];
 		  $supervisor_array = explode(",", $elderid2name[$supervisor]);
 		  $supervisor_last_name = $supervisor_array[0];
-		  $location = "$supervisor_last_name"." home";
+		  $sql = "SELECT * FROM eq_elder where elder='$supervisor'";
+		  $this->db2->query($sql,__LINE__,__FILE__);
+		  if($this->db2->next_record()) {
+		    $indiv_id = $this->db2->f('indiv_id');
+		  }
+		  $sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+		  $this->db2->query($sql,__LINE__,__FILE__);
+		  if($this->db2->next_record()) {
+		    $supervisor_address = $this->db2->f('address');
+		  }
+		  $location = "$supervisor_last_name"." home ($supervisor_address)";
 		}
 		if($elder == 0) { $location = ""; }
 		
@@ -1830,6 +1850,17 @@ class eq
       $supervisor = $districts[$d]['supervisor'];
       $supervisor_array = explode(",", $supervisor);
       $supervisor_last_name = $supervisor_array[0];
+      $sql = "SELECT * FROM eq_elder where elder='$supervisor'";
+      $this->db2->query($sql,__LINE__,__FILE__);
+      if($this->db2->next_record()) {
+	$indiv_id = $this->db2->f('indiv_id');
+      }
+      $sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+      $this->db2->query($sql,__LINE__,__FILE__);
+      if($this->db2->next_record()) {
+	$supervisor_address = $this->db2->f('address');
+      }
+      $location = "$supervisor_last_name"." home ($supervisor_address)";
       $table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": All Elders with Interviews Not Completed";
       $appt_table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": Interview Appointment Slots";
       $this->t->set_var('table_title',$table_title);
@@ -1844,7 +1875,7 @@ class eq
 	  $appointment = $this->db->f('appointment');
 	  $elder = $this->db->f('elder');
 	  $location = $this->db->f('location');
-	  if(($location == "") && ($elder > 0)) { $location = "$supervisor_last_name"." home"; }
+	  if(($location == "") && ($elder > 0)) { $location = "$supervisor_last_name"." home ($supervisor_address)"; }
 	  
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
@@ -3636,6 +3667,7 @@ class eq
 	  $presidency_data[$i]['name'] = $this->db->f('name');
 	  $presidency_data[$i]['elder'] = $this->db->f('elder');
 	  $presidency2name[$presidency_data[$i]['id']] = $presidency_data[$i]['name'];
+	  $presidency2elder[$presidency_data[$i]['id']] = $presidency_data[$i]['elder'];
 	  $i++;
 	}
       
@@ -3688,7 +3720,17 @@ class eq
 		   else if($elder > 0) {
 		     $supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		     $supervisor_last_name = $supervisor_name_array[0];
-		     $location = "$supervisor_last_name"." home";
+		     $sql = "SELECT * FROM eq_elder where elder='$presidency2elder[$presidency]'";
+		     $this->db2->query($sql,__LINE__,__FILE__);
+		     if($this->db2->next_record()) {
+		       $indiv_id = $this->db2->f('indiv_id');
+		     }
+		     $sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+		     $this->db2->query($sql,__LINE__,__FILE__);
+		     if($this->db2->next_record()) {
+		       $supervisor_address = $this->db2->f('address');
+		     }
+		     $location = "$supervisor_last_name"." home ($supervisor_address)";
 		   }
 		 }
 		 
@@ -3805,7 +3847,17 @@ class eq
 	      else if($elder > 0) {
 		$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		$supervisor_last_name = $supervisor_name_array[0];
-		$location = "$supervisor_last_name"." home";
+		$sql = "SELECT * FROM eq_elder where elder='$presidency2elder[$presidency]'";
+		$this->db2->query($sql,__LINE__,__FILE__);
+		if($this->db2->next_record()) {
+		  $indiv_id = $this->db2->f('indiv_id');
+		}
+		$sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+		$this->db2->query($sql,__LINE__,__FILE__);
+		if($this->db2->next_record()) {
+		  $supervisor_address = $this->db2->f('address');
+		}
+		$location = "$supervisor_last_name"." home ($supervisor_address)";
 	      }
 	    }
 	    

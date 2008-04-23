@@ -131,6 +131,7 @@ sub update_eq_aaronic_table
 #| Field       | Type             | Null | Key | Default | Extra          |
 #+-------------+------------------+------+-----+---------+----------------+
 #| elder       | int(16) unsigned |      | PRI | NULL    | auto_increment |
+#| indiv_id    | int(16) unsigned |      |     | NULL    |                |
 #| name        | varchar(60)      | YES  |     | NULL    |                |
 #| phone       | varchar(12)      | YES  |     | NULL    |                |
 #| email       | varchar(120)     | YES  |     | NULL    |                |
@@ -174,7 +175,7 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$elder_name','$phone','','1','','1','',$attending,1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$id','$elder_name','$phone','','1','','1','',$attending,1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it
@@ -188,6 +189,8 @@ sub update_eq_elder_table
 		    }
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_elder set attending='$attending' where name='$elder_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_elder set indiv_id='$id' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
