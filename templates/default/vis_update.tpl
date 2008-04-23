@@ -28,7 +28,7 @@
 		</tr>
 		<tr>	
 			<td align="left"><font face="{font}" size="{font_size}">
-			<textarea cols="60" rows="10" name="notes" wrap="virtual" {readonly}>{notes}</textarea></font></td>
+			<textarea cols="100" rows="10" name="notes" wrap="virtual" {readonly}>{notes}</textarea></font></td>
 		</tr>
 	</table>
 
