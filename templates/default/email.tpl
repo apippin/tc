@@ -14,7 +14,8 @@
 	&nbsp; | &nbsp;
 	<a href="{email_edit_link}">{email_edit_link_title}</a>
 	<br><br>
-
+	
+	<font color=red>Coming Soon...</font>
 
 	</form>
 
