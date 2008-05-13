@@ -45,6 +45,7 @@ CREATE TABLE `eq_appointment` (
   `elder` int(16) unsigned default '0',
   `date` date NOT NULL default '0000-00-00',
   `time` time NOT NULL default '00:00:00',
+  `location` varchar(120) default NULL,
   `uid` bigint(64) unsigned NOT NULL default '0',
   PRIMARY KEY  (`appointment`)
 ) ENGINE=MyISAM AUTO_INCREMENT=132 DEFAULT CHARSET=latin1;
@@ -132,8 +133,10 @@ CREATE TABLE `eq_district` (
 --
 CREATE TABLE `eq_elder` (
   `elder` int(16) unsigned NOT NULL auto_increment,
+  `indiv_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
   `phone` varchar(12) default NULL,
+  `email` varchar(120) default NULL,
   `ppi_pri` int(10) unsigned NOT NULL default '1',
   `ppi_notes` varchar(128) default NULL,
   `int_pri` int(10) unsigned default '1',
