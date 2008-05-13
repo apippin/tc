@@ -3649,7 +3649,7 @@ class eq
       $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
-      $date_width=150; $time_width=225; $elder_width=200; $family_width=200; $location_width=100;
+      $date_width=150; $time_width=220; $elder_width=170; $family_width=180; $location_width=100;
       $table_width=$date_width + $time_width + $elder_width + $family_width + $location_width;
       $header_row = "<th width=$date_width><font size=-2>Date</th>";
       $header_row.= "<th width=$time_width><font size=-2>Time</th>";      
@@ -3887,7 +3887,7 @@ class eq
 	    $table_data.= "</td>";
 	    
 	    // Elder drop down list (for PPIs)
-	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder]>';
+	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder] STYLE="font-size : 8pt">';
 	    $table_data.= '<option value=0></option>';  
 	    for ($j=0; $j < count($elder_id); $j++) {
 	      $id = $elder_id[$j];
@@ -3898,7 +3898,7 @@ class eq
 	    $table_data.='</select></td>';
 
 	    // Family drop down list (for Visits)
-	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family]>';
+	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family] STYLE="font-size : 8pt">';
 	    $table_data.= '<option value=0></option>';  	    
 	    for ($j=0; $j < count($elder_id); $j++) {
 	      $id = $family_id[$j];
@@ -3910,7 +3910,7 @@ class eq
 
 	    // Location text box
 	    $table_data.= '<td align=center><input type=text size="25" maxlength="120" ';
-	    $table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="'.$location.'">';
+	    $table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="'.$location.'" STYLE="font-size : 8pt">';
 	    
 	    $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
 	    $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
@@ -3936,7 +3936,7 @@ class eq
 	  $table_data.= "</td>";
 	  
 	  // Elder drop down list
-	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder]>';
+	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder] STYLE="font-size : 8pt">';
 	  $table_data.= '<option value=0></option>';  
 	  for ($j=0; $j < count($elder_id); $j++) {
 	    $id = $elder_id[$j];
@@ -3946,7 +3946,7 @@ class eq
 	  $table_data.='</select></td>';
 	  
 	  // Family drop down list
-	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family]>';
+	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family] STYLE="font-size : 8pt">';
 	  $table_data.= '<option value=0></option>';  	    
 	  for ($j=0; $j < count($elder_id); $j++) {
 	    $id = $family_id[$j];
@@ -3957,7 +3957,7 @@ class eq
 
 	  // Location text box
 	  $table_data.= '<td align=center><input type=text size="25" maxlength="120" ';
-	  $table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="">';
+	  $table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="" STYLE="font-size : 8pt">';
 	  
 	  $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
 	  $table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
