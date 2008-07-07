@@ -1599,7 +1599,7 @@ class eq
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
-	    $sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " ORDER BY date DESC";
+	    $sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " AND eqpresppi=1 ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
 	    $link_data['menuaction'] = 'eq.eq.ppi_update';
