@@ -660,14 +660,14 @@ class eq
 	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
-	  $link_data['menuaction'] = 'eq.eq.act_update';
-	  $link_data['activity'] = '0';
-	  $link_data['action'] = 'add';
-	  $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/eq/index.php',$link_data)
-                           . '"><input type="submit" name="Add" value="' . 'Add Activity' .'"></font></form>');
-
 	  $this->t->fp('list','act_list',True);
 	}
+
+      $link_data['menuaction'] = 'eq.eq.act_update';
+      $link_data['activity'] = '0';
+      $link_data['action'] = 'add';
+      $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/eq/index.php',$link_data)
+			. '"><input type="submit" name="Add" value="' . 'Add Activity' .'"></font></form>');
 
       $this->t->pfp('out','act_list_t');
       $this->save_sessiondata();
@@ -772,12 +772,14 @@ class eq
 	  
 	  // Re-add the elders who are checked as having participated in this activity
 	  $elders = get_var('elder_name',array('POST'));
-	  foreach ($elders as $elder)
-	    {
-	      $this->db->query("INSERT INTO eq_participation (elder,activity) "
-			       . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
-	    }
-
+	  if(is_array($elders)) { // Only do the foreach loop if we have a valid array of elders to work with
+	    foreach ($elders as $elder)
+	      {
+		$this->db->query("INSERT INTO eq_participation (elder,activity) "
+				 . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
+	      }
+	  }
+	  
 	  $this->act_list();
 	  return false;
 	}
