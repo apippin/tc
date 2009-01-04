@@ -12,10 +12,10 @@
 $this->upload_target_path = "/home/users/eqpres/eq_data";
 
 // The full path to the installation location of this module
-$this->application_path = "/usr/local/www/data-dist/phpgroupware/eq";
+$this->application_path = "/usr/share/phpgroupware/eq";
 
 // The full path to the unzip application
-$this->unzip_path = "/usr/local/bin/unzip";
+$this->unzip_path = "/usr/bin/unzip";
 
 // Use drop down lists when specifying times in the scheduling tools.
 // If set to 0, free form text fields for the hour and minutes will be used instead.
