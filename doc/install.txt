@@ -64,13 +64,15 @@ Requirements
 
    Membership.csv:
      Preferred Name
-     Phone 1
+     Household Phone
      Indiv ID
      HofH ID
      Street 1
      Street 2
      Birth
      Full Name
+     Priesthood
+     HH Position
     
    Hometeaching.csv:
      Home Teacher 1
@@ -78,6 +80,8 @@ Requirements
      Comp ID
      HT District
      Household
+     Quorum
+     Supervisor
        
    Organization.csv:
      Indiv ID
@@ -87,3 +91,5 @@ Requirements
      Org Seq
      Sustained
    
+   Home Teacher per Companionship.csv  (optional file that lists home teaching stats - use all fields)
+     import mls/Home\ Teacher\ per\ Companionship.mls as a new report into MLS to create the csv file.

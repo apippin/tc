@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ThirdCouncelorMLSFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <CSVFiles>
+    <MLSFile Name="Membership.csv">
+      <Description>Membership file</Description>
+      <Extension>csv</Extension>
+      <MLSField>Preferred Name</MLSField>
+      <MLSField>Household Phone</MLSField>
+      <MLSField>Indiv ID</MLSField>
+      <MLSField>HofH ID</MLSField>
+      <MLSField>Street 1</MLSField>
+      <MLSField>Street 2</MLSField>
+      <MLSField>Birth</MLSField>
+      <MLSField>Full Name</MLSField>
+      <MLSField>Priesthood</MLSField>
+      <MLSField>HH Position</MLSField>
+    </MLSFile>
+
+    <MLSFile Name="HomeTeaching.csv">
+      <Description>Home Teaching file</Description>
+      <Extension>csv</Extension>
+      <MLSField>Home Teacher 1</MLSField>
+      <MLSField>Home Teacher 2</MLSField>
+      <MLSField>Comp ID</MLSField>
+      <MLSField>HT District</MLSField>
+      <MLSField>Household</MLSField>
+      <MLSField>Quorum</MLSField>
+      <MLSField>Supervisor</MLSField>
+    </MLSFile>
+
+    <MLSFile Name="Organization.csv">
+      <Description>Organization file</Description>
+      <Extension>csv</Extension>
+      <MLSField>Indiv ID</MLSField>
+      <MLSField>Indiv Name</MLSField>
+      <MLSField>Organization</MLSField>
+      <MLSField>Position</MLSField>
+      <MLSField>Org Seq</MLSField>
+      <MLSField>Sustained</MLSField>
+    </MLSFile>
+
+    <MLSFile Name="Home Teacher per Companionship.csv">
+      <Description>Home Teaching Statistics file</Description>
+      <Extension>csv</Extension>
+      <MLSField>*</MLSField>
+    </MLSFile>
+  </CSVFiles>
+</ThirdCouncelorMLSFiles>

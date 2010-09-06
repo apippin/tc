@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLSFileTrimmer", "MLSFileTrimmer\MLSFileTrimmer.csproj", "{FB8A0153-84AA-402E-A5F4-E790AFF2B261}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "MLSFileTrimmerInstaller", "MLSFileTrimmerInstaller\MLSFileTrimmerInstaller.vdproj", "{BB14AFD8-EE0B-4094-B69A-DBC2AA4F6554}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB8A0153-84AA-402E-A5F4-E790AFF2B261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB8A0153-84AA-402E-A5F4-E790AFF2B261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB8A0153-84AA-402E-A5F4-E790AFF2B261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB8A0153-84AA-402E-A5F4-E790AFF2B261}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB14AFD8-EE0B-4094-B69A-DBC2AA4F6554}.Debug|Any CPU.ActiveCfg = Debug
+		{BB14AFD8-EE0B-4094-B69A-DBC2AA4F6554}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

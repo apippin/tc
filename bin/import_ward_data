@@ -54,6 +54,38 @@ sub csv_to_hash
     close(FILE);
 }
 
+sub optional_csv_to_hash
+{
+    my ($filename, $hashref) = @_;
+
+    my $opened = open(FILE,$filename);
+
+    if ($opened) {
+        my $found_header = 0; my $index = 0;
+        while(<FILE>)
+        {
+	    $line = $_;
+	    @data = split /\",/, $line;
+	    if(!$found_header) { @header = @data; $found_header = 1; }
+	    else {
+	        foreach $i (0..$#data-1) {
+		    $data[$i] =~ s/\"//g;
+		    $header[$i] =~ s/\"//g;
+	            $hashref->{$index}{$header[$i]} = $data[$i];
+		    #print "$index: $i: $header[$i]: $data[$i]\n";
+	        }
+	        $index++;
+	    }
+        }
+    
+    close(FILE);
+    }
+    else
+    {
+        print "-W- could not open optional csv file $filename\n";
+    }
+}
+
 ######################################################################
 sub print_hash
 {
@@ -96,7 +128,7 @@ sub update_eq_aaronic_table
 	        $membership_data{$index}{$key} =~ /^Teacher\s*$/i ||
 		$membership_data{$index}{$key} =~ /^Priest\s*$/i)) {
 		$aaronic_name = $membership_data{$index}{'Preferred Name'};
-		$phone = $membership_data{$index}{'Phone 1'};
+		$phone = $membership_data{$index}{'Household Phone'};
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$sth = $dbh->prepare("select * from eq_aaronic where name='$aaronic_name'");
@@ -157,7 +189,7 @@ sub update_eq_elder_table
 	    if($key =~ /Priesthood/i && $membership_data{$index}{$key} =~ /Elder/i) {
 		$id = $membership_data{$index}{'Indiv ID'};
 		$elder_name = $membership_data{$index}{'Preferred Name'};
-		$phone = $membership_data{$index}{'Phone 1'};
+		$phone = $membership_data{$index}{'Household Phone'};
 		$organization = $organization_by_id{$id};
 		$attending = 0;
 		if(($organization =~ /Elders/) ||
@@ -496,7 +528,7 @@ sub update_eq_parent_table
 		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
 		$hofh_id = $membership_data{$index}{'HofH ID'};
 		$id = $membership_data{$index}{'Indiv ID'};
-		$phone = $membership_data{$index}{'Phone 1'};
+		$phone = $membership_data{$index}{'Household Phone'};
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$address = $membership_data{$index}{'Street 1'};
@@ -625,6 +657,113 @@ sub update_eq_child_table
     }
 }
 
+# EQ_VISIT
+#+----------------+------------------+------+-----+---------+-------+
+#| Field          | Type             | Null | Key | Default | Extra |
+#+----------------+------------------+------+-----+---------+-------+
+#| visit          | int(16) unsigned |      | PRI | 0       |   A   |
+#| family         | int(16) unsigned | YES  | UNI | NULL    |       |
+#| companionship  | int(16) unsigned | YES  |     | NULL    |       |
+#| date           | date             | YES  |     | NULL    |       |
+#| notes          | varchar(128)     | YES  |     | NULL    |       |
+#| visited        | varchar(1)       | YES  |     | NULL    |       |
+#+----------------+------------------+------+-----+---------+-------+
+sub update_eq_visit_table
+{
+	print "\n-> updating eq_visit table\n";
+	
+	my $month_header_retrieved = 0;
+	my $month_header;
+	my @data_months;
+	my %months = ('Jan', 1, 'Feb', 2, 'Mar', 3, 'Apr', 4, 'May', 5, 'Jun', 6, 'Jul', 7, 'Aug', 8, 'Sep', 9, 'Oct', 10, 'Nov', 11, 'Dec', 12);
+	($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
+	my %visit_status = ('X', 'y', '-', 'n', '', '');
+	
+	foreach $index (keys %hometeaching_stats_data)
+	{
+		$hashref = $hometeaching_stats_data{$index};
+		#foreach $key (keys %$hashref) {print "$key\n";}
+		
+		$family_name = $hometeaching_stats_data{$index}{"Preferred Name"};
+		print "   Updating visit data: $family_name\n";
+
+		# get family id from eq_family
+		$sth = $dbh->prepare("select * from eq_family where name=\"$family_name\" and valid=1");
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+		my @family_data = ();
+		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
+		my $family_rows = scalar @family_data;
+		if($family_rows > 0) { 
+			$family_id = $family_data[0]->{'family'}; 
+			$comp_id = $family_data[0]->{'companionship'};
+		}
+		else { next; }
+		#print "family_id = $family_id\n";
+		#print "comp_id = $comp_id\n";
+		
+		# ignore visits that weren't done by the EQ
+		if ($comp_id == 0) { next; }
+		
+		# retrieve the month header if not already done
+		if ($month_header_retrieved == 0)
+		{
+			foreach $key (keys %$hashref) 
+			{
+				if (($key ne "Preferred Name") && ($key ne "Home Teachers"))
+				{
+					$month_header = $key;
+					@data_months = split /\t/, $key;
+				}
+			}
+			$month_header_retrieved = 1;
+		}
+		
+		# loop through history data
+		@history = split /\t/, $hometeaching_stats_data{$index}{$month_header};
+		my $data_year = 1900 + $yearOffset;
+		my $data_month = $months{$data_months[-1]};
+		#print "$month_header\n";
+		#print $hometeaching_stats_data{$index}{$month_header};
+		#print "\n";
+		foreach $i (reverse(0..$#history)) {
+			# went back a calendar year, decrement $data_year
+			if ($months{$data_months[$i]} > $data_month)
+			{
+				$data_year -= 1;
+			}
+			$data_month = $months{$data_months[$i]};
+			my $visit_date = sprintf("%4d-%02d-01\n", $data_year, $data_month);
+			#print "$visit_date\n";
+			my $importing_status = $visit_status{$history[$i]};
+			#print "importing_status = $importing_status\n";
+			#print "select * from eq_visit where family=$family_id and companionship=$comp_id and date='$visit_date'\n";
+			$sth = $dbh->prepare("select * from eq_visit where family=$family_id and companionship=$comp_id and date='$visit_date'");
+			$sth->execute or die "-E- DB error: $DBI::errstr\n";
+			my @visit_data = ();
+			while($sqlhashref = $sth->fetchrow_hashref) { push(@visit_data, $sqlhashref); }
+			my $visit_rows = scalar @visit_data;
+			if($visit_rows > 0) { 
+				my $visited = $visit_data[0]->{'visited'}; 
+				#print "visited = $visited\n";
+				# update visit if data is different in eq_visit
+				if ($visited ne $importing_status)
+				{
+					#print "importing_status = $importing_status\n";
+					$sth = $dbh->prepare("update eq_visit set visited='$importing_status' where family='$family_id' and date='$visit_date' and companionship='$comp_id'");
+					$sth->execute or die "-E- DB error: $DBI::errstr\n";
+				}
+			} else {
+				if ($importing_status ne '')
+				{
+					# add visit if it doesn't exist in eq_visit
+					$sth = $dbh->prepare("insert into eq_visit values (NULL, '$family_id', '$comp_id', '$visit_date', '', '$importing_status')");
+					$sth->execute or die "-E- DB error: $DBI::errstr\n";
+				}
+			}
+		}
+	}
+}
+
 ######################################################################
 sub check_for_changed_ids
 {
@@ -705,6 +844,7 @@ print "\n-> Processing all ward data files in $datadir\n";
 &csv_to_hash("$datadir/Membership.csv",\%membership_data);
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
 &csv_to_hash("$datadir/Organization.csv",\%organization_data);
+&optional_csv_to_hash("$datadir/Home\ Teacher\ per\ Companionship.csv", \%hometeaching_stats_data);
 %organization_by_name = ();
 %organization_by_id = ();
 
@@ -715,6 +855,8 @@ if($opt_v) {
     &print_hash(\%hometeaching_data);
     print "-> Organization Data Dump\n\n";
     &print_hash(\%organization_data);
+    print "-> HomeTeaching Stats Data Dump\n\n";
+    &print_hash(\%hometeaching_stats_data);
 }
 
 if($opt_s) { $dbh->disconnect(); exit; }
@@ -728,6 +870,7 @@ if($opt_s) { $dbh->disconnect(); exit; }
 &update_eq_family_table();
 &update_eq_parent_table();
 &update_eq_child_table();
+&update_eq_visit_table();
 
 print "\n-> Import Successful! DONE...\n";
 
