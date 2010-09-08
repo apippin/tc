@@ -2555,7 +2555,7 @@ class eq
       $notes = get_var('notes',array('GET','POST'));
       $eqpresppi = get_var('eqpresppi',array('GET','POST'));
      
-      $sql = "SELECT * FROM eq_presidency where valid=1 and eqpres=0";
+      $sql = "SELECT * FROM eq_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
@@ -2893,25 +2893,21 @@ class eq
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
       $eqpresppi = get_var('eqpresppi',array('GET','POST'));
-      
-      $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      while ($this->db->next_record())
-	{
-	  $supervisor = $this->db->f('supervisor');
-	  $sql = "SELECT * FROM eq_elder WHERE elder=" . $supervisor;
-	  $this->db2->query($sql,__LINE__,__FILE__);
-	  $this->db2->next_record();
-	  $interviewer_name = $this->db2->f('name');
-	  
-	  if($supervisor == $interviewer) { 
-	    $this->t->set_var('interviewer',$supervisor . ' selected');
-	  } else {
-	    $this->t->set_var('interviewer',$interviewer);
-	  }
-	  $this->t->set_var('interviewer_name',$interviewer_name);
-	  $this->t->fp('int_list','interviewer_list',True);
-	}
+
+      $sql = "SELECT * FROM eq_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
+      $this->db2->query($sql,__LINE__,__FILE__);
+      while ($this->db2->next_record())
+      {
+        $elder = $this->db2->f('elder');
+        $interviewer_name = $this->db2->f('name');
+        if($elder == $interviewer) {
+          $this->t->set_var('interviewer',$interviewer . ' selected');
+        } else {
+          $this->t->set_var('interviewer',$interviewer);
+        }
+        $this->t->set_var('interviewer_name',$interviewer_name);
+        $this->t->fp('int_list','interviewer_list',True);
+      }
       
       if($action == 'save')
 	{
