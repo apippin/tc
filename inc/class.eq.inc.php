@@ -2554,15 +2554,22 @@ class eq
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
       $eqpresppi = get_var('eqpresppi',array('GET','POST'));
-      
-      $sql = "SELECT * FROM eq_elder WHERE elder=" . $interviewer;
+     
+      $sql = "SELECT * FROM eq_presidency where valid=1 and eqpres=0";
       $this->db2->query($sql,__LINE__,__FILE__);
-      $this->db2->next_record();
-      $interviewer_name = $this->db2->f('name');
-      $this->t->set_var('interviewer',$interviewer . ' selected');
-      $this->t->set_var('interviewer_name',$interviewer_name);
-      $this->t->set_var('eqpresppi_checked','');
-      $this->t->fp('int_list','interviewer_list',True);
+      while ($this->db2->next_record())
+      {
+        $elder = $this->db2->f('elder');
+	$interviewer_name = $this->db2->f('name');
+        if($elder == $interviewer) { 
+          $this->t->set_var('interviewer',$interviewer . ' selected');
+        } else {
+	  $this->t->set_var('interviewer',$interviewer);
+	}
+        $this->t->set_var('interviewer_name',$interviewer_name);
+        $this->t->set_var('eqpresppi_checked','');
+        $this->t->fp('int_list','interviewer_list',True);
+      }
     
       if($action == 'save')
 	{
@@ -4050,6 +4057,12 @@ class eq
 	    if(!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 	      $uploadstatus = "<b><font color=red> -E- Unable to move the uploaded file to ";
 	      $uploadstatus.= "the target path (check the path and permissions) of: $target_path</font></b>";
+	      $uploadstatus = "<b>The following file was uploaded successfully: </b><br><br>";
+	      $uploadstatus.= "Tmp Filename : " . $_FILES['uploadedfile']['tmp_name'] . "<br>";
+	      $uploadstatus.= "Filename     : " . $_FILES['uploadedfile']['name'] . "<br>";
+	      $uploadstatus.= "Type         : " . $_FILES['uploadedfile']['type'] . "<br>";
+	      $uploadstatus.= "Size         : " . $_FILES['uploadedfile']['size'] . "<br>";
+	      $uploadstatus.= "Error        : " . $_FILES['uploadedfile']['error'] . "<br>";	 
 	      $this->t->set_var('uploadstatus',$uploadstatus);
 	      $this->t->pfp('uploadhandle','upload',True);
 	      return 0;
