@@ -235,12 +235,11 @@ class eq
 	$this->t->set_var('district_number',$districts[$i]['district']);
 	$this->t->set_var('district_name',$districts[$i]['name']);	
 	$supervisor = $districts[$i]['supervisor'];
-	$unique_companionships='';
 		
 	// Select all the unique companionship numbers for this district
 	$sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];
 	$this->db->query($sql,__LINE__,__FILE__);
-	$j=0;
+	$j=0; $unique_companionships = '';
 	while ($this->db->next_record())
 	  {
 	    $unique_companionships[$j]['companionship'] = $this->db->f('companionship');
@@ -418,7 +417,7 @@ class eq
 	  // Get a list of all the companionships in this district
 	  $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $district;
 	  $this->db->query($sql,__LINE__,__FILE__);
-	  $j=0;
+	  $j=0; $unique_companionships = '';
 	  while ($this->db->next_record())
 	    {
 	      $unique_companionships[$j]['companionship'] = $this->db->f('companionship');
@@ -485,7 +484,7 @@ class eq
       // Select all the unique companionship numbers for this district
       $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $district;
       $this->db->query($sql,__LINE__,__FILE__);
-      $j=0; $unique_companionships='';
+      $j=0; $unique_companionships = '';
       while ($this->db->next_record())
 	{
 	  $unique_companionships[$j]['companionship'] = $this->db->f('companionship');
@@ -1921,7 +1920,7 @@ class eq
       // Select all the unique companionship numbers for this district
       $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$d]['district'];
       $this->db->query($sql,__LINE__,__FILE__);
-      $j=0;
+      $j=0; $unique_companionships = '';
       while ($this->db->next_record())
 	{
 	  $unique_companionships[$j]['companionship'] = $this->db->f('companionship');
@@ -2735,13 +2734,11 @@ class eq
 	$this->t->set_var('district_number',$districts[$i]['district']);
 	$this->t->set_var('district_name',$districts[$i]['name']);	
 	$supervisor = $districts[$i]['supervisor'];
-	$unique_companionships='';
 		
 	// Select all the unique companionship numbers for this district
 	$sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];
-
 	$this->db->query($sql,__LINE__,__FILE__);
-	$j=0;
+	$j=0; $unique_companionships = '';
 	while ($this->db->next_record())
 	  {
 	    $unique_companionships[$j]['companionship'] = $this->db->f('companionship');
