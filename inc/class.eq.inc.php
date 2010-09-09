@@ -4424,16 +4424,15 @@ class eq
 	  $dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  $dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  
-	  // Set the email address of the person making the appointment
-	  $from = $GLOBALS['phpgw_info']['user']['fullname'] . "<" .
-	          $GLOBALS['phpgw_info']['user']['preferences']['email']['address'] . ">";
-	  
 	  $sql = "SELECT * FROM eq_presidency where presidency='$presidency'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $email = $this->db2->f('email');
 	    $interviewer = $this->db2->f('name');
 	  }
+
+	  // Set the email address of the interviewer
+	  $from = $email;
 
 	  if($elder > 0) { 
 	    $sql = "SELECT * FROM eq_elder where elder='$elder'";

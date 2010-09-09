@@ -14,6 +14,8 @@
       <MLSField>Full Name</MLSField>
       <MLSField>Priesthood</MLSField>
       <MLSField>HH Position</MLSField>
+      <MLSField>Household E-mail</MLSField>
+      <MLSField>Individual E-mail</MLSField>
     </MLSFile>
 
     <MLSFile Name="HomeTeaching.csv">
@@ -41,6 +43,12 @@
 
     <MLSFile Name="Home Teacher per Companionship.csv">
       <Description>Home Teaching Statistics file</Description>
+      <Extension>csv</Extension>
+      <MLSField>*</MLSField>
+    </MLSFile>
+
+    <MLSFile Name="EQ Prospective Elders.csv">
+      <Description>A list of prospective elders in the EQ stewardship</Description>
       <Extension>csv</Extension>
       <MLSField>*</MLSField>
     </MLSFile>

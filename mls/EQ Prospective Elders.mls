@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customReport name="EQ Prospective Elders" description="" isPortrait="false" groupOption="NONE" splitGroups="false">
+  <query string="2,7,18,true,-1" />
+  <query string="1,0,1,true,-1" />
+  <query string="15,0,3,true,-1" />
+  <query string="11,1,1,true,-1" />
+  <column typeID="27" width="50" />
+  <column typeID="31" width="50" />
+</customReport>
+
+

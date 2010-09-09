@@ -53,6 +53,7 @@ def ParseFile(xmlNode, zipfile):
 			if options.verbose: print lineToWrite
 			tf.write(lineToWrite + "\n")
 			#if options.verbose: print line
+		tf.flush()
 		zipfile.write(tf.name, xmlNode.getAttribute("Name"))
 		tf.close()
 		

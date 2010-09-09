@@ -199,6 +199,8 @@ sub update_eq_elder_table
 		   ) { $attending = 1; }
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
+		$email = $membership_data{$index}{'Individual E-mail'};
+		if ($email eq "") { $email = $membership_data{$index}{'Household E-mail'}; }
 		$sth = $dbh->prepare("select * from eq_elder where name='$elder_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @data = ();
@@ -207,7 +209,7 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$id','$elder_name','$phone','','1','','1','',$attending,1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$id','$elder_name','$phone','$email','1','','1','',$attending,1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it
@@ -223,6 +225,8 @@ sub update_eq_elder_table
 		    $sth = $dbh->prepare("update eq_elder set attending='$attending' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_elder set indiv_id='$id' where name='$elder_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_elder set email='$email' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 		    # More than one record was found. Error! This shouldn't happen.
@@ -841,6 +845,7 @@ print "\n-> Processing all ward data files in $datadir\n";
 
 ###################################################
 # Parse Ward Data Files
+#&optional_csv_to_hash("$datadir/EQ\ Prospective\ Elders.csv", \%prospective_elder_data);
 &csv_to_hash("$datadir/Membership.csv",\%membership_data);
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
 &csv_to_hash("$datadir/Organization.csv",\%organization_data);
