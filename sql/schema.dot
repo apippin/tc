@@ -7,7 +7,7 @@ digraph schema {
     shape = "record"
   ];
   elder   [
-    label = "<e> elder||<n> name|<p> phone|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
+    label = "<e> elder||<n> name|<p> phone|<em> email|<po> priesthood|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
     shape = "record"
   ];
   companionship   [
@@ -43,7 +43,7 @@ digraph schema {
     shape = "record"
   ]; 
   aaronic       [
-    label = "<a> aaronic||<n> name|<p> phone|<v> valid"
+    label = "<a> aaronic||<n> name|<p> phone|<em> email|<v> valid"
     shape = "record"
   ];
   appointment   [

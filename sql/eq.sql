@@ -18,6 +18,7 @@ CREATE TABLE `eq_aaronic` (
   `aaronic` int(16) unsigned NOT NULL auto_increment,
   `name` varchar(60) default NULL,
   `phone` varchar(12) default NULL,
+  `email` varchar(120) default NULL,
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`aaronic`)
 ) ENGINE=MyISAM AUTO_INCREMENT=92 DEFAULT CHARSET=latin1;
@@ -137,6 +138,7 @@ CREATE TABLE `eq_elder` (
   `name` varchar(60) default NULL,
   `phone` varchar(12) default NULL,
   `email` varchar(120) default NULL,
+  `priesthood` enum('High Priest','Elder','Priest','Teacher','Deacon','Unordained') DEFAULT NULL,
   `ppi_pri` int(10) unsigned NOT NULL default '1',
   `ppi_notes` varchar(128) default NULL,
   `int_pri` int(10) unsigned default '1',

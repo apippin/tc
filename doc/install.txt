@@ -24,6 +24,7 @@ Dependencies
    mysql
    apache (or equivalent webserver)
    MLS data dumps (required fields shown below)
+   Python 2.6 or .Net 3.5 (for trimming MLS data dumps)
 
 Installing
 
@@ -48,6 +49,12 @@ Installing
       Install the right perl modules until the scripts run without any errors.
    7) A graphical representation of the mysql schema used by this application can 
       be found here: eq/sql/eq.jpg
+   8) Run mls/mlstrimmer.py or MLSFileTrimmer.exe to trim down the csv files and combine them
+      into a zip file.  If you run mls/mlstrimmer.py, you'll need to point it to 
+      mls/windowsGUI/MLSFileTrimmer/MLSRequiredFields.xml.  If you choose to not use 
+      EQ\ Prospective\ Elders.mls or Home\ Teacher\ per\ Companionship.mls, you'll need to 
+      remove them from MLSRequiredFields.xml (probably best to just comment them out in case you
+      decide to use them later)
    8) Click on the Admin tool in the EQ app to import your initial set of ward data
       obtained from MLS into the EQ application.
    9) Click on the Admin tool and update the EQ Presidency Table appropriately.
@@ -59,7 +66,7 @@ Requirements
 
    The following csv files must be obtained from MLS (or a stripped down version
    of each csv with the fields indicated must be manually created). These files
-   should be placed in 1 .zip file and uplodaed to the application via the Admin
+   should be placed in 1 .zip file and uploaded to the application via the Admin
    section of the EQ Tools application.
 
    Membership.csv:
@@ -94,9 +101,9 @@ Requirements
      Sustained
    
    EQ Prospective Elders.csv  
-      (optional file that lists the prospective elders for which  the EQ has stewardship.
-      Use this file if you want them listed in the PPI list
-      import mls/EQ\ Prospective\ Elders.mls as a new report into MLS to create the csv file.)
+      Optional file that lists the prospective elders for which  the EQ has stewardship.
+      Use this file if you want them listed in the PPI/attendence/etc lists
+      import mls/EQ\ Prospective\ Elders.mls as a new report into MLS to create the csv file.
 
    Home Teacher per Companionship.csv  (optional file that lists home teaching stats - use all fields)
      import mls/Home\ Teacher\ per\ Companionship.mls as a new report into MLS to create the csv file.

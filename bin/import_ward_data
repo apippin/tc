@@ -109,6 +109,7 @@ sub print_hash
 #| aaronic | int(16) unsigned |      | PRI | 0       |   A   |
 #| name    | varchar(60)      | YES  |     | NULL    |       |
 #| phone   | varchar(12)      | YES  |     | NULL    |       |
+#| email   | varchar(120)     | YES  |     | NULL    |       |
 #| valid   | tinyint(1)       | YES  |     | NULL    |       |
 #+-------+--------------------+------+-----+---------+-------+
 sub update_eq_aaronic_table
@@ -131,6 +132,8 @@ sub update_eq_aaronic_table
 		$phone = $membership_data{$index}{'Household Phone'};
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
+		$email = $membership_data{$index}{'Individual E-mail'};
+		if ($email eq "") { $email = $membership_data{$index}{'Household E-mail'}; }
 		$sth = $dbh->prepare("select * from eq_aaronic where name='$aaronic_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @data = ();
@@ -139,12 +142,14 @@ sub update_eq_aaronic_table
 		if($rows == 0) {
 		    # No existing records found for this aaronic, make a new entry
 		    print "   Adding new Aaronic: $aaronic_name\n";
-		    $sth = $dbh->prepare("insert into eq_aaronic values (NULL,'$aaronic_name','$phone',1)");
+		    $sth = $dbh->prepare("insert into eq_aaronic values (NULL,'$aaronic_name','$phone','$email',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this aaronic, update it, mark it valid!
 		    print "   Updating existing aaronic: $aaronic_name\n";
 		    $sth = $dbh->prepare("update eq_aaronic set phone='$phone' where name='$aaronic_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_aaronic set email='$email' where name='$aaronic_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_aaronic set valid=1 where name='$aaronic_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -167,6 +172,7 @@ sub update_eq_aaronic_table
 #| name        | varchar(60)      | YES  |     | NULL    |                |
 #| phone       | varchar(12)      | YES  |     | NULL    |                |
 #| email       | varchar(120)     | YES  |     | NULL    |                |
+#| priesthood  | enum             | YES  |     | NULL    |                |
 #| ppi_pri     | int(10) unsigned | YES  |     | 1       |                |
 #| ppi_notes   | varchar(128)     | YES  |     | NULL    |                |
 #| int_pri     | int(10) unsigned | YES  |     | 1       |                |
@@ -186,10 +192,31 @@ sub update_eq_elder_table
     {
 	$hashref = $membership_data{$index};
 	foreach $key (keys %$hashref) {
-	    if($key =~ /Priesthood/i && $membership_data{$index}{$key} =~ /Elder/i) {
+	    if($key =~ /Priesthood/i && 
+	       ($membership_data{$index}{$key} =~ /Deacon/i ||
+	        $membership_data{$index}{$key} =~ /Teacher/i ||
+		$membership_data{$index}{$key} =~ /Priest/i ||
+		$membership_data{$index}{$key} =~ /Elder/i ||
+		$membership_data{$index}{$key} =~ /Unordained/i)) {
+		
+		# check if this is a prospective elder under the stewardship of the EQ
+		if($membership_data{$index}{$key} !~ /Elder/i) {
+			$found = 0;
+			foreach $i (keys %prospective_elder_data) {
+				#print "$membership_data{$index}{'Full Name'}\n";
+				#print "$prospective_elder_data{$i}{'Full Name'}\n";
+				if($membership_data{$index}{'Full Name'} eq $prospective_elder_data{$i}{'Full Name'}) {
+					$found = 1;
+					last;
+				}
+			}
+			if($found == 0) { next;}
+		}
+		
 		$id = $membership_data{$index}{'Indiv ID'};
 		$elder_name = $membership_data{$index}{'Preferred Name'};
 		$phone = $membership_data{$index}{'Household Phone'};
+		$priesthood = $membership_data{$index}{'Priesthood'};
 		$organization = $organization_by_id{$id};
 		$attending = 0;
 		if(($organization =~ /Elders/) ||
@@ -209,7 +236,7 @@ sub update_eq_elder_table
 		if($rows == 0) {
 		    # No existing records found for this elder, make a new entry
 		    print "   Adding new Elder: $elder_name\n";
-		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$id','$elder_name','$phone','$email','1','','1','',$attending,1)");
+		    $sth = $dbh->prepare("insert into eq_elder values (NULL,'$id','$elder_name','$phone','$email','$priesthood','1','','1','',$attending,1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this elder, update it
@@ -225,6 +252,8 @@ sub update_eq_elder_table
 		    $sth = $dbh->prepare("update eq_elder set attending='$attending' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_elder set indiv_id='$id' where name='$elder_name'");
+		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+		    $sth = $dbh->prepare("update eq_elder set priesthood='$priesthood' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sth = $dbh->prepare("update eq_elder set email='$email' where name='$elder_name'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -845,7 +874,7 @@ print "\n-> Processing all ward data files in $datadir\n";
 
 ###################################################
 # Parse Ward Data Files
-#&optional_csv_to_hash("$datadir/EQ\ Prospective\ Elders.csv", \%prospective_elder_data);
+&optional_csv_to_hash("$datadir/EQ\ Prospective\ Elders.csv", \%prospective_elder_data);
 &csv_to_hash("$datadir/Membership.csv",\%membership_data);
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
 &csv_to_hash("$datadir/Organization.csv",\%organization_data);
