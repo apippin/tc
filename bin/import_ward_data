@@ -97,7 +97,7 @@ sub update_eq_aaronic_table
 		$membership_data{$index}{$key} =~ /^Priest\s*$/i)) {
 		$aaronic_name = $membership_data{$index}{'Preferred Name'};
 		$phone = $membership_data{$index}{'Phone 1'};
-		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
+		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$sth = $dbh->prepare("select * from eq_aaronic where name='$aaronic_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -165,7 +165,7 @@ sub update_eq_elder_table
 		   ($organization =~ /Sunday School/) ||
 		   ($organization =~ /Primary/)
 		   ) { $attending = 1; }
-		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
+		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$sth = $dbh->prepare("select * from eq_elder where name='$elder_name'");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -497,7 +497,7 @@ sub update_eq_parent_table
 		$hofh_id = $membership_data{$index}{'HofH ID'};
 		$id = $membership_data{$index}{'Indiv ID'};
 		$phone = $membership_data{$index}{'Phone 1'};
-		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "970-$1"; }
+		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$address = $membership_data{$index}{'Street 1'};
 		if($membership_data{$index}{'Street 2'} ne "") { 
