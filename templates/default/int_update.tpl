@@ -3,7 +3,7 @@
 <center>
 	<form action="{actionurl}" method="POST">
 	<input type=hidden name=interviewer value={interviewer}>
-	<input type=hidden name=elder value={elder}>
+	<input type=hidden name=indiv value={indiv}>
 	<input type=hidden name=aaronic value={aaronic}>
 	<input type=hidden name=companionship value={companionship}>
 	<table border="0" width="60%" cellspacing="2" cellpadding="2">

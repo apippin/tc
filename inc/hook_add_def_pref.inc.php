@@ -1,6 +1,6 @@
 <?php
   /**************************************************************************\
-  * phpGroupWare - eq                                                        *
+  * phpGroupWare - 3rd                                                       *
   * http://www.phpgroupware.org                                              *
   * -----------------------------------------------                          *
   *  This program is free software; you can redistribute it and/or modify it *

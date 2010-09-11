@@ -1,6 +1,6 @@
 <center>
 	<form action="{actionurl}" method="POST">
-	<input type=hidden name=elder_id value={elder_id}>
+	<input type=hidden name=indiv_id value={indiv_id}>
 
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
@@ -13,7 +13,7 @@
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
  		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>Elder: {elder_name}</b></font>
+			<font face="{font}"><b>Individual: {indiv_name}</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>

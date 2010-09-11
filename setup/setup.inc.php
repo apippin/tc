@@ -12,8 +12,8 @@
 	/* $Id: setup.inc.php,v 1.9.4.2 2004/03/07 02:14:23 skwashd Exp $ */
 
 	/* Basic information about this app */
-	$setup_info['eq']['name']      = 'eq';
-	$setup_info['eq']['title']     = 'Elders Quorum Tools';
+	$setup_info['eq']['name']      = '3rd';
+	$setup_info['eq']['title']     = '3rd Counselor';
 	$setup_info['eq']['version']   = '0.2.0';
 	$setup_info['eq']['app_order'] = 8;
 	$setup_info['eq']['enable']    = 1;
@@ -22,7 +22,7 @@
 	$setup_info['eq']['author']    = 'Alan J. Pippin';
 	$setup_info['eq']['license']   = 'GPL';
 	$setup_info['eq']['description'] =
-		'This app provides tools to help manage an Elders Quorum';
+		'This app provides tools to help manage a Priesthood Quorum';
 	$setup_info['eq']['note'] =
 		'This was created for the Miramont Ward.';
 	$setup_info['eq']['maintainer'] = 'Alan J. Pippin';

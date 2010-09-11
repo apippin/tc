@@ -27,12 +27,20 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("RENAME TABLE `eq_appointment` TO `3rd_appointment`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Change elder field in 3rd_appointment table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_appointment` CHANGE `elder` `indiv` INT(16)");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 # Rename eq_assignment table to 3rd_assignment
 $sth = $dbh->prepare("RENAME TABLE `eq_assignment` TO `3rd_assignment`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_attendance table to 3rd_attendance
 $sth = $dbh->prepare("RENAME TABLE `eq_attendance` TO `3rd_attendance`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change elder field in 3rd_attendance table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_attendance` CHANGE `elder` `indiv` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_calling table to 3rd_calling
@@ -47,20 +55,32 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("RENAME TABLE `eq_companionship` TO `3rd_companionship`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Change elder field in 3rd_companionship table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_companionship` CHANGE `elder` `indiv` INT(16)");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 # Rename eq_district table to 3rd_district
 $sth = $dbh->prepare("RENAME TABLE `eq_district` TO `3rd_district`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Rename eq_elder table to 3rd_elder
-$sth = $dbh->prepare("RENAME TABLE `eq_elder` TO `3rd_elder`");
+# Rename eq_elder table to 3rd_indiv
+$sth = $dbh->prepare("RENAME TABLE `eq_elder` TO `3rd_indiv`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Add a new 'propective' field to the 3rd_elder table
-$sth = $dbh->prepare("ALTER TABLE `3rd_elder` ADD `prospective` enum('y','n') NULL AFTER `priesthood`");
+# Add a new 'propective' field to the 3rd_indiv table
+$sth = $dbh->prepare("ALTER TABLE `3rd_indiv` ADD `prospective` enum('y','n') NULL AFTER `priesthood`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change elder field in 3rd_indiv table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_indiv` CHANGE `elder` `indiv` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_family table to 3rd_family
 $sth = $dbh->prepare("RENAME TABLE `eq_family` TO `3rd_family`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change elder_id field in 3rd_family table to indiv_id
+$sth = $dbh->prepare("ALTER TABLE `3rd_family` CHANGE `elder_id` `indiv_id` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_parent table to 3rd_parent
@@ -71,8 +91,16 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("RENAME TABLE `eq_participation` TO `3rd_participation`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Change elder field in 3rd_participation table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_participation` CHANGE `elder` `indiv` INT(16)");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 # Rename eq_ppi table to 3rd_interview
 $sth = $dbh->prepare("RENAME TABLE `eq_ppi` TO `3rd_interview`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change elder field in 3rd_interview table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_interview` CHANGE `elder` `indiv` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change ppi field in 3rd_interview table to interview
@@ -93,6 +121,10 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_presidency table to 3rd_presidency
 $sth = $dbh->prepare("RENAME TABLE `eq_presidency` TO `3rd_presidency`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change elder field in 3rd_presidency table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_presidency` CHANGE `elder` `indiv` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_visit table to 3rd_visit
@@ -117,6 +149,10 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_willingness table to 3rd_willingness
 $sth = $dbh->prepare("RENAME TABLE `eq_willingness` TO `3rd_willingness`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change elder field in 3rd_willingness table to indiv
+$sth = $dbh->prepare("ALTER TABLE `3rd_willingness` CHANGE `elder` `indiv` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 print "-> Done!\n";

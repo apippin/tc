@@ -12,7 +12,7 @@
 	<br><br>
 
 
-<!-- BEGIN elder_list -->
+<!-- BEGIN indiv_list -->
 	<form action="{actionurl}" method="POST">
         <hr>
         <table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
@@ -57,12 +57,12 @@
 		</td>
 		</tr>
 	</table>
-<!-- END elder_list -->
+<!-- END indiv_list -->
 	<hr>
 	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>All Elders with Yearly PPI Completed</b></font>
+			<font face="{font}"><b>All Individuals with Yearly PPI Completed</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{completed_header_row}</tr>

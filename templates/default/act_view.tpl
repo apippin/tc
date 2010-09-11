@@ -26,10 +26,10 @@
 	</table>
 	
 	<table border="0" width="70%" cellspacing="2" cellpadding="2">
-                <tr bgcolor="#c9c9c9" align=center><td colspan=3><font face="{font}"><b>Elders Attending</b></font></td></tr>
+                <tr bgcolor="#c9c9c9" align=center><td colspan=3><font face="{font}"><b>Individuals Attending</b></font></td></tr>
 	        <tr>
 <!-- BEGIN part_list -->
-		<td width=25% bgcolor={tr_color}><font face="{font}">{elder_name}</font>{table_sep}
+		<td width=25% bgcolor={tr_color}><font face="{font}">{indiv_name}</font>{table_sep}
 <!-- END part_list -->
 		</tr>
         </table>

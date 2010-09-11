@@ -70,10 +70,10 @@ class eq
  
   function eq()
     {
-      if(file_exists("setup/eq_config.local")) {
-	include("setup/eq_config.local");
+      if(file_exists("setup/3rd_config.local")) {
+	include("setup/3rd_config.local");
       } else {
-	include("setup/eq_config");
+	include("setup/3rd_config");
       }
       
       $this->script_path = "$this->application_path"."/bin";
@@ -95,7 +95,7 @@ class eq
                                 mondayFirst : false,
                                 weekNumbers : false';
        
-      $GLOBALS['phpgw_info']['flags']['app_header'] = 'Elders Quorum Tools - The 3rd Counselor';
+      $GLOBALS['phpgw_info']['flags']['app_header'] = 'The 3rd Counselor';
       $GLOBALS['phpgw']->common->phpgw_header();
 
       $this->current_day = `date '+%d'`;
@@ -202,22 +202,22 @@ class eq
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
 
-      // Make an array mapping elder_ids to elder_names
-      for($i=0; $i < count($elder_id); $i++) {
-          $id = $elder_id[$i];
-          $elders[$id] = $elder_name[$i];
+      // Make an array mapping indiv_ids to indiv_names
+      for($i=0; $i < count($indiv_id); $i++) {
+          $id = $indiv_id[$i];
+          $indivs[$id] = $indiv_name[$i];
       }      
 
       $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
@@ -261,11 +261,11 @@ class eq
 	      // Get this companions information
 	      if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 	      $companionship = $this->db->f('companionship');
-	      $elder_id = $this->db->f('elder');
+	      $indiv_id = $this->db->f('indiv');
 	      $aaronic_id = $this->db->f('aaronic');
-	      if($elder_id) {
-		$name = $elders[$elder_id];
-		$phone = $elder_phone[$elder_id];
+	      if($indiv_id) {
+		$name = $indivs[$indiv_id];
+		$phone = $indiv_phone[$indiv_id];
 	      }
 	      else if($aaronic_id) {
 		$name = $aaronic[$aaronic_id]['name'];
@@ -454,22 +454,22 @@ class eq
 	  return false;
 	}
       
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
 
-      // Make an array mapping elder_ids to elder_names
-      for($i=0; $i < count($elder_id); $i++) {
-          $id = $elder_id[$i];
-          $elders[$id] = $elder_name[$i];
+      // Make an array mapping indiv_ids to indiv_names
+      for($i=0; $i < count($indiv_id); $i++) {
+          $id = $indiv_id[$i];
+          $indivs[$id] = $indiv_name[$i];
       }      
 
       $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
@@ -505,11 +505,11 @@ class eq
 	    // Get this companions information
 	    if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 	    $companionship = $this->db->f('companionship');
-	    $elder_id = $this->db->f('elder');
+	    $indiv_id = $this->db->f('indiv');
 	    $aaronic_id = $this->db->f('aaronic');
-	    if($elder_id) {
-	      $name = $elders[$elder_id];
-	      $phone = $elder_phone[$elder_id];
+	    if($indiv_id) {
+	      $name = $indivs[$indiv_id];
+	      $phone = $indiv_phone[$indiv_id];
 	    }
 	    else if($aaronic_id) {
 	      $name = $aaronic[$aaronic_id]['name'];
@@ -709,7 +709,7 @@ class eq
       $this->t->set_var('lang_edit','Edit');
       $this->t->set_var('cal_date',$this->db->f('date'));
       
-      // Now find out which elders participated in this activity
+      // Now find out which indivs participated in this activity
       $sql = "SELECT * FROM 3rd_participation WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
@@ -717,13 +717,13 @@ class eq
       $i = 0;
       while ($this->db->next_record())
 	{
-	  $part_list[$i]['elder']  = $this->db->f('elder');
+	  $part_list[$i]['indiv']  = $this->db->f('indiv');
 	  $i++;
 	}
       
       for ($i=0; $i < count($part_list); $i++)
 	{
-	  $sql = "SELECT * FROM 3rd_elder WHERE elder=" . $part_list[$i]['elder'];
+	  $sql = "SELECT * FROM 3rd_indiv WHERE indiv=" . $part_list[$i]['indiv'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $names[$i] = $this->db->f('name');
@@ -732,7 +732,7 @@ class eq
       for ($i=0; $i < count($names); $i++)
 	{
           //$this->nextmatchs->template_alternate_row_color(&$this->t);
-	  $this->t->set_var('elder_name',$names[$i]);
+	  $this->t->set_var('indiv_name',$names[$i]);
 	  if(($i+1) % 3 == 0) { $this->t->set_var('table_sep',"</td></tr><tr>"); }
 	  else { $this->t->set_var('table_sep',"</td>"); }
 	  if(($i) % 3 == 0) { $this->nextmatchs->template_alternate_row_color(&$this->t); }
@@ -746,7 +746,7 @@ class eq
   function act_update()
     {
       $this->t->set_file(array('form' => 'act_update.tpl'));
-      $this->t->set_block('form','elder_list','list');
+      $this->t->set_block('form','indiv_list','list');
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       $this->t->set_var('lang_done','Done');
@@ -766,16 +766,16 @@ class eq
 			   ", notes='" . $activity['notes'] . "'" .
 			   " WHERE activity=" . $activity['activity'],__LINE__,__FILE__);
 
-	  // Delete all the elders who have particiapted in this activity
+	  // Delete all the individuals who have particiapted in this activity
 	  $this->db->query("DELETE from 3rd_participation where activity=".$activity['activity'],__LINE__,__FILE__);
 	  
-	  // Re-add the elders who are checked as having participated in this activity
-	  $elders = get_var('elder_name',array('POST'));
-	  if(is_array($elders)) { // Only do the foreach loop if we have a valid array of elders to work with
-	    foreach ($elders as $elder)
+	  // Re-add the individuals who are checked as having participated in this activity
+	  $indivs = get_var('indiv_name',array('POST'));
+	  if(is_array($indivs)) { // Only do the foreach loop if we have a valid array of indivs to work with
+	    foreach ($indivs as $indiv)
 	      {
-		$this->db->query("INSERT INTO 3rd_participation (elder,activity) "
-				 . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
+		$this->db->query("INSERT INTO 3rd_participation (indiv,activity) "
+				 . "VALUES (" . $indiv . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 	      }
 	  }
 	  
@@ -800,11 +800,11 @@ class eq
 	    $activity['activity'] = $this->db->f('activity');
 	  }
 	  
-	  $elders = get_var('elder_name',array('POST'));
-	  foreach ($elders as $elder)
+	  $indivs = get_var('indiv_name',array('POST'));
+	  foreach ($indivs as $indiv)
 	    {
-	      $this->db->query("INSERT INTO 3rd_participation (elder,activity) "
-			       . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
+	      $this->db->query("INSERT INTO 3rd_participation (indiv,activity) "
+			       . "VALUES (" . $indiv . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 	    }
 	  
 	  $this->act_list();
@@ -864,36 +864,36 @@ class eq
       $assignment_data.='</select>';
       $this->t->set_var('assignment_data',$assignment_data);
       
-      // Create elder selection boxes
-      $sql = "SELECT * FROM 3rd_elder";
+      // Create individual selection boxes
+      $sql = "SELECT * FROM 3rd_indiv";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
 	  if($this->db->f('valid') == 1 || $action != 'add') {
-	    $elder_name[$i] = $this->db->f('name');
-	    $elder_id[$i] = $this->db->f('elder');
-	    $elder_valid[$i] = $this->db->f('valid');
+	    $indiv_name[$i] = $this->db->f('name');
+	    $indiv_id[$i] = $this->db->f('indiv');
+	    $indiv_valid[$i] = $this->db->f('valid');
 	    $i++;
 	  }
 	}
-      array_multisort($elder_name, $elder_id, $elder_valid);
+      array_multisort($indiv_name, $indiv_id, $indiv_valid);
 
       $j=0;
-      for ($i=0; $i < count($elder_id); $i++)
+      for ($i=0; $i < count($indiv_id); $i++)
 	{
 	  //$this->nextmatchs->template_alternate_row_color(&$this->t);
-	  $sql = "SELECT * FROM 3rd_participation where activity=". $activity['activity'] . " AND elder=" . $elder_id[$i];
+	  $sql = "SELECT * FROM 3rd_participation where activity=". $activity['activity'] . " AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) { $this->t->set_var('checked','checked'); $checked=1; }
 	  else { $this->t->set_var('checked',''); $checked=0; }
-	  if($checked || $elder_valid[$i] == 1) {
-	    $this->t->set_var('elder_name',$elder_name[$i]);
-	    $this->t->set_var('elder',$elder_id[$i]);
+	  if($checked || $indiv_valid[$i] == 1) {
+	    $this->t->set_var('indiv_name',$indiv_name[$i]);
+	    $this->t->set_var('indiv',$indiv_id[$i]);
 	    if(($j+1) % 3 == 0) { $this->t->set_var('table_sep',"</td></tr><tr>"); }
 	    else { $this->t->set_var('table_sep',"</td>"); }
 	    if(($j) % 3 == 0) { $this->nextmatchs->template_alternate_row_color(&$this->t); }
-	    $this->t->fp('list','elder_list',True);
+	    $this->t->fp('list','indiv_list',True);
 	    $j++;
 	  }
 	}
@@ -1034,18 +1034,18 @@ class eq
     {
       $this->t->set_file(array('par_view_t' => 'par_view.tpl'));
       $this->t->set_block('par_view_t','header_list','list1');
-      $this->t->set_block('par_view_t','elder_list','list2');
+      $this->t->set_block('par_view_t','indiv_list','list2');
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_id[$i] = $this->db->f('elder');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_id[$i] = $this->db->f('indiv');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
 
       $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -1071,8 +1071,8 @@ class eq
 	  $i++;
 	}
       
-      $elder_width=300; $part_width=25; $assignment_width=50;
-      $total_width=$elder_width+$part_width;
+      $indiv_width=300; $part_width=25; $assignment_width=50;
+      $total_width=$indiv_width+$part_width;
       for ($i=0; $i < count($assignment_list); $i++) {
 	$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
 	$this->t->set_var('assignment_code',$assignment_list[$i]['code']);
@@ -1080,17 +1080,17 @@ class eq
 	$total_width += $assignment_width;
       }
 
-      for ($i=0; $i < count($elder_id); $i++) {
+      for ($i=0; $i < count($indiv_id); $i++) {
 	$participated=0; $part_table = ''; 
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
-	$this->t->set_var('elder_name',$elder_name[$i]);
+	$this->t->set_var('indiv_name',$indiv_name[$i]);
 	for ($j=0; $j < count($assignment_list); $j++) {
 	  $date = "0000-00-00"; $checkmark=0; $num_matches=0;
 	  for ($k=0; $k < count($activity_list); $k++) {
 	    if($assignment_list[$j]['assignment'] == $activity_list[$k]['assignment']) { 
 	      $sql = "SELECT * FROM 3rd_participation where "
 		 . " activity=" . $activity_list[$k]['activity']
-		 . " AND elder=" . $elder_id[$i];
+		 . " AND indiv=" . $indiv_id[$i];
 	      $this->db->query($sql,__LINE__,__FILE__);
 	      while($this->db->next_record()) {
 		if($activity_list[$k]['date'] > $date) { 
@@ -1113,10 +1113,10 @@ class eq
 	if($participated) { $part_table .= '<td align=center><img src="images/checkmark.gif">'.$participated.'</td>'; }
 	else { $part_table .= '<td>&nbsp;</td>'; }
 	$this->t->set_var('part_table',$part_table);
-	$this->t->fp('list2','elder_list',True);
+	$this->t->fp('list2','indiv_list',True);
       }
       $this->t->set_var('total_width',$total_width);
-      $this->t->set_var('elder_width',$elder_width);
+      $this->t->set_var('indiv_width',$indiv_width);
       $this->t->set_var('part_width',$part_width);
       $this->t->set_var('act_width',$act_width);
       $this->t->pfp('out','par_view_t');
@@ -1127,10 +1127,10 @@ class eq
     {
       $this->t->set_file(array('willing_view_t' => 'willing_view.tpl'));
       $this->t->set_block('willing_view_t','header_list','list1');
-      $this->t->set_block('willing_view_t','elder_list','list2');
+      $this->t->set_block('willing_view_t','indiv_list','list2');
 
       $this->t->set_var('lang_filter','Filter');
-      $this->t->set_var('lang_filter_unwilling','Filter out unwilling Elders:');
+      $this->t->set_var('lang_filter_unwilling','Filter out unwilling individuals:');
 
       $filter_unwilling = get_var('filter_unwilling',array('POST'));
       $this->t->set_var('filter_unwilling',$filter_unwilling);
@@ -1146,17 +1146,17 @@ class eq
       }
       $this->t->set_var('filter_input',$filter_input);
       
-      $sql = "SELECT * FROM 3rd_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
 
       $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
@@ -1182,8 +1182,8 @@ class eq
 	  $i++;
 	}
       
-      $elder_width=275; $willing_width=40; $assignment_width=50;
-      $total_width=$elder_width+$willing_width;
+      $indiv_width=275; $willing_width=40; $assignment_width=50;
+      $total_width=$indiv_width+$willing_width;
       
       for ($i=0; $i < count($assignment_list); $i++) {
 	$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
@@ -1193,17 +1193,17 @@ class eq
 	$total_willing[$i] = 0;
       }
 
-      for ($i=0; $i < count($elder_id); $i++) {
-	$willing_table = ''; $elder_willing=0;
-	$this->t->set_var('elder_name',$elder_name[$i]);
-	$this->t->set_var('elder_phone',$elder_phone[$elder_id[$i]]);
-	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&elder_id='
-							    . $elder_id[$i] . '&action=' . 'edit'));
+      for ($i=0; $i < count($indiv_id); $i++) {
+	$willing_table = ''; $indiv_willing=0;
+	$this->t->set_var('indiv_name',$indiv_name[$i]);
+	$this->t->set_var('indiv_phone',$indiv_phone[$indiv_id[$i]]);
+	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&indiv_id='
+							    . $indiv_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
 	  $found_willingness=0; 
 	  $sql = "SELECT * FROM 3rd_willingness where "
 	     . " assignment=" . $assignment_list[$j]['assignment']
-	     . " AND elder=" . $elder_id[$i];
+	     . " AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  while($this->db->next_record()) {
 	    $found_willingness=1;
@@ -1217,7 +1217,7 @@ class eq
 	      $date = $this->db2->f('date');
 	      $sql = "SELECT * FROM 3rd_participation where "
 		 . " activity=" . $activity
-		 . " AND elder=". $elder_id[$i];
+		 . " AND indiv=". $indiv_id[$i];
 	      $this->db3->query($sql,__LINE__,__FILE__);
 	      if($this->db3->next_record()) {
 		$date_part = $date;
@@ -1226,25 +1226,25 @@ class eq
 	      
 	    if($this->db->f('willing') == 'y') {
 	      $total_willing[$j]++;
-	      $elder_willing=1;
+	      $indiv_willing=1;
 	      $willing_table .= '<td align=center><img src="images/checkmark.gif"><br><font size=-2>'.$date_part.'</font></td></td>';
 	    }
 	    else if($this->db->f('willing') == 'n') {
 	      $willing_table .= '<td align=center><img src="images/x.gif"></td>';
 	    }
 	    else {
-	      $elder_willing=1;
+	      $indiv_willing=1;
 	      $willing_table .= "<td>&nbsp;</td>";
 	    }
 	  }
 	  if(!$found_willingness) {
-	    $elder_willing=1;
+	    $indiv_willing=1;
 	    $willing_table .= "<td>&nbsp;</td>";
 	  }
 	}
-	if(($elder_willing == 1) || ($filter_unwilling == 'n')) { 
+	if(($indiv_willing == 1) || ($filter_unwilling == 'n')) { 
 	  $this->t->set_var('willing_table',$willing_table);
-	  $this->t->fp('list2','elder_list',True);
+	  $this->t->fp('list2','indiv_list',True);
 	  $this->nextmatchs->template_alternate_row_color(&$this->t);
 	} 
       }
@@ -1256,7 +1256,7 @@ class eq
       $this->t->set_var('stat_table',$stat_table);
       
       $this->t->set_var('total_width',$total_width);
-      $this->t->set_var('elder_width',$elder_width);
+      $this->t->set_var('indiv_width',$indiv_width);
       $this->t->set_var('willing_width',$willing_width);
       $this->t->pfp('out','willing_view_t');
       $this->save_sessiondata(); 
@@ -1272,8 +1272,8 @@ class eq
       $this->t->set_block('willing_update_t','assignment_list','list');
       $this->t->set_block('willing_update_t','save','savehandle');
       
-      $elder_id = get_var('elder_id',array('GET','POST'));
-      $this->t->set_var('elder_id',$elder_id);
+      $indiv_id = get_var('indiv_id',array('GET','POST'));
+      $this->t->set_var('indiv_id',$indiv_id);
       $action = get_var('action',array('GET','POST'));
       
       $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_view'));
@@ -1283,19 +1283,19 @@ class eq
       
       if($action == 'save')
 	{
-	  // Delete all the previous willingness entries for this elder
-	  $this->db->query("DELETE from 3rd_willingness where elder=" . $elder_id ,__LINE__,__FILE__);
+	  // Delete all the previous willingness entries for this individual
+	  $this->db->query("DELETE from 3rd_willingness where indiv=" . $indiv_id ,__LINE__,__FILE__);
 	      
-	  // Now, add the assignment willingness that is checked for this elder
+	  // Now, add the assignment willingness that is checked for this individual
 	  $new_data = get_var('willingness',array('POST'));
 	  foreach ($new_data as $data)
 	    {
 	      $data_array = explode("/",$data);
 	      $assignment = $data_array[0];
 	      $willing = $data_array[1];
-	      //print "elder_id: $elder_id assignment: $assignment willing: $willing<br>";
-	      $this->db->query("INSERT INTO 3rd_willingness (elder,assignment,willing) "
-			       . "VALUES (" . $elder_id .",". $assignment .",'". $willing . "')",__LINE__,__FILE__);
+	      //print "indiv_id: $indiv_id assignment: $assignment willing: $willing<br>";
+	      $this->db->query("INSERT INTO 3rd_willingness (indiv,assignment,willing) "
+			       . "VALUES (" . $indiv_id .",". $assignment .",'". $willing . "')",__LINE__,__FILE__);
 	    }      
 	  $this->willing_view();
 	  return false;
@@ -1304,12 +1304,12 @@ class eq
       $assignment_width=300; $willing_width=25; $table_width=$assignment_width + $willing_width;
       $table_data=""; 
 
-      // Find out the elder's name
-      $sql = "SELECT * FROM 3rd_elder WHERE elder=".$elder_id." AND valid=1";
+      // Find out the individual's name
+      $sql = "SELECT * FROM 3rd_indiv WHERE indiv=".$indiv_id." AND valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
-	$elder_name = $this->db->f('name');
-	$this->t->set_var('elder_name',$elder_name);
+	$indiv_name = $this->db->f('name');
+	$this->t->set_var('indiv_name',$indiv_name);
       }
       
       // Select all the assignments
@@ -1326,7 +1326,7 @@ class eq
 	  $table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$assignment_name</td>";
 	  
 	  $header_row="<th width=$comp_width><font size=-2>Assignments</th><th>Willingness</th>";
-	  $sql = "SELECT * FROM 3rd_willingness WHERE elder=".$elder_id." AND assignment=".$assignment;
+	  $sql = "SELECT * FROM 3rd_willingness WHERE indiv=".$indiv_id." AND assignment=".$assignment;
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  $value = $assignment;
 	     
@@ -1385,7 +1385,7 @@ class eq
     function ppi_sched()
       {
       $this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
-      $this->t->set_block('ppi_sched_t','elder_list','elderlist');
+      $this->t->set_block('ppi_sched_t','indiv_list','indivlist');
       $this->t->set_block('ppi_sched_t','appt_list','apptlist');
       $action = get_var('action',array('GET','POST'));
 
@@ -1401,9 +1401,9 @@ class eq
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched&action=save'));
       $this->t->set_var('title','Yearly PPI Scheduler');
 
-      $elder_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
-      $table_width=$elder_width + $phone_width + $pri_width + $notes_width + $ppi_date_width;
-      $header_row = "<th width=$elder_width><font size=-2>Elder Name</th>";
+      $indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
+      $table_width=$indiv_width + $phone_width + $pri_width + $notes_width + $ppi_date_width;
+      $header_row = "<th width=$indiv_width><font size=-2>individual Name</th>";
       $header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
       $header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
       $header_row.= "<th width=$ppi_date_width><font size=-2>Last PPI</th>";
@@ -1419,12 +1419,12 @@ class eq
 	$president_name = $this->db->f('name');
 	$president_name_array = explode(",",$president_name);
 	$president_last_name = $president_name_array[0];
-	$president_id = $this->db->f('elder');
+	$president_id = $this->db->f('indiv');
 	$presidency_id = $this->db->f('presidency');
-	$interviewer = $this->db->f('elder');
+	$interviewer = $this->db->f('indiv');
 	$district_number = '*';
 	$district_name = $president_name;
-	$sql = "SELECT * FROM 3rd_elder where elder='$president_id'";
+	$sql = "SELECT * FROM 3rd_indiv where indiv='$president_id'";
 	$this->db2->query($sql,__LINE__,__FILE__);
 	if($this->db2->next_record()) {
 	  $indiv_id = $this->db2->f('indiv_id');
@@ -1435,7 +1435,7 @@ class eq
 	  $president_address = $this->db2->f('address');
 	}
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ President in 3rd_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate President in 3rd_presidency table</h3></font></hr>";
 	return;
       }
 
@@ -1446,19 +1446,19 @@ class eq
 	  if($new_data != "") { 
 	    foreach ($new_data as $entry)
 	      {
-		$elder = $entry['elder'];
+		$indiv = $entry['indiv'];
 		$appointment = $entry['appointment'];
 		$location = $entry['location'];
 		if($location == "") { $location = "$president_last_name"." home ($president_address)"; }
-		if($elder == 0) { $location = ""; }
+		if($indiv == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
+		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
 		  $this->db->query("UPDATE 3rd_appointment set " .
-				   " elder='" . $elder . "'" .
+				   " indiv='" . $indiv . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		  // Email the appointment
@@ -1473,14 +1473,14 @@ class eq
 	  foreach ($new_data as $entry)
 	   {
 	     $ppi_notes = $entry['notes'];
-	     $elder_id = $entry['elder_id'];
+	     $indiv_id = $entry['indiv_id'];
 	     $ppi_pri = $entry['pri'];
 	     
 	     // Perform database save actions here
-	     $this->db->query("UPDATE 3rd_elder set " .
+	     $this->db->query("UPDATE 3rd_indiv set " .
 			      " ppi_notes='" . $ppi_notes . "'" .
 			      ",ppi_pri='" . $ppi_pri . "'" .
-			      " WHERE elder=" . $elder_id,__LINE__,__FILE__);
+			      " WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
 	     
 	   }
 
@@ -1488,34 +1488,34 @@ class eq
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
-      // create the elder id -> elder name mapping
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY name ASC";
+      // create the individual id -> individual name mapping
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
-      $elder_id = NULL;
-      $elder_name = NULL;
+      $indiv_id = NULL;
+      $indiv_name = NULL;
       while ($this->db->next_record())
 	{
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_id[$i] = $this->db->f('elder');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_id[$i] = $this->db->f('indiv');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
 
       // APPOINTMENT TABLE
-      $date_width=250; $time_width=100; $elder_width=200; $location_width=100;
-      $appt_table_width=$date_width + $time_width + $elder_width + $location_width;
+      $date_width=250; $time_width=100; $indiv_width=200; $location_width=100;
+      $appt_table_width=$date_width + $time_width + $indiv_width + $location_width;
       $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
       $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-      $appt_header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $appt_header_row.= "<th width=$indiv_width><font size=-2>indiv</th>";
       $appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $appt_table_data = ""; 
 
-      $total_elders=0; $elders_with_yearly_ppi=0;
+      $total_indivs=0; $indivs_with_yearly_ppi=0;
       
       // Display a scheduling table for the EQ President
       $table_data=""; $appt_table_data="";
-      $table_title = "District ".$district_number.": ".$district_name.": All Elders with Yearly PPI Not Completed";
+      $table_title = "District ".$district_number.": ".$district_name.": All indivs with Yearly PPI Not Completed";
       $appt_table_title = "District ".$district_number.": ".$district_name.": Yearly PPI Appointment Slots";
       $this->t->set_var('table_title',$table_title);
       $this->t->set_var('appt_table_title',$appt_table_title);
@@ -1527,9 +1527,9 @@ class eq
       while ($this->db->next_record())
 	{
 	  $appointment = $this->db->f('appointment');
-	  $elder = $this->db->f('elder');
+	  $indiv = $this->db->f('indiv');
 	  $location = $this->db->f('location');
-	  if(($location == "") && ($elder > 0)) { $location = "$president_last_name"." home ($president_address)"; }
+	  if(($location == "") && ($indiv > 0)) { $location = "$president_last_name"." home ($president_address)"; }
 	  
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
@@ -1544,12 +1544,12 @@ class eq
 	  $appt_table_data.= "<td align=center>$day_string</td>";
 	  $appt_table_data.= "<td align=center>$time_string</td>";
 
-	  $appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][elder]>';
+	  $appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][indiv]>';
 	  $appt_table_data.= '<option value=0></option>';
-	  for ($i=0; $i < count($elder_id); $i++) {
-	    $id = $elder_id[$i];
-	    $name = $elder_name[$i];
-	    if($elder_id[$i] == $elder) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	  for ($i=0; $i < count($indiv_id); $i++) {
+	    $id = $indiv_id[$i];
+	    $name = $indiv_name[$i];
+	    if($indiv_id[$i] == $indiv) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
 	    $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
 	  }
 	  $appt_table_data.='</select></td>';
@@ -1568,43 +1568,43 @@ class eq
       $this->t->set_var('appt_table_width',$appt_table_width);
 
       // PPI SCHEDULING TABLE
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY ppi_pri ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY ppi_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       $i=0; 
-      $elder_id = NULL;
+      $indiv_id = NULL;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
-	  $elder_ppi_pri[$elder_id[$i]] = $this->db->f('ppi_pri');
-	  $elder_ppi_notes[$elder_id[$i]] = $this->db->f('ppi_notes');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
+	  $indiv_ppi_pri[$indiv_id[$i]] = $this->db->f('ppi_pri');
+	  $indiv_ppi_notes[$indiv_id[$i]] = $this->db->f('ppi_notes');
 	  $i++;
-	  $total_elders++;
+	  $total_indivs++;
 	}
 
-      $max = count($elder_id);
+      $max = count($indiv_id);
       
       for($i=0; $i < $max; $i++) {
-          $id = $elder_id[$i];
-          $name = $elder_name[$i];
-	  $phone = $elder_phone[$id];
-	  $ppi_pri = $elder_ppi_pri[$id];
-	  $ppi_notes = $elder_ppi_notes[$id];
+          $id = $indiv_id[$i];
+          $name = $indiv_name[$i];
+	  $phone = $indiv_phone[$id];
+	  $ppi_pri = $indiv_ppi_pri[$id];
+	  $ppi_notes = $indiv_ppi_notes[$id];
 
-	  // If this elder has had a yearly PPI this year, don't show him on the schedule list
+	  // If this individual has had a yearly PPI this year, don't show him on the schedule list
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 	  $sql = "SELECT * FROM 3rd_interview WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id . " AND interview_type='ppi'";
+	     "AND indiv=" . $id . " AND interview_type='ppi'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
-	    $sql = "SELECT * FROM 3rd_interview WHERE elder=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
+	    $sql = "SELECT * FROM 3rd_interview WHERE indiv=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
 	    $link_data['menuaction'] = 'eq.eq.ppi_update';
-	    $link_data['elder'] = $id;
+	    $link_data['indiv'] = $id;
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = '';
 	    $link_data['interview_type'] = 1;
@@ -1626,20 +1626,20 @@ class eq
 	    $table_data.= '</select></td>';
 	    $table_data.= "<td align=center>$date</td>";
 	    $table_data.= '<td><input type=text size="50" maxlength="128" name="ppi_notes['.$i.'][notes]" value="'.$ppi_notes.'">';
-	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_id]" value="'.$id.'">';
-	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][elder_name]" value="'.$name.'">';
+	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][indiv_id]" value="'.$id.'">';
+	    $table_data.= '<input type=hidden name="ppi_notes['.$i.'][indiv_name]" value="'.$name.'">';
 	    $table_data.= '</td>';
 	    $table_data.= '</tr>';
 	  } else {
 	    $link_data['menuaction'] = 'eq.eq.ppi_update';
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
-	    $link_data['elder'] = $this->db2->f('elder');
+	    $link_data['indiv'] = $this->db2->f('indiv');
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = $this->db2->f('interview');
 	    $link_data['interview_type'] = $this->db2->f('interview_type');
 	    $link_data['action'] = 'view';
 	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
-	    $elders_with_yearly_ppi++;
+	    $indivs_with_yearly_ppi++;
 	    $date = $this->db2->f('date');
 	    $ppi_notes = $this->db2->f('notes');
 	    if(strlen($ppi_notes) > 40) { $ppi_notes = substr($ppi_notes,0,40) . "..."; }
@@ -1651,11 +1651,11 @@ class eq
 	    $completed_data.= "<td align=left>$ppi_notes</td>";
 	    $completed_data.= '</tr>';
 	  }
-      } // End for Elders Loop
+      } // End for individuals Loop
 
       $name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
       $completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-      $completed_header_row = "<th width=$name_width><font size=-2>Elder Name</th>";
+      $completed_header_row = "<th width=$name_width><font size=-2>Individual Name</th>";
       $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
       $completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
       $completed_header_row.= "<th width=$notes_width><font size=-2>PPI Notes</th>";
@@ -1666,16 +1666,16 @@ class eq
       $this->t->set_var('completed_header_row',$completed_header_row);
       $this->t->set_var('completed_table_width',$completed_table_width);
       $this->t->set_var('completed',$completed_data);
-      $this->t->fp('elderlist','elder_list',True); 
+      $this->t->fp('indivlist','indiv_list',True); 
       
-      $elders_width=300; $totals_width=100;
-      $totals_table_width=$elders_width + $totals_width;
-      $totals_header_row = "<th width=$elders_width><font size=-2>Elders</th>";
+      $indivs_width=300; $totals_width=100;
+      $totals_table_width=$indivs_width + $totals_width;
+      $totals_header_row = "<th width=$indivs_width><font size=-2>Individuals</th>";
       $totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
       $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
-      $totals_data.= "<td align=left><font size=-2><b>Total Elders with yearly PPIs completed:</b></font></td>";
-      $totals_data.= "<td align=center><font size=-2><b>$elders_with_yearly_ppi / $total_elders</b></font></td>";
-      $percent = ceil(($elders_with_yearly_ppi / $total_elders)*100);
+      $totals_data.= "<td align=left><font size=-2><b>Total Individuals with yearly PPIs completed:</b></font></td>";
+      $totals_data.= "<td align=center><font size=-2><b>$indivs_with_yearly_ppi / $total_indivs</b></font></td>";
+      $percent = ceil(($indivs_with_yearly_ppi / $total_indivs)*100);
       $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
       $this->t->set_var('tr_color',$tr_color);
       $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
@@ -1695,7 +1695,7 @@ class eq
   function int_sched()
     {
       $this->t->set_file(array('int_sched_t' => 'int_sched.tpl'));
-      $this->t->set_block('int_sched_t','elder_list','elderlist');
+      $this->t->set_block('int_sched_t','indiv_list','indivlist');
       $this->t->set_block('int_sched_t','appt_list','apptlist');
       $action = get_var('action',array('GET','POST'));
 
@@ -1711,9 +1711,9 @@ class eq
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched&action=save'));
       $this->t->set_var('title','Hometeaching Interviews Scheduler');
 
-      $elder_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $int_date_width=20;
-      $table_width=$elder_width + $phone_width + $pri_width + $notes_width + $int_date_width;
-      $header_row = "<th width=$elder_width><font size=-2>Elder Name</th>";
+      $indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $int_date_width=20;
+      $table_width=$indiv_width + $phone_width + $pri_width + $notes_width + $int_date_width;
+      $header_row = "<th width=$indiv_width><font size=-2>individual Name</th>";
       $header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
       $header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
       $header_row.= "<th width=$int_date_width><font size=-2>Last Interview</th>";
@@ -1729,20 +1729,20 @@ class eq
       if($month >= 10 && $month <= 12) { $quarter_start=$year."-10-01"; $quarter_end=$nextyear."-01-01"; }
       //print "year: $year month: $month quarter_start: $quarter_start quarter_end: $quarter_end<br>";
 
-      // create the elder id -> elder name mapping
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY name ASC";
+      // create the individual id -> individual name mapping
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
-      $elder_id_data = NULL;
-      $elder_name_data = NULL;
+      $indiv_id_data = NULL;
+      $indiv_name_data = NULL;
       while ($this->db->next_record())
 	{
-	  $elder_name_data[$i] = $this->db->f('name');
-	  $elder_id_data[$i] = $this->db->f('elder');
-	  $elderid2name[$elder_id_data[$i]] = $elder_name_data[$i];
+	  $indiv_name_data[$i] = $this->db->f('name');
+	  $indiv_id_data[$i] = $this->db->f('indiv');
+	  $individ2name[$indiv_id_data[$i]] = $indiv_name_data[$i];
 	  $i++;
 	}
-      array_multisort($elder_name_data, $elder_id_data);
+      array_multisort($indiv_name_data, $indiv_id_data);
 
       if($action == 'save')
 	{
@@ -1751,14 +1751,14 @@ class eq
 	  if($new_data != "") { 
 	    foreach ($new_data as $entry)
 	      {
-		$elder = $entry['elder'];
+		$indiv = $entry['indiv'];
 		$appointment = $entry['appointment'];
 		$location = $entry['location'];
 		if($location == "") {
 		  $supervisor = $entry['supervisor'];
-		  $supervisor_array = explode(",", $elderid2name[$supervisor]);
+		  $supervisor_array = explode(",", $individ2name[$supervisor]);
 		  $supervisor_last_name = $supervisor_array[0];
-		  $sql = "SELECT * FROM 3rd_elder where elder='$supervisor'";
+		  $sql = "SELECT * FROM 3rd_indiv where indiv='$supervisor'";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  if($this->db2->next_record()) {
 		    $indiv_id = $this->db2->f('indiv_id');
@@ -1770,16 +1770,16 @@ class eq
 		  }
 		  $location = "$supervisor_last_name"." home ($supervisor_address)";
 		}
-		if($elder == 0) { $location = ""; }
+		if($indiv == 0) { $location = ""; }
 		
-		//print "elder: $elder appointment: $appointment <br>";
+		//print "indiv: $indiv appointment: $appointment <br>";
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
+		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
 		  $this->db->query("UPDATE 3rd_appointment set " .
-				   " elder='" . $elder . "'" .
+				   " indiv='" . $indiv . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 		  
@@ -1794,17 +1794,17 @@ class eq
 	  foreach ($new_data as $entry)
 	   {
 	     $int_notes = $entry['notes'];
-	     $elder_id = $entry['elder_id'];
-	     $elder_name = $entry['elder_name'];
+	     $indiv_id = $entry['indiv_id'];
+	     $indiv_name = $entry['indiv_name'];
 	     $int_pri = $entry['pri'];
 	     $aaronic = $entry['aaronic'];
-	     //print "int_notes: $int_notes elder_name: $elder_name aaronic: $aaronic <Br>";
+	     //print "int_notes: $int_notes indiv_name: $indiv_name aaronic: $aaronic <Br>";
 	     if($aaronic == 0) { 
 	       // Perform database save actions here
-	       $this->db->query("UPDATE 3rd_elder set " .
+	       $this->db->query("UPDATE 3rd_indiv set " .
 				" int_notes='" . $int_notes . "'" .
 				",int_pri='" . $int_pri . "'" .
-				" WHERE elder=" . $elder_id,__LINE__,__FILE__);
+				" WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
 	     } 
 	     
 	   }
@@ -1833,11 +1833,11 @@ class eq
       
       // APPOINTMENT TABLE
       $district = 1;
-      $date_width=250; $time_width=100; $elder_width=200; $location_width=100;
-      $appt_table_width=$date_width + $time_width + $elder_width + $location_width;
+      $date_width=250; $time_width=100; $indiv_width=200; $location_width=100;
+      $appt_table_width=$date_width + $time_width + $indiv_width + $location_width;
       $appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
       $appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-      $appt_header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $appt_header_row.= "<th width=$indiv_width><font size=-2>Individual</th>";
       $appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $appt_table_data = ""; 
 
@@ -1851,7 +1851,7 @@ class eq
       $supervisor = $districts[$d]['supervisor'];
       $supervisor_array = explode(",", $supervisor);
       $supervisor_last_name = $supervisor_array[0];
-      $sql = "SELECT * FROM 3rd_elder where elder='$supervisor'";
+      $sql = "SELECT * FROM 3rd_indiv where indiv='$supervisor'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record()) {
 	$indiv_id = $this->db2->f('indiv_id');
@@ -1862,7 +1862,7 @@ class eq
 	$supervisor_address = $this->db2->f('address');
       }
       $location = "$supervisor_last_name"." home ($supervisor_address)";
-      $table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": All Elders with Interviews Not Completed";
+      $table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": All Individuals with Interviews Not Completed";
       $appt_table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": Interview Appointment Slots";
       $this->t->set_var('table_title',$table_title);
       $this->t->set_var('appt_table_title',$appt_table_title);
@@ -1874,9 +1874,9 @@ class eq
       while ($this->db->next_record())
 	{
 	  $appointment = $this->db->f('appointment');
-	  $elder = $this->db->f('elder');
+	  $indiv = $this->db->f('indiv');
 	  $location = $this->db->f('location');
-	  if(($location == "") && ($elder > 0)) { $location = "$supervisor_last_name"." home ($supervisor_address)"; }
+	  if(($location == "") && ($indiv > 0)) { $location = "$supervisor_last_name"." home ($supervisor_address)"; }
 	  
 	  $date = $this->db->f('date');
 	  $date_array = explode("-",$date);
@@ -1891,12 +1891,12 @@ class eq
 	  $appt_table_data.= "<td align=center>$day_string</td>";
 	  $appt_table_data.= "<td align=center>$time_string</td>";
 
-	  $appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][elder]>';
+	  $appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][indiv]>';
 	  $appt_table_data.= '<option value=0></option>';
-	  for ($i=0; $i < count($elder_id_data); $i++) {
-	    $id = $elder_id_data[$i];
-	    $name = $elder_name_data[$i];
-	    if($elder_id_data[$i] == $elder) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	  for ($i=0; $i < count($indiv_id_data); $i++) {
+	    $id = $indiv_id_data[$i];
+	    $name = $indiv_name_data[$i];
+	    if($indiv_id_data[$i] == $indiv) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
 	    $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
 	  }
 	  $appt_table_data.='</select></td>';
@@ -1941,38 +1941,38 @@ class eq
 	while ($this->db->next_record())
 	    {	      
 	      // Get this companions information
-	      $elder_id = $this->db->f('elder');
+	      $indiv_id = $this->db->f('indiv');
 	      $aaronic_id = $this->db->f('aaronic');
 	     
-	      $sql = "SELECT * FROM 3rd_elder where elder=$elder_id";
+	      $sql = "SELECT * FROM 3rd_indiv where indiv=$indiv_id";
 	      $this->db2->query($sql,__LINE__,__FILE__);	
 	      if($this->db2->next_record())
 		{
-		  $elder_id = $this->db2->f('elder');
-		  $elder_name = $this->db2->f('name');
-		  $elder_phone[$elder_id] = $this->db2->f('phone');
-		  $elder_int_pri[$elder_id] = $this->db2->f('int_pri');
-		  $elder_int_notes[$elder_id] = $this->db2->f('int_notes');
-		  $elder_aaronic = 0;
+		  $indiv_id = $this->db2->f('indiv');
+		  $indiv_name = $this->db2->f('name');
+		  $indiv_phone[$indiv_id] = $this->db2->f('phone');
+		  $indiv_int_pri[$indiv_id] = $this->db2->f('int_pri');
+		  $indiv_int_notes[$indiv_id] = $this->db2->f('int_notes');
+		  $indiv_aaronic = 0;
 		}
 	      else {
 		$sql = "SELECT * FROM 3rd_aaronic where aaronic=$aaronic_id";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record())
 		  {
-		    $elder_id = $this->db2->f('aaronic');
-		    $elder_name = $this->db2->f('name');
-		    $elder_phone[$elder_id] = $this->db2->f('phone');
-		    $elder_aaronic = 1;
+		    $indiv_id = $this->db2->f('aaronic');
+		    $indiv_name = $this->db2->f('name');
+		    $indiv_phone[$indiv_id] = $this->db2->f('phone');
+		    $indiv_aaronic = 1;
 		  }
 	      }
 
-	      $id = $elder_id;
-	      $name = $elder_name;
-	      $phone = $elder_phone[$id];
-	      $int_pri = $elder_int_pri[$id];
-	      $int_notes = $elder_int_notes[$id];
-	      $aaronic = $elder_aaronic;
+	      $id = $indiv_id;
+	      $name = $indiv_name;
+	      $phone = $indiv_phone[$id];
+	      $int_pri = $indiv_int_pri[$id];
+	      $int_notes = $indiv_int_notes[$id];
+	      $aaronic = $indiv_aaronic;
 	      
 	      // If the companionship has already had its quarterly interview,
 	      // Skip the other companion in the companionship.
@@ -1991,15 +1991,15 @@ class eq
 	      
 	      // If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
 	      $sql = "SELECT * FROM 3rd_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
-		 "AND elder=" . $id;
+		 "AND indiv=" . $id;
 	      $this->db2->query($sql,__LINE__,__FILE__);
 	      
 	      if(!$this->db2->next_record()) {
-		$sql = "SELECT * FROM 3rd_interview WHERE elder=" . $id . " ORDER BY date DESC";
+		$sql = "SELECT * FROM 3rd_interview WHERE indiv=" . $id . " ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
 		$link_data['menuaction'] = 'eq.eq.int_update';
-		$link_data['elder'] = $id;
+		$link_data['indiv'] = $id;
 		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
 		$link_data['interview'] = '';
@@ -2022,8 +2022,8 @@ class eq
 		if($aaronic == 0) { 
 		  $table_data.= '<td><input type=text size="50" maxlength="128" name="int_notes['.$i.'][notes]" value="'.$int_notes.'">';
 		}
-		$table_data.= '<input type=hidden name="int_notes['.$i.'][elder_id]" value="'.$id.'">';
-		$table_data.= '<input type=hidden name="int_notes['.$i.'][elder_name]" value="'.$name.'">';
+		$table_data.= '<input type=hidden name="int_notes['.$i.'][indiv_id]" value="'.$id.'">';
+		$table_data.= '<input type=hidden name="int_notes['.$i.'][indiv_name]" value="'.$name.'">';
 		$table_data.= '<input type=hidden name="int_notes['.$i.'][aaronic]" value="'.$aaronic.'">';
 		$table_data.= '</td>';
 		$table_data.= '</tr>'."\n";
@@ -2031,7 +2031,7 @@ class eq
 	      } else {
 		$link_data['menuaction'] = 'eq.eq.int_update';
 		$link_data['interviewer'] = $this->db2->f('interviewer');
-		$link_data['elder'] = $this->db2->f('elder');
+		$link_data['indiv'] = $this->db2->f('indiv');
 		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
 		$link_data['interview'] = $this->db2->f('interview');
@@ -2053,7 +2053,7 @@ class eq
       	
       $name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
       $completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-      $completed_header_row = "<th width=$name_width><font size=-2>Elder Name</th>";
+      $completed_header_row = "<th width=$name_width><font size=-2>Individual Name</th>";
       $completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
       $completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
       $completed_header_row.= "<th width=$notes_width><font size=-2>Interview Notes</th>";
@@ -2064,14 +2064,14 @@ class eq
       $this->t->set_var('completed_header_row',$completed_header_row);
       $this->t->set_var('completed_table_width',$completed_table_width);
       $this->t->set_var('completed',$completed_data);
-      $this->t->fp('elderlist','elder_list',True);
+      $this->t->fp('indivlist','indiv_list',True);
 
       } // End for each district loop
 
       
-      $elders_width=300; $totals_width=100;
-      $totals_table_width=$elders_width + $totals_width;
-      $totals_header_row = "<th width=$elders_width><font size=-2>Elders</th>";
+      $indivs_width=300; $totals_width=100;
+      $totals_table_width=$indivs_width + $totals_width;
+      $totals_header_row = "<th width=$indivs_width><font size=-2>Individuals</th>";
       $totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
       $totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
       $totals_data.= "<td align=left><font size=-2><b>Total Companionships with interviews completed:</b></font></td>";
@@ -2110,7 +2110,7 @@ class eq
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched&action=save'));
-      $this->t->set_var('title','EQ Presidency Yearly Visit Scheduler');
+      $this->t->set_var('title','Presidency Yearly Visit Scheduler');
 
       $family_width=500; $phone_width=40; $pri_width=10; $notes_width=128; $visit_date_width=20;
       $table_width=$family_width + $phone_width + $pri_width + $notes_width + $visit_date_width;
@@ -2124,7 +2124,7 @@ class eq
       $year = date('Y');
 
       // create the family id -> family name mapping
-      $sql = "SELECT * FROM 3rd_family where valid=1 and elder_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $family_id = NULL;
@@ -2212,7 +2212,7 @@ class eq
 	$presidency_name = $this->db->f('name');
 	$presidency_id = $this->db->f('presidency');
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ Presidency in 3rd_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate Presidency in 3rd_presidency table</h3></font></hr>";
 	return;
       }
             
@@ -2268,7 +2268,7 @@ class eq
 
       
       // VISIT SCHEDULING TABLE
-      $sql = "SELECT * FROM 3rd_family where valid=1 and elder_id != 0 ORDER BY visit_pri ASC";
+      $sql = "SELECT * FROM 3rd_family where valid=1 and indiv_id != 0 ORDER BY visit_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       $total_families=0; $families_with_yearly_visit=0;
@@ -2434,34 +2434,34 @@ class eq
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$president_name = $this->db->f('name');
-	$interviewer = $this->db->f('elder');
+	$interviewer = $this->db->f('indiv');
 	$interview_type = 'ppi';
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ President in 3rd_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate President in 3rd_presidency table</h3></font></hr>";
 	return;
       }
       $this->t->set_var('district_number','*');
       $this->t->set_var('district_name',$president_name);
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
-	  $elder_ppi_pri[$elder_id[$i]] = $this->db->f('ppi_pri');
-	  $elder_ppi_notes[$elder_id[$i]] = $this->db->f('ppi_notes');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
+	  $indiv_ppi_pri[$indiv_id[$i]] = $this->db->f('ppi_pri');
+	  $indiv_ppi_notes[$indiv_id[$i]] = $this->db->f('ppi_notes');
 	  $i++;
 	}
-      $total_elders=$i;
-      array_multisort($elder_name, $elder_id);
-      //var_dump($elder_name); print "<br><br>"; var_dump($elder_id);
+      $total_indivs=$i;
+      array_multisort($indiv_name, $indiv_id);
+      //var_dump($indiv_name); print "<br><br>"; var_dump($indiv_id);
       
-      $header_row="<th width=$comp_width><font size=-2>Elder Name</th>";
+      $header_row="<th width=$comp_width><font size=-2>Individual Name</th>";
 	
-      $elder_width=400; $ppi_width=75; $table_width=$elder_width + $num_months*$ppi_width;
+      $indiv_width=400; $ppi_width=75; $table_width=$indiv_width + $num_months*$ppi_width;
       $table_data="";
       for($m=$num_months; $m >= 0; $m--) {
 	$year = date('Y') - $m;
@@ -2469,14 +2469,14 @@ class eq
 	$ppis[$m] = 0;
       }
       
-      for ($j=0; $j < count($elder_id); $j++) {
-	$id = $elder_id[$j];
-	$name = $elder_name[$j];
-	$phone = $elder_phone[$id];
+      for ($j=0; $j < count($indiv_id); $j++) {
+	$id = $indiv_id[$j];
+	$name = $indiv_name[$j];
+	$phone = $indiv_phone[$id];
 	
 	$link_data['menuaction'] = 'eq.eq.ppi_update';
 	$link_data['interviewer'] = $interviewer;
-	$link_data['elder'] = $id;
+	$link_data['indiv'] = $id;
 	$link_data['name'] = $name;
 	$link_data['interview'] = '';
 	$link_data['interview_type'] = $interview_type;
@@ -2485,12 +2485,12 @@ class eq
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 
-	// Find out how many times PPIs were performed in the past $num_months for this Elder
+	// Find out how many times PPIs were performed in the past $num_months for this individual
 	for($m=$num_months; $m >= 0; $m--) {
 	  $year = date('Y') - $m;
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 	  $sql = "SELECT * FROM 3rd_interview WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id . " AND interview_type='ppi'";
+	     "AND indiv=" . $id . " AND interview_type='ppi'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  	  
 	  if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2499,7 +2499,7 @@ class eq
 	    $link_data['menuaction'] = 'eq.eq.ppi_update';
 	    $link_data['companionship'] = $companionship;
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
-	    $link_data['elder'] = $id;
+	    $link_data['indiv'] = $id;
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = $this->db2->f('interview');
 	    $link_data['interview_type'] = $interview_type;
@@ -2517,9 +2517,9 @@ class eq
       }
       $table_data .= "<tr><td colspan=20><hr></td></tr>";
       
-      $stat_data = "<tr><td><b><font size=-2>$total_elders Elders<br>PPI Totals:</font></b></td>";
+      $stat_data = "<tr><td><b><font size=-2>$total_indivs Individuals<br>PPI Totals:</font></b></td>";
       for($m=$num_months; $m >=0; $m--) {
-	$percent = ceil(($ppis[$m] / $total_elders)*100);
+	$percent = ceil(($ppis[$m] / $total_indivs)*100);
 	$stat_data .= "<td align=center><font size=-2><b>$ppis[$m]<br>$percent%</font></b></td>";
       }
       $stat_data .= "</tr>";
@@ -2548,7 +2548,7 @@ class eq
       $interviewer = get_var('interviewer',array('GET','POST'));      
       $name = get_var('name',array('GET','POST'));
       $interview = get_var('interview',array('GET','POST'));
-      $elder = get_var('elder',array('GET','POST'));
+      $indiv = get_var('indiv',array('GET','POST'));
       $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
@@ -2558,9 +2558,9 @@ class eq
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
-        $elder = $this->db2->f('elder');
+        $indiv = $this->db2->f('indiv');
 	$interviewer_name = $this->db2->f('name');
-        if($elder == $interviewer) { 
+        if($indiv == $interviewer) { 
           $this->t->set_var('interviewer',$interviewer . ' selected');
         } else {
 	  $this->t->set_var('interviewer',$interviewer);
@@ -2576,7 +2576,7 @@ class eq
 	  $this->db->query("UPDATE 3rd_interview set " .
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
-			  ", elder='" . $elder . "'" .
+		          ", indiv='" . $indiv . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
@@ -2589,8 +2589,8 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_interview (interviewer,elder,aaronic,date,notes,interview_type) "
-			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
+	  $this->db->query("INSERT INTO 3rd_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
+			   . "VALUES ('" . $interviewer . "','" . $indiv . "','" . $aaronic . "','"
 			   . $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
@@ -2602,7 +2602,7 @@ class eq
 	  $this->t->set_var('interview', '');
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
-	  $this->t->set_var('elder',$elder);
+	  $this->t->set_var('indiv',$indiv);
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('interview_type',$interview_type);
@@ -2621,7 +2621,7 @@ class eq
 	  $this->t->set_var('interview',$interview);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
-	  $this->t->set_var('elder',$this->db->f('elder'));
+	  $this->t->set_var('indiv',$this->db->f('indiv'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
 	  $this->t->set_var('interview_type',$this->db->f('interview_type'));
@@ -2703,20 +2703,20 @@ class eq
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
-      for($i=0; $i < count($elder_id); $i++) {
-          $id = $elder_id[$i];
-          $elders[$id] = $elder_name[$i];
+      array_multisort($indiv_name, $indiv_id);
+      for($i=0; $i < count($indiv_id); $i++) {
+          $id = $indiv_id[$i];
+          $indivs[$id] = $indiv_name[$i];
       }      
 
       $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
@@ -2746,7 +2746,7 @@ class eq
 	  }
 	
 	$comp_width=250; $int_width=75; $table_width=$comp_width + $num_months*$int_width;
-	$table_data=""; $num_companionships = $j; $num_elders = 0;
+	$table_data=""; $num_companionships = $j; $num_indivs = 0;
 	for($m=$num_months; $m >= 0; $m--) { $ints[$m] = 0; }
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  // Select all the companions in each companionship
@@ -2759,13 +2759,13 @@ class eq
 	  while ($this->db->next_record())
 	    {
 	      // Get this companions information
-	      $num_elders++;
+	      $num_indivs++;
 	      $companionship = $this->db->f('companionship');
-	      $elder_id = $this->db->f('elder');
+	      $indiv_id = $this->db->f('indiv');
 	      $aaronic_id = $this->db->f('aaronic');
-	      if($elder_id) {
-		$name = $elders[$elder_id];
-		$phone = $elder_phone[$elder_id];
+	      if($indiv_id) {
+		$name = $indivs[$indiv_id];
+		$phone = $indiv_phone[$indiv_id];
 	      }
 	      else if($aaronic_id) {
 		$name = $aaronic[$aaronic_id]['name'];
@@ -2774,7 +2774,7 @@ class eq
 	      $link_data['menuaction'] = 'eq.eq.int_update';
 	      $link_data['companionship'] = $companionship;
 	      $link_data['interviewer'] = $supervisor;
-	      $link_data['elder'] = $elder_id;
+	      $link_data['indiv'] = $indiv_id;
 	      $link_data['aaronic'] = $aaronic_id;
 	      $link_data['name'] = $name;
 	      $link_data['interview'] = '';
@@ -2782,7 +2782,7 @@ class eq
 	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 
-	      // Find out how many times Interviews were performed in the past $num_months for this Elder
+	      // Find out how many times Interviews were performed in the past $num_months for this individual
 	      $header_row="<th width=$comp_width><font size=-2>Companionship</th>";
 	      for($m=$num_months; $m >= 0; $m--) {
 		$month = $current_month - $m;
@@ -2793,7 +2793,7 @@ class eq
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
 		$sql = "SELECT * FROM 3rd_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
-		   "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id;
+		   "AND indiv=" . $indiv_id . " AND aaronic=" . $aaronic_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$header_row .= "<th width=$int_width><font size=-2>$month</th>";
 	      
@@ -2805,7 +2805,7 @@ class eq
 		  $link_data['menuaction'] = 'eq.eq.int_update';
 		  $link_data['companionship'] = $companionship;
 		  $link_data['interviewer'] = $this->db2->f('interviewer');
-		  $link_data['elder'] = $elder_id;
+		  $link_data['indiv'] = $indiv_id;
 		  $link_data['aaronic'] = $aaronic_id;
 		  $link_data['name'] = $name;
 		  $link_data['interview'] = $this->db2->f('interview');
@@ -2885,7 +2885,7 @@ class eq
       $interviewer = get_var('interviewer',array('GET','POST'));      
       $name = get_var('name',array('GET','POST'));
       $interview = get_var('interview',array('GET','POST'));
-      $elder = get_var('elder',array('GET','POST'));
+      $indiv = get_var('indiv',array('GET','POST'));
       $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
@@ -2895,9 +2895,9 @@ class eq
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
-        $elder = $this->db2->f('elder');
+        $indiv = $this->db2->f('indiv');
         $interviewer_name = $this->db2->f('name');
-        if($elder == $interviewer) {
+        if($indiv == $interviewer) {
           $this->t->set_var('interviewer',$interviewer . ' selected');
         } else {
           $this->t->set_var('interviewer',$interviewer);
@@ -2912,7 +2912,7 @@ class eq
 	  $this->db->query("UPDATE 3rd_interview set " .
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
-			  ", elder='" . $elder . "'" .
+		          ", indiv='" . $indiv . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
@@ -2925,8 +2925,8 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_interview (interviewer,elder,aaronic,date,notes,interview_type) "
-			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
+	  $this->db->query("INSERT INTO 3rd_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
+			   . "VALUES ('" . $interviewer . "','" . $indiv . "','" . $aaronic . "','"
 			   . $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
@@ -2938,7 +2938,7 @@ class eq
 	  $this->t->set_var('interview', '');
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
-	  $this->t->set_var('elder',$elder);
+	  $this->t->set_var('indiv',$indiv);
 	  $this->t->set_var('aaronic',$aaronic);
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
@@ -2956,7 +2956,7 @@ class eq
 	  $this->t->set_var('interview',$interview);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
-	  $this->t->set_var('elder',$this->db->f('elder'));
+	  $this->t->set_var('indiv',$this->db->f('indiv'));
 	  $this->t->set_var('aaronic',$this->db->f('aaronic'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
@@ -3215,7 +3215,7 @@ class eq
 
       $this->t->set_block('att_view_t','month_list','list1');
       $this->t->set_block('att_view_t','header_list','list2');
-      $this->t->set_block('att_view_t','elder_list','list3');
+      $this->t->set_block('att_view_t','indiv_list','list3');
       
       $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_view'));
       $num_quarters = get_var('num_quarters',array('GET','POST'));
@@ -3232,16 +3232,16 @@ class eq
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_id[$i] = $this->db->f('elder');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_id[$i] = $this->db->f('indiv');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
       
       // Create a list of sunday dates for a window of 3 months back and current month
       $i=0; 
@@ -3268,7 +3268,7 @@ class eq
 	if($found_sunday) { $i++; $found_sunday=0; }
       }
 
-      $total_elders = count($elder_id);
+      $total_indivs = count($indiv_id);
       $old_month=$sunday_list[0]['month']; $span=0;
       for ($i=0; $i < count($sunday_list); $i++) {
         $date = $sunday_list[$i]['date'];
@@ -3292,10 +3292,10 @@ class eq
 	  $this->t->fp('list1','month_list',True);
 	} $span++;
       }
-      $this->t->set_var('total_elders',$total_elders);
+      $this->t->set_var('total_indivs',$total_indivs);
       $this->t->set_var('header_row',$header_row);
       
-      $elder_width=200; $att_width=25; $total_width=$elder_width; 
+      $indiv_width=200; $att_width=25; $total_width=$indiv_width; 
       for ($i=0; $i < count($sunday_list); $i++) {
       	$link_data['menuaction'] = 'eq.eq.att_update';
 	$link_data['month'] = $sunday_list[$i]['month'];
@@ -3313,17 +3313,17 @@ class eq
 	$attendance[$monthnum[$sunday_list[$i]['month']]]=0;
       }
 
-      for ($i=0; $i < count($elder_id); $i++) {
+      for ($i=0; $i < count($indiv_id); $i++) {
         $att_table = "";
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
-	$this->t->set_var('elder_name',$elder_name[$i]);
-	#print "checking for elder: " . $elder_id[$i] . "<br>";
+	$this->t->set_var('indiv_name',$indiv_name[$i]);
+	#print "checking for indiv: " . $indiv_id[$i] . "<br>";
 	for ($j=0; $j < count($sunday_list); $j++) {
 	  #print "checking for date: " .  $sunday_list[$j]['date'] . "<br>";
 	  #print "SELECT * FROM 3rd_attendance WHERE date='"
-	  #  . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i] . "<br>";
+	  #  . $sunday_list[$j]['date'] . "' AND indiv=" . $indiv_id[$i] . "<br>";
 	  $sql = "SELECT * FROM 3rd_attendance WHERE date='"
-	     . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i];
+	     . $sunday_list[$j]['date'] . "' AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
 	    $cur_month = $sunday_list[$j]['month'];
@@ -3337,10 +3337,10 @@ class eq
 	  }
 	}
 	$this->t->set_var('att_table',$att_table);
-	$this->t->fp('list3','elder_list',True);
+	$this->t->fp('list3','indiv_list',True);
       }
       $this->t->set_var('total_width',$total_width);
-      $this->t->set_var('elder_width',$elder_width);
+      $this->t->set_var('indiv_width',$indiv_width);
       $this->t->set_var('att_width',$att_width);
 
       # Now calculate attendance for these months
@@ -3354,17 +3354,17 @@ class eq
       foreach($attendance as $att => $value) {
 	$total_attended = $attendance[$att];
 	$ave_total_attended += $attendance[$att]; $num_months++;
-	$percent = ceil(($total_attended / $total_elders)*100);
+	$percent = ceil(($total_attended / $total_indivs)*100);
 	$attendance_str.="<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
-	$total_nonattended = $total_elders - $total_attended;
-	$percent = ceil(($total_nonattended / $total_elders)*100);
+	$total_nonattended = $total_indivs - $total_attended;
+	$percent = ceil(($total_nonattended / $total_indivs)*100);
 	$nonattendance_str.="<td align=center><font size=-2><b>$total_nonattended ($percent%)</b></font></td>";
 	
 	$total_attended = ceil(($ave_total_attended / $num_months));
-	$percent = ceil(($total_attended / $total_elders)*100);
+	$percent = ceil(($total_attended / $total_indivs)*100);
 	$aveattendance_str .= "<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
-	$total_attended = $total_elders - ceil(($ave_total_attended / $num_months));
-	$percent = ceil(($total_attended / $total_elders)*100);
+	$total_attended = $total_indivs - ceil(($ave_total_attended / $num_months));
+	$percent = ceil(($total_attended / $total_indivs)*100);
 	$avenonattendance_str .= "<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
       }
       
@@ -3388,7 +3388,7 @@ class eq
       
       $this->t->set_block('form','month_list','list1');
       $this->t->set_block('form','header_list','list2');
-      $this->t->set_block('form','elder_list','list3');
+      $this->t->set_block('form','indiv_list','list3');
 
       $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_view'));
 
@@ -3400,7 +3400,7 @@ class eq
 
       if($action == 'save_month' || $action == 'save_day')
 	{
-	   $new_data = get_var('elders_attended',array('POST'));
+	   $new_data = get_var('indivs_attended',array('POST'));
 	   $month = $monthnum[$month]; if($month < 10) { $month = "0" . $month; }
 
 	   if($action == 'save_month') {	
@@ -3414,27 +3414,27 @@ class eq
 	   foreach ($new_data as $data)
 	   {
 	      $data_array = explode("-",$data);
-	      $elder = $data_array[0];
+	      $indiv = $data_array[0];
 	      $date  = "$data_array[1]-$data_array[2]-$data_array[3]";	      
-	      $this->db->query("INSERT INTO 3rd_attendance (elder,date) "
-	      		       . "VALUES (" . $elder . ",'". $date . "')",__LINE__,__FILE__);
+	      $this->db->query("INSERT INTO 3rd_attendance (indiv,date) "
+	      		       . "VALUES (" . $indiv . ",'". $date . "')",__LINE__,__FILE__);
 	   }
 	
 	 $this->att_view();
 	 return false;    
 	}
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_attending[$elder_id[$i]] = $this->db->f('attending');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_attending[$indiv_id[$i]] = $this->db->f('attending');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
       
       if($action == 'update_month')
       {
@@ -3466,7 +3466,7 @@ class eq
 	$this->t->set_var('month',$sunday_list[$i-1]['month']);
 	$this->t->set_var('year',$sunday_list[$i-1]['year']);
 	$this->t->fp('list1','month_list',True);
-	$elder_width=200; $att_width=25; $total_width=$elder_width;
+	$indiv_width=200; $att_width=25; $total_width=$indiv_width;
 	for ($i=0; $i < count($sunday_list); $i++) {
 	  $link_data['menuaction'] = 'eq.eq.att_update';
 	  $link_data['month'] = $sunday_list[$i]['month'];
@@ -3498,25 +3498,25 @@ class eq
 	$this->t->fp('list2','header_list',True);
       }           
             
-      for ($i=0; $i < count($elder_id); $i++) {
+      for ($i=0; $i < count($indiv_id); $i++) {
         $att_table = "";
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
-	$this->t->set_var('elder_name',$elder_name[$i]);
+	$this->t->set_var('indiv_name',$indiv_name[$i]);
 	for ($j=0; $j < count($sunday_list); $j++) {
 	  $sql = "SELECT * FROM 3rd_attendance WHERE date='"
-	     . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i];
+	     . $sunday_list[$j]['date'] . "' AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
-	  $value = $elder_id[$i] . "-" . $sunday_list[$j]['date'];
+	  $value = $indiv_id[$i] . "-" . $sunday_list[$j]['date'];
 	  if($this->db->next_record()) {
-	    $att_table .= '<td align=center><input type="checkbox" name="elders_attended[]" value="'.$value.'" checked></td>';
-	  } else if($elder_attending[$elder_id[$i]] == 1) {
-	    $att_table .= '<td align=center><input type="checkbox" name="elders_attended[]" value="'.$value.'" checked></td>';
+	    $att_table .= '<td align=center><input type="checkbox" name="indivs_attended[]" value="'.$value.'" checked></td>';
+	  } else if($indiv_attending[$indiv_id[$i]] == 1) {
+	    $att_table .= '<td align=center><input type="checkbox" name="indivs_attended[]" value="'.$value.'" checked></td>';
 	  } else {
-	    $att_table .= '<td align=center><input type="checkbox" name="elders_attended[]" value="'.$value.'"></td>';
+	    $att_table .= '<td align=center><input type="checkbox" name="indivs_attended[]" value="'.$value.'"></td>';
 	  }
 	}
 	$this->t->set_var('att_table',$att_table);
-	$this->t->fp('list3','elder_list',True);
+	$this->t->fp('list3','indiv_list',True);
       } 
            
       $this->t->set_var('lang_done', 'Cancel');
@@ -3637,7 +3637,7 @@ class eq
       $action = get_var('action',array('GET','POST'));
       
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule&action=save'));
-      $this->t->set_var('title','EQ Scheduling Tool');
+      $this->t->set_var('title','Scheduling Tool');
 
       $this->t->set_var('lang_save','Save Schedule');
       $this->t->set_var('lang_reset','Cancel');
@@ -3651,11 +3651,11 @@ class eq
       $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
-      $date_width=150; $time_width=220; $elder_width=170; $family_width=180; $location_width=100;
-      $table_width=$date_width + $time_width + $elder_width + $family_width + $location_width;
+      $date_width=150; $time_width=220; $indiv_width=170; $family_width=180; $location_width=100;
+      $table_width=$date_width + $time_width + $indiv_width + $family_width + $location_width;
       $header_row = "<th width=$date_width><font size=-2>Date</th>";
       $header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-      $header_row.= "<th width=$elder_width><font size=-2>Elder</th>";
+      $header_row.= "<th width=$indiv_width><font size=-2>individual</th>";
       $header_row.= "<th width=$family_width><font size=-2>Family</th>";
       $header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $table_data = "";
@@ -3667,13 +3667,13 @@ class eq
 	{
 	  $presidency_data[$i]['id'] = $this->db->f('presidency');
 	  $presidency_data[$i]['name'] = $this->db->f('name');
-	  $presidency_data[$i]['elder'] = $this->db->f('elder');
+	  $presidency_data[$i]['indiv'] = $this->db->f('indiv');
 	  $presidency2name[$presidency_data[$i]['id']] = $presidency_data[$i]['name'];
-	  $presidency2elder[$presidency_data[$i]['id']] = $presidency_data[$i]['elder'];
+	  $presidency2indiv[$presidency_data[$i]['id']] = $presidency_data[$i]['indiv'];
 	  $i++;
 	}
       
-      $sql = "SELECT * FROM 3rd_family where valid=1 and elder_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3704,7 +3704,7 @@ class eq
 		 $hour = $entry['hour'];
 		 $minute = $entry['minute'];
 		 $pm = $entry['pm'];
-		 $elder = $entry['elder'];
+		 $indiv = $entry['indiv'];
 		 $family = $entry['family'];
 		 $location = $entry['location'];
 		 if($pm) { $hour = $hour + 12; }
@@ -3719,10 +3719,10 @@ class eq
 		     $family_address = $familyid2address[$family];
 		     $location = "$family_last_name"." home ($family_address)";
 		   }
-		   else if($elder > 0) {
+		   else if($indiv > 0) {
 		     $supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		     $supervisor_last_name = $supervisor_name_array[0];
-		     $sql = "SELECT * FROM 3rd_elder where elder='$presidency2elder[$presidency]'";
+		     $sql = "SELECT * FROM 3rd_indiv where indiv='$presidency2indiv[$presidency]'";
 		     $this->db2->query($sql,__LINE__,__FILE__);
 		     if($this->db2->next_record()) {
 		       $indiv_id = $this->db2->f('indiv_id');
@@ -3736,14 +3736,14 @@ class eq
 		   }
 		 }
 		 
-		 // Zero out the family or elder if date = NULL
+		 // Zero out the family or individual if date = NULL
 		 if($date == "") {
-		   $elder = 0;
+		   $indiv = 0;
 		   $family = 0;
 		   $location = "";
 		 }
 
-		 if(($elder == 0) && ($family == 0)) { $location = ""; }
+		 if(($indiv == 0) && ($family == 0)) { $location = ""; }
 		 
 		 // Update an existing appointment
 		 if($appointment < $this->max_appointments)
@@ -3752,7 +3752,7 @@ class eq
 		     $sql = "SELECT * FROM 3rd_appointment where " .
 			"appointment='$appointment'" .
 			" and presidency='$presidency'" .
-			" and elder='$elder'" .
+			" and indiv='$indiv'" .
 			" and family='$family'" .
 			" and date='$date'" .
 			" and time='$time'" .
@@ -3763,7 +3763,7 @@ class eq
 		       $old_time = $this->db->f('time');
 		       $this->db2->query("UPDATE 3rd_appointment set" .
 					" family=" . $family . 
-					" ,elder=" . $elder . 
+					" ,indiv=" . $indiv . 
 					" ,date='" . $date . "'" .
 					" ,time='" . $time . "'" .
 					" ,location='" . $location . "'" .
@@ -3778,15 +3778,15 @@ class eq
 		 // Add a new appointment
 		 else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 		   {
-		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";
-		     $this->db2->query("INSERT INTO 3rd_appointment (appointment,presidency,family,elder,date,time,location,uid) "
-			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $elder . "','"
+		     //print "adding entry: appt=$appointment date: $date time: $time indiv: $indiv family: $family<br>";
+		     $this->db2->query("INSERT INTO 3rd_appointment (appointment,presidency,family,indiv,date,time,location,uid) "
+			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $indiv . "','"
 			   . $date . "','" . $time  . "','" . $location . "','" . $uid ."')",__LINE__,__FILE__);
 
 		     // Now reselect this entry from the database to see if we need
 		     // to send an appointment out for it.
 		     $sql = "SELECT * FROM 3rd_appointment where " .
-			"elder='$elder'" .
+			"indiv='$indiv'" .
 			" and family='$family'" .
 			" and presidency='$presidency'" .
 			" and date='$date'" .
@@ -3796,7 +3796,7 @@ class eq
 		     $this->db3->query($sql,__LINE__,__FILE__);
 		     if($this->db3->next_record()) {
 		       // Email the appointment if warranted
-		       if(($date != "") && ($time != "") && (($elder > 0) || $family > 0)) { 
+		       if(($date != "") && ($time != "") && (($indiv > 0) || $family > 0)) { 
 			 $this->email_appt($this->db3->f('appointment'));
 		       }
 		     }
@@ -3808,21 +3808,21 @@ class eq
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder_phone[$elder_id[$i]] = $this->db->f('phone');
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv_phone[$indiv_id[$i]] = $this->db->f('phone');
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
       
       for ($i=0; $i < count($presidency_data); $i++) {
 	$presidency = $presidency_data[$i]['id'];
-	$interviewer = $presidency_data[$i]['elder'];
+	$interviewer = $presidency_data[$i]['indiv'];
 	$name = $presidency_data[$i]['name'];
 	$this->t->set_var('presidency_name',$name);
 	$table_data="";
@@ -3835,7 +3835,7 @@ class eq
 	while ($this->db->next_record())
 	  {
 	    $appointment = $this->db->f('appointment');
-	    $elder = $this->db->f('elder');
+	    $indiv = $this->db->f('indiv');
 	    $family = $this->db->f('family');
 	    $location = $this->db->f('location');
 
@@ -3846,10 +3846,10 @@ class eq
 		$family_address = $familyid2address[$family];
 		$location = "$family_last_name"." home ($family_address)";
 	      }
-	      else if($elder > 0) {
+	      else if($indiv > 0) {
 		$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		$supervisor_last_name = $supervisor_name_array[0];
-		$sql = "SELECT * FROM 3rd_elder where elder='$presidency2elder[$presidency]'";
+		$sql = "SELECT * FROM 3rd_indiv where indiv='$presidency2indiv[$presidency]'";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 		  $indiv_id = $this->db2->f('indiv_id');
@@ -3888,13 +3888,13 @@ class eq
 	    $table_data .= $this->get_time_selection_form($hour, $minute, $pm, $presidency, $appointment);
 	    $table_data.= "</td>";
 	    
-	    // Elder drop down list (for PPIs)
-	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder] STYLE="font-size : 8pt">';
+	    // individual drop down list (for PPIs)
+	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][indiv] STYLE="font-size : 8pt">';
 	    $table_data.= '<option value=0></option>';  
-	    for ($j=0; $j < count($elder_id); $j++) {
-	      $id = $elder_id[$j];
-	      $name = $elder_name[$j];
-	      if($elder_id[$j] == $elder) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
+	    for ($j=0; $j < count($indiv_id); $j++) {
+	      $id = $indiv_id[$j];
+	      $name = $indiv_name[$j];
+	      if($indiv_id[$j] == $indiv) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
 	      $table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
 	    }
 	    $table_data.='</select></td>';
@@ -3902,7 +3902,7 @@ class eq
 	    // Family drop down list (for Visits)
 	    $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family] STYLE="font-size : 8pt">';
 	    $table_data.= '<option value=0></option>';  	    
-	    for ($j=0; $j < count($elder_id); $j++) {
+	    for ($j=0; $j < count($indiv_id); $j++) {
 	      $id = $family_id[$j];
 	      $name = $family_name[$j];
 	      if($family_id[$j] == $family) { $selected[$id] = 'selected="selected"'; } else { $selected[$id] = ''; }
@@ -3937,12 +3937,12 @@ class eq
 	  $table_data .= $this->get_time_selection_form(0, 0, 0, $presidency, $appointment);
 	  $table_data.= "</td>";
 	  
-	  // Elder drop down list
-	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][elder] STYLE="font-size : 8pt">';
+	  // individual drop down list
+	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][indiv] STYLE="font-size : 8pt">';
 	  $table_data.= '<option value=0></option>';  
-	  for ($j=0; $j < count($elder_id); $j++) {
-	    $id = $elder_id[$j];
-	    $name = $elder_name[$j];
+	  for ($j=0; $j < count($indiv_id); $j++) {
+	    $id = $indiv_id[$j];
+	    $name = $indiv_name[$j];
 	    $table_data.= '<option value='.$id.'>'.$name.'</option>';
 	  }
 	  $table_data.='</select></td>';
@@ -3950,7 +3950,7 @@ class eq
 	  // Family drop down list
 	  $table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family] STYLE="font-size : 8pt">';
 	  $table_data.= '<option value=0></option>';  	    
-	  for ($j=0; $j < count($elder_id); $j++) {
+	  for ($j=0; $j < count($indiv_id); $j++) {
 	    $id = $family_id[$j];
 	    $name = $family_name[$j];
 	    $table_data.= '<option value='.$id.'>'.$name.' Family</option>';
@@ -3982,12 +3982,12 @@ class eq
   function email()
     {
       $this->t->set_file(array('email_t' => 'email.tpl'));
-      $this->t->set_block('email_t','elder_list','list');
+      $this->t->set_block('email_t','indiv_list','list');
 
       $action = get_var('action',array('GET','POST'));
       
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email'));
-      $this->t->set_var('title','EQ Email Tool');
+      $this->t->set_var('title','Email Tool');
 
       $this->t->set_var('lang_email','Send Email');
       $this->t->set_var('lang_reset','Cancel');
@@ -4026,17 +4026,17 @@ class eq
 
       $this->t->pfp('out','admin_t');
 
-      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
 	{
-	  $elder_id[$i] = $this->db->f('elder');
-	  $elder_name[$i] = $this->db->f('name');
-	  $elder2name[$elder_id[$i]] = $elder_name[$i];
+	  $indiv_id[$i] = $this->db->f('indiv');
+	  $indiv_name[$i] = $this->db->f('name');
+	  $indiv2name[$indiv_id[$i]] = $indiv_name[$i];
 	  $i++;
 	}
-      array_multisort($elder_name, $elder_id);
+      array_multisort($indiv_name, $indiv_id);
 
       if($action == 'upload')
 	{	 
@@ -4120,7 +4120,7 @@ class eq
 	    
 	    # run the import perl script to encorporate it into the DB
 	    ob_start('ob_logstdout', 2);
-	    print "-> Importing the data into the EQ database<br>\n";
+	    print "-> Importing the data into the database<br>\n";
 	    ob_flush(); flush(); sleep(1);
 	    $import_log = $this->upload_target_path . '/import.log';
 	    $data_log = $this->upload_target_path . '/data.log';
@@ -4161,25 +4161,25 @@ class eq
 	   {
 	     $id = $entry['id'];
 	     $email = $entry['email'];
-	     $elder = $entry['elder'];
+	     $indiv = $entry['indiv'];
 	     $name = $entry['name'];
 	     $district = $entry['district'];
 	     $president = $entry['president'];
 	     $counselor = $entry['counselor'];
 	     $secretary = $entry['secretary'];
 	     $eqpresidency = $entry['eqpresidency'];
-	     // Set the elder id to 0 for EQ Presidency tagged entry
-	     if($eqpresidency == 1) { $elder="0"; }
-	     // Re-look up the elder name for the ID if we aren't an EQ Presidency tagged entry
-	     else { $name = $elder2name[$elder]; }
-	     //print "id=$id elder=$elder name=$name email=$email district=$district president=$president ";
+	     // Set the individual id to 0 for EQ Presidency tagged entry
+	     if($eqpresidency == 1) { $indiv="0"; }
+	     // Re-look up the individual name for the ID if we aren't an EQ Presidency tagged entry
+	     else { $name = $indiv2name[$indiv]; }
+	     //print "id=$id indiv=$indiv name=$name email=$email district=$district president=$president ";
 	     //print "counselor=$counselor secretary=$secretary eqpres=$eqpresidency<br>";
 
-	     if(($elder > 0) || ($name != "")) {
+	     if(($indiv > 0) || ($name != "")) {
 	       if($id < $this->max_presidency_members) {
 		 //print "Updating Existing Entry<br>";
 		 $this->db2->query("UPDATE 3rd_presidency set" .
-				   " elder=" . $elder . 
+				   " indiv=" . $indiv . 
 				   " ,district=" . $district . 
 				   " ,name='" . $name . "'" .
 				   " ,email='" . $email . "'" .
@@ -4191,9 +4191,9 @@ class eq
 		 
 	       } else {
 		 //print "Adding New Entry<br>";
-		 $this->db2->query("INSERT INTO 3rd_presidency (presidency,elder,district,name,"
+		 $this->db2->query("INSERT INTO 3rd_presidency (presidency,indiv,district,name,"
 				   . "email,president,counselor,secretary,eqpres,valid) "
-				   . "VALUES (NULL,'" . $elder . "','" . $district . "','"
+				   . "VALUES (NULL,'" . $indiv . "','" . $district . "','"
 				   . $name . "','" . $email . "','" . $president  . "','"
 				   . $counselor . "','" . $secretary . "','" . $eqpres  . "','1'"
 				   .")",__LINE__,__FILE__);
@@ -4212,11 +4212,11 @@ class eq
 	  // Always add a "District 0" assigned to the High Priests Group
 	  $district = 0;
 	  $name = "High Priests";
-	  $elder = 0;
+	  $indiv = 0;
 	  $valid = 0;
 	  $this->db2->query("INSERT INTO 3rd_district (district,name,supervisor,valid) "
 			    . "VALUES ('" . $district . "','" . $name . "','"
-			    . $elder . "','" . $valid . "'"
+			    . $indiv . "','" . $valid . "'"
 			    .")",__LINE__,__FILE__);
 	  
 	  
@@ -4227,7 +4227,7 @@ class eq
 	    {
 	      // Extract the data for each presidency record
 	      $id = $this->db->f('presidency');
-	      $elder = $this->db->f('elder');
+	      $indiv = $this->db->f('indiv');
 	      $name = $this->db->f('name');
 	      $district = $this->db->f('district');
 	      $name = $this->db->f('name');
@@ -4237,7 +4237,7 @@ class eq
 	      if($district > 0) {
 		$this->db2->query("INSERT INTO 3rd_district (district,name,supervisor,valid) "
 				  . "VALUES ('" . $district . "','" . $name . "','"
- 				  . $elder . "','" . $valid . "'"
+ 				  . $indiv . "','" . $valid . "'"
 				  .")",__LINE__,__FILE__);
 	      }
 	      
@@ -4257,12 +4257,12 @@ class eq
       $sql = "SELECT * FROM 3rd_presidency where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $table_data = "";
-      $header_row = "<th>Elder</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th><th>EQ Presidency</th>";
+      $header_row = "<th>Individual</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th><th>Presidency</th>";
       while ($this->db->next_record())
 	{
 	  // Extract the data for each presidency record
 	  $id = $this->db->f('presidency');
-	  $elder = $this->db->f('elder');
+	  $indiv = $this->db->f('indiv');
 	  $district = $this->db->f('district');
 	  $name = $this->db->f('name');
 	  $email = $this->db->f('email');
@@ -4277,21 +4277,21 @@ class eq
 	  // Presidency ID
 	  $table_data .= '<input type=hidden name="eqpres['.$id.'][id]" value="'.$id.'">';
 	  
-	  // Elder
+	  // individual
 	  if($eqpresidency == 0) { 
-	    $table_data.= '<td align=center><select name="eqpres['.$id.'][elder]">';
+	    $table_data.= '<td align=center><select name="eqpres['.$id.'][indiv]">';
 	    $table_data.= '<option value=0></option>';  
-	    for ($j=0; $j < count($elder_id); $j++) {
-	      $tmp_id = $elder_id[$j];
-	      $name = $elder_name[$j];
-	      if($elder_id[$j] == $elder) { $eldername = $name; $selected = 'selected="selected"'; } else { $selected = ''; }
+	    for ($j=0; $j < count($indiv_id); $j++) {
+	      $tmp_id = $indiv_id[$j];
+	      $name = $indiv_name[$j];
+	      if($indiv_id[$j] == $indiv) { $indivname = $name; $selected = 'selected="selected"'; } else { $selected = ''; }
 	      $table_data.= '<option value='.$tmp_id.' '.$selected.'>'.$name.'</option>';
 	    }
 	    $table_data.='</select></td>';
-	    $table_data.='<input type=hidden name="eqpres['.$id.'][name]" value="'.$eldername.'">';
+	    $table_data.='<input type=hidden name="eqpres['.$id.'][name]" value="'.$indivname.'">';
 	  } else {
-	    $table_data.= '<td align=left><input type=text size="20" name="eqpresname" value="EQ Presidency"></td>';
-	    $table_data.= '<input type=hidden name="eqpres['.$id.'][name]" value="EQ Presidency">';
+	    $table_data.= '<td align=left><input type=text size="20" name="eqpresname" value="Presidency"></td>';
+	    $table_data.= '<input type=hidden name="eqpres['.$id.'][name]" value="Presidency">';
 	  }
 	    
 	  // Email Address
@@ -4324,7 +4324,7 @@ class eq
 	  else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
 	  $table_data.='</select></td>';
 
-	  // EQ Presidency
+	  // Presidency
 	  $table_data.= '<td align=center><select name="eqpres['.$id.'][eqpresidency]">';
 	  if($eqpresidency == 1) { $table_data .= '<option value=0>0</option><option value=1 selected="selected">1</option>'; }
 	  else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
@@ -4336,17 +4336,17 @@ class eq
 	  $this->t->set_var('tr_color',$tr_color);
 	}
 
-      // Now create 1 blank row to always have a line available to add a new elder with
+      // Now create 1 blank row to always have a line available to add a new individual with
       $id = $this->max_presidency_members;
       $table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
       // Presidency ID
       $table_data .= '<input type=hidden name="eqpres['.$id.'][id]" value="'.$id.'">';
-      // Elder
-      $table_data.= '<td align=center><select name="eqpres['.$id.'][elder]">';
+      // individual
+      $table_data.= '<td align=center><select name="eqpres['.$id.'][indiv]">';
       $table_data.= '<option value=0></option>';  
-      for ($j=0; $j < count($elder_id); $j++) {
-	$tmp_id = $elder_id[$j];
-	$name = $elder_name[$j];
+      for ($j=0; $j < count($indiv_id); $j++) {
+	$tmp_id = $indiv_id[$j];
+	$name = $indiv_name[$j];
 	$table_data.= '<option value='.$tmp_id.'>'.$name.'</option>';
       }
       $table_data.='</select></td>';
@@ -4373,7 +4373,7 @@ class eq
       $table_data.= '<td align=center><select name="eqpres['.$id.'][secretary]">';
       $table_data.= '<option value=0>0</option><option value=1>1</option>';
       $table_data.='</select></td>';
-      // EQ Presidency
+      // Presidency
       $table_data.= '<td align=center><select name="eqpres['.$id.'][eqpresidency]">';
       $table_data.= '<option value=0>0</option><option value=1>1</option>';
       $table_data.='</select></td>';
@@ -4403,8 +4403,8 @@ class eq
 	  $location = $this->db->f('location');
 	  $interviewer = "";
 	  $email = "";
-	  $elder = $this->db->f('elder');
-	  $elder_name = "";
+	  $indiv = $this->db->f('indiv');
+	  $indiv_name = "";
 	  $family = $this->db->f('family');
 	  $family_name = "";
 	  $appt_name = "";
@@ -4434,13 +4434,13 @@ class eq
 	  // Set the email address of the interviewer
 	  $from = $email;
 
-	  if($elder > 0) { 
-	    $sql = "SELECT * FROM 3rd_elder where elder='$elder'";
+	  if($indiv > 0) { 
+	    $sql = "SELECT * FROM 3rd_indiv where indiv='$indiv'";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
-	      $elder_name = $this->db2->f('name');
+	      $indiv_name = $this->db2->f('name');
 	      $phone = $this->db2->f('phone');
-	      $appt_name = $elder_name . " Interview";
+	      $appt_name = $indiv_name . " Interview";
 	      $duration = $this->default_ppi_appt_duration * 60;
 	    }
 	  }
@@ -4451,9 +4451,9 @@ class eq
 	    if($this->db2->next_record()) {
 	      $family_name = $this->db2->f('name');
 	      $phone = $this->db2->f('phone');
-	      $elder_id = $this->db2->f('elder_id');
+	      $indiv_id = $this->db2->f('indiv_id');
 	      $appt_name = $family_name . " Family Visit";
-	      $sql = "SELECT * FROM 3rd_elder where elder='$elder_id'";
+	      $sql = "SELECT * FROM 3rd_indiv where indiv='$indiv_id'";
 	      $this->db3->query($sql,__LINE__,__FILE__);
 	      if($this->db3->next_record()) {
 		$phone = $this->db3->f('phone');

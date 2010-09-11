@@ -2,7 +2,7 @@
 	<form action="{actionurl}" method="POST">
 	<table border="0" width="80%" cellspacing="2" cellpadding="2">
 		<tr>
-			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Elder Attendance Table</b></font></td>
+			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Attendance Table</b></font></td>
 		</tr>
 	</table>
 	<br>
@@ -30,36 +30,36 @@
 <!-- END month_list -->
 	</tr>
 	<tr bgcolor="#c9c9c9">
-		<th width={elder_width}>Elder</th>
+		<th width={indiv_width}>Individual</th>
 <!-- BEGIN header_list -->
 		<th width={act_width}><font size=-3><a href="{update_day}">{day}</a></font></th>
 <!-- END header_list -->
 	</tr>
 
-<!-- BEGIN elder_list -->
-	<tr bgcolor="{tr_color}"><td>{elder_name}</td>{att_table}</tr>
-<!-- END elder_list -->
+<!-- BEGIN indiv_list -->
+	<tr bgcolor="{tr_color}"><td>{indiv_name}</td>{att_table}</tr>
+<!-- END indiv_list -->
 
 	</table>
 	<br>
 
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
-	<tr bgcolor="#c9c9c9"><th width={elder_width}><font size=-2>{total_elders} Total Elders</font></th>{header_row}</tr>
+	<tr bgcolor="#c9c9c9"><th width={indiv_width}><font size=-2>{total_indivs} Total Individuals</font></th>{header_row}</tr>
 	<tr>
-		<td><b><font size=-2>Elders Attending:</b></font></td>
+		<td><b><font size=-2>Individuals Attending:</b></font></td>
 		{attendance}
 	</tr>
 	<tr>
-		<td><b><font size=-2>Elders <font color=red>Not</font> Attending:</b></font></td>
+		<td><b><font size=-2>Individuals <font color=red>Not</font> Attending:</b></font></td>
 		{nonattendance}
 	</tr>
 	<tr><td colspan={span}><hr></td></tr>
 	<tr>
-		<td><b><font size=-2>Average Elders Attending:</b></font></td>
+		<td><b><font size=-2>Average Individuals Attending:</b></font></td>
 		{aveattendance}
 	</tr>
 	<tr>
-		<td><b><font size=-2>Average Elders <font color=red>Not</font> Attending:</b></font></td>	
+		<td><b><font size=-2>Average Individuals <font color=red>Not</font> Attending:</b></font></td>	
 		{avenonattendance}
 	</tr>
 	</table>

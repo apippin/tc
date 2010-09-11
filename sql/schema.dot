@@ -3,15 +3,15 @@ digraph schema {
     rankdir = "LR"
   ];
   family   [
-    label = "<f> family||<c> companionship|<n> name_id|<i> hofh_id|<e> elder_id|<vp> visit_pri|<vn> visit_notes|<v> valid"
+    label = "<f> family||<i> hofh_id|<n> name|<ni> name_id|<i> indiv_id|<c> companionship|<vp> visit_pri|<vn> visit_notes|<v> valid"
     shape = "record"
   ];
-  elder   [
-    label = "<e> elder||<n> name|<p> phone|<em> email|<po> priesthood|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
+  indiv   [
+    label = "<i> indiv||<id> indiv_id|<n> name|<p> phone|<em> email|<po> priesthood|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
     shape = "record"
   ];
   companionship   [
-    label = "<c> companionship||<e> elder|<a> aaronic|<d> district|<v> valid"
+    label = "<c> companionship||<i> indiv|<a> aaronic|<d> district|<v> valid"
     shape = "record"
   ];
   visit   [
@@ -19,7 +19,7 @@ digraph schema {
     shape = "record"
   ];
   interview   [
-    label = "<in> interview||<i> interviewer|<e> elder|<a> aaronic|<t> date|<n> notes|<it> interview_type"
+    label = "<in> interview||<i> interviewer|<il> indiv|<a> aaronic|<t> date|<n> notes|<it> interview_type"
     shape = "record"
   ];
   activity   [
@@ -27,15 +27,15 @@ digraph schema {
     shape = "record"
   ];
   participation   [
-    label = "participation||<e> elder|<a> activity"
+    label = "participation||<i> indiv|<a> activity"
     shape = "record"
   ];
   attendance   [
-    label = "attendance||<e> elder|<d> date"
+    label = "attendance||<i> indiv|<d> date"
     shape = "record"
   ];
   child	[
-    label = "<c> child||<f> family|<i> indiv_id|<n> name|<b> birthday|<v> valid"
+    label = "<c> child||<f> family|<n> name|<b> birthday|<i> indiv_id|<v> valid"
     shape = "record"
   ]; 
   parent	[
@@ -47,7 +47,7 @@ digraph schema {
     shape = "record"
   ];
   appointment   [
-    label = "<a> appointment||<p> presidency|<f> family|<e> elder |<d> date|<t> time|<u> uid"
+    label = "<a> appointment||<p> presidency|<f> family|<i> indiv |<d> date|<t> time|<l> location|<u> uid"
     shape = "record"
   ];
   assignment    [
@@ -63,42 +63,42 @@ digraph schema {
     shape = "record"
   ];
   presidency    [
-    label = "<p> presidency||<e> elder|<d> district|<n> name|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+    label = "<p> presidency||<i> indiv|<d> district|<n> name|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
     shape = "record"
   ];
   willingness   [
-    label = "<e> elder||<a> assignment|<w> willing"
+    label = "<i> indiv||<a> assignment|<w> willing"
     shape = "record"
   ];
 
   family:c        -> companionship:c
-  companionship:e -> elder:e
+  companionship:i -> indiv:i
   companionship:a -> aaronic:a
 
-  appointment:e   -> elder:e
+  appointment:i   -> indiv:i
   appointment:f   -> family:f
 
-  interview:e     -> elder:e
-  interview:i     -> elder:e
+  interview:il    -> indiv:i
+  interview:i     -> indiv:i
   interview:a     -> aaronic:a
 
-  presidency:e    -> elder:e
+  presidency:i    -> indiv:i
   presidency:d    -> district:d
 
-  willingness:e   -> elder:e
+  willingness:i   -> indiv:i
   willingness:a   -> assignment:a
 
   activity:s      -> assignment:a
 
   visit:c         -> companionship:c
   visit:f         -> family:f
-  visit:c1        -> presidency:e
-  visit:c2        -> presidency:e
+  visit:c1        -> presidency:i
+  visit:c2        -> presidency:i
 
-  participation:e -> elder:e
+  participation:i -> indiv:i
   participation:a -> activity:a
 
-  attendance:e    -> elder:e
+  attendance:i    -> indiv:i
 
   child:f         -> family:f
   parent:f        -> family:f

@@ -1,5 +1,5 @@
 ################################################################################
-# This is a perl module included by the perl scripts for this EQ application.
+# This is a perl module included by the perl scripts for this application.
 # You must modify these values to match your system configuration.
 # Save the resulting file as "db_config.local" in this setup dir.
 # This will prevent your settings from being overwritten by future code updates.

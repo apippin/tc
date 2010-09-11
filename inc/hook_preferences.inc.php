@@ -1,6 +1,6 @@
 <?php
   /**************************************************************************\
-  * phpGroupWare - eq                                                        *
+  * phpGroupWare - 3rd                                                       *
   * http://www.phpgroupware.org                                              *
   * -----------------------------------------------                          *
   *  This program is free software; you can redistribute it and/or modify it *
@@ -12,7 +12,7 @@
 {
 // Only Modify the $file and $title variables.....
 	$file = Array(
-//		'Preferences'     => $GLOBALS['phpgw']->link('/eq/preferences.php'),
+//		'Preferences'     => $GLOBALS['phpgw']->link('/3rd/preferences.php'),
 //		'Grant Access'    => $GLOBALS['phpgw']->link('/index.php','menuaction=preferences.uiaclprefs.index&acl_app='.$appname),
 //		'Edit categories' => $GLOBALS['phpgw']->link('/index.php','menuaction=preferences.uicategories.index&cats_app=' . $appname . '&cats_level=True&global_cats=True')
 	);

@@ -43,7 +43,7 @@ CREATE TABLE `3rd_appointment` (
   `appointment` int(16) unsigned NOT NULL auto_increment,
   `presidency` int(16) unsigned NOT NULL default '0',
   `family` int(16) unsigned default '0',
-  `elder` int(16) unsigned default '0',
+  `indiv` int(16) unsigned default '0',
   `date` date NOT NULL default '0000-00-00',
   `time` time NOT NULL default '00:00:00',
   `location` varchar(120) default NULL,
@@ -74,9 +74,9 @@ UNLOCK TABLES;
 -- Table structure for table `3rd_attendance`
 --
 CREATE TABLE `3rd_attendance` (
-  `elder` int(16) unsigned NOT NULL default '0',
+  `indiv` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
-  KEY `elder` (`elder`)
+  KEY `indiv` (`indiv`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -111,7 +111,7 @@ CREATE TABLE `3rd_child` (
 
 CREATE TABLE `3rd_companionship` (
   `companionship` int(16) unsigned NOT NULL default '0',
-  `elder` int(16) unsigned NOT NULL default '0',
+  `indiv` int(16) unsigned NOT NULL default '0',
   `aaronic` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
@@ -130,10 +130,10 @@ CREATE TABLE `3rd_district` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_elder`
+-- Table structure for table `3rd_indiv`
 --
-CREATE TABLE `3rd_elder` (
-  `elder` int(16) unsigned NOT NULL auto_increment,
+CREATE TABLE `3rd_indiv` (
+  `indiv` int(16) unsigned NOT NULL auto_increment,
   `indiv_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
   `phone` varchar(12) default NULL,
@@ -146,7 +146,7 @@ CREATE TABLE `3rd_elder` (
   `int_notes` varchar(128) default NULL,
   `attending` tinyint(1) default '0',
   `valid` tinyint(1) default NULL,
-  PRIMARY KEY  (`elder`)
+  PRIMARY KEY  (`indiv`)
 ) ENGINE=MyISAM AUTO_INCREMENT=105 DEFAULT CHARSET=latin1;
 
 --
@@ -157,7 +157,7 @@ CREATE TABLE `3rd_family` (
   `hofh_id` int(16) unsigned NOT NULL default '0',
   `name` varchar(30) NOT NULL default '',
   `name_id` varchar(30) NOT NULL default '',
-  `elder_id` int(16) unsigned default '0',
+  `indiv_id` int(16) unsigned default '0',
   `companionship` int(16) unsigned default NULL,
   `visit_pri` int(10) unsigned default '1',
   `visit_notes` varchar(128) default NULL,
@@ -184,9 +184,9 @@ CREATE TABLE `3rd_parent` (
 -- Table structure for table `3rd_participation`
 --
 CREATE TABLE `3rd_participation` (
-  `elder` int(16) unsigned NOT NULL default '0',
+  `indiv` int(16) unsigned NOT NULL default '0',
   `activity` int(16) unsigned default NULL,
-  UNIQUE KEY `activity_ndx` (`elder`,`activity`)
+  UNIQUE KEY `activity_ndx` (`indiv`,`activity`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -195,7 +195,7 @@ CREATE TABLE `3rd_participation` (
 CREATE TABLE `3rd_interview` (
   `interview` int(16) unsigned NOT NULL auto_increment,
   `interviewer` int(16) unsigned default NULL,
-  `elder` int(16) unsigned default NULL,
+  `indiv` int(16) unsigned default NULL,
   `aaronic` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
   `notes` text,
@@ -209,7 +209,7 @@ CREATE TABLE `3rd_interview` (
 --
 CREATE TABLE `3rd_presidency` (
   `presidency` int(16) unsigned NOT NULL auto_increment,
-  `elder` int(16) unsigned NOT NULL default '0',
+  `indiv` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
   `name` varchar(60) NOT NULL,
   `email` varchar(60) NOT NULL,
@@ -219,7 +219,7 @@ CREATE TABLE `3rd_presidency` (
   `eqpres` tinyint(1) default '0',
   `valid` tinyint(1) default '1',
   KEY `presidency` (`presidency`),
-  KEY `elder` (`elder`)
+  KEY `indiv` (`indiv`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 --
@@ -242,8 +242,8 @@ CREATE TABLE `3rd_visit` (
 -- Table structure for table `3rd_willingness`
 --
 CREATE TABLE `3rd_willingness` (
-  `elder` int(16) unsigned NOT NULL,
+  `indiv` int(16) unsigned NOT NULL,
   `assignment` int(16) unsigned NOT NULL,
   `willing` enum('y','n','') NOT NULL,
-  KEY `elder` (`elder`,`assignment`)
+  KEY `indiv` (`indiv`,`assignment`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

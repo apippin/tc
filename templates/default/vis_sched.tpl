@@ -42,7 +42,7 @@
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-				<font face="{font}"><b>All Elders with Yearly Visit Not Completed</b></font>
+				<font face="{font}"><b>All Families with Yearly Visit Not Completed</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
@@ -64,7 +64,7 @@
 	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>All Elders with Yearly Visit Completed</b></font>
+			<font face="{font}"><b>All Families with Yearly Visit Completed</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{completed_header_row}</tr>
@@ -75,7 +75,7 @@
 	<table border="0" width="{totals_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>Total EQ Presidency Yearly Visits</b></font>
+			<font face="{font}"><b>Total Presidency Yearly Visits</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{totals_header_row}</tr>

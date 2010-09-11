@@ -23,7 +23,7 @@
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
 		{table_data}
 		<tr>
-		<tr><td colspan=5 align=center><i>Note: Choose an Elder or Family per slot. A blank Date will delete the slot. If the Location is left blank, it will be autofilled for you.</i></td></tr>
+		<tr><td colspan=5 align=center><i>Note: Choose an Individual or Family per slot. A blank Date will delete the slot. If the Location is left blank, it will be autofilled for you.</i></td></tr>
 		<td></td><td></td><td></td>
 		<td height="50" align="right">
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>

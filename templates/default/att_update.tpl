@@ -6,11 +6,11 @@
 
 	<table border="0" width="80%" cellspacing="2" cellpadding="2">
 		<tr>
-			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Elder Attendance Table</b></font></td>
+			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Attendance Table</b></font></td>
 		</tr>
 	</table>
 	<br>
-	<b>Note:</b> All Elders serving in the EQ Presidency, Young Men, Sunday School, or Primary
+	<b>Note:</b> All individuals serving in the EQ Presidency, Young Men, Sunday School, or Primary
 	<br>have been automarked as attending. Feel free to adjust this accordingly.
 	<br>
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
@@ -21,15 +21,15 @@
 <!-- END month_list -->
 	</tr>
 	<tr bgcolor="#c9c9c9">
-		<th width={elder_width}>Elder</th>
+		<th width={indiv_width}>Individual</th>
 <!-- BEGIN header_list -->
 		<th width={act_width}><font size=-3><a href="{update_day}">{day}</a></font></th>
 <!-- END header_list -->
 	</tr>
 
-<!-- BEGIN elder_list -->
-	<tr bgcolor="{tr_color}"><td>{elder_name}</td>{att_table}</tr>
-<!-- END elder_list -->
+<!-- BEGIN indiv_list -->
+	<tr bgcolor="{tr_color}"><td>{indiv_name}</td>{att_table}</tr>
+<!-- END indiv_list -->
 
 	</table>
 

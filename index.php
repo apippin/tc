@@ -13,7 +13,7 @@
 
 	$GLOBALS['phpgw_info']['flags'] = array
 	(
-		'currentapp' => 'eq',
+		'currentapp' => '3rd',
 		'noheader'   => True,
 		'nonavbar'   => True 
 	);
@@ -29,7 +29,7 @@
 	}
 	else
 	{
-		$app = 'eq';
+		$app = '3rd';
 		$class = 'eq';
 		$invalid_data = True;
 	}

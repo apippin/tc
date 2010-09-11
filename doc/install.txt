@@ -1,11 +1,11 @@
 
-Elders Quorum Installation Guide
+3rd Counselor Installation Guide
 
 Alan Pippin <apippin@pippins.net>
 
    v1.0, 05 Jan 2008
    
-   Steps for installing Elders Quroum app
+   Steps for installing 3rd Counselor app
    _________________________________________________________________
    
 Getting and Installing
@@ -13,10 +13,12 @@ Getting and Installing
 Downloading
 
    Can be downloaded from:
-   https://eq.pippins.net/eq.zip
+   http://github.com/apippin/3rd/downloads
 
    It can also be obtained via the GIT revision control system by pulling from here:
-   http://git.pippins.net/eq/.git
+   (ssh)               git@github.com:apippin/3rd.git
+   (http)              https://owenleonard@github.com/apippin/3rd.git
+   (git - read-only)   git://github.com/apippin/3rd.git
 
 Dependencies
 
@@ -28,36 +30,36 @@ Dependencies
 
 Installing
 
-   1) Download the eq.tar file and extract it or GIT pull the archive into 
+   1) Download the tgz or zip file and extract it or GIT pull the archive into 
       your base phpgroupware directory (like /usr/share/phpgroupware/).
-   2) Setup the mysql table structures for the EQ application:
-      mysql -u <dbuser> -p <dbpass> < eq/sql/eq.sql
+   2) Setup the mysql table structures for the 3rd Counselor application:
+      mysql -u <dbuser> -p <dbpass> < 3rd/sql/3rd.sql
    3) Point your browser to: http://www.yourdomain.com/phpgroupware/setup 
       The setup prog will autodetect this application. From there you will 
       need to assign this app to the users you want to have be able to use it.
       Enable it for each user by going to Site Admin -> User Accounts -> <username> -> edit
-      Make sure the "eq" application has a checkmark next to it under "Permissions this user has"
+      Make sure the "3rd" application has a checkmark next to it under "Permissions this user has"
    4) Copy the setup/db_config to setup/db_config.local and change the values in .local appropriately. 
       Check for syntax errors by running eq/bin/check_config_syntax
-   5) Copy the setup/eq_config to setup/eq_config.local and change the values in .local appropriately.
+   5) Copy the setup/3rd_config to setup/3rd_config.local and change the values in .local appropriately.
       Make sure you update the path locations for your specific installation locations: 
       upload_target_path & application_path
-      Check for syntax errors by running eq/bin/check_config_syntax
-   6) Try to run eq/bin/import_ward_data & parse_ward_data scripts from the commandline
+      Check for syntax errors by running 3rd/bin/check_config_syntax
+   6) Try to run 3rd/bin/import_ward_data & parse_ward_data scripts from the commandline
       to check for any missing perl library dependencies and mysql connection. 
       Just run them without command line args.
       Install the right perl modules until the scripts run without any errors.
    7) A graphical representation of the mysql schema used by this application can 
-      be found here: eq/sql/eq.jpg
+      be found here: 3rd/sql/3rd.jpg
    8) Run mls/mlstrimmer.py or MLSFileTrimmer.exe to trim down the csv files and combine them
       into a zip file.  If you run mls/mlstrimmer.py, you'll need to point it to 
       mls/windowsGUI/MLSFileTrimmer/MLSRequiredFields.xml.  If you choose to not use 
       EQ\ Prospective\ Elders.mls or Home\ Teacher\ per\ Companionship.mls, you'll need to 
       remove them from MLSRequiredFields.xml (probably best to just comment them out in case you
       decide to use them later)
-   8) Click on the Admin tool in the EQ app to import your initial set of ward data
-      obtained from MLS into the EQ application.
-   9) Click on the Admin tool and update the EQ Presidency Table appropriately.
+   8) Click on the Admin tool in the 3rd Counselor app to import your initial set of ward data
+      obtained from MLS.
+   9) Click on the Admin tool and update the Presidency Table appropriately.
       The most important thing at this point is to get your district leaders added 
       for each district you have in your quorum.
   10) I highly recommend installing phpmyadmin to view/edit/debug mysql tables related to this tool.
@@ -67,7 +69,7 @@ Requirements
    The following csv files must be obtained from MLS (or a stripped down version
    of each csv with the fields indicated must be manually created). These files
    should be placed in 1 .zip file and uploaded to the application via the Admin
-   section of the EQ Tools application.
+   section of the application.
 
    Membership.csv:
      Preferred Name

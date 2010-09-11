@@ -12,7 +12,7 @@
 %define httpdroot  /home/httpd/html/phpgroupware
 %define packaging 1
 
-Summary: Tools for Managing an Elders Quorum app for phpGroupWare. 
+Summary: Tools for Managing a Priesthood Quorum app for phpGroupWare. 
 Name: %{packagename}
 Version: %{version}
 Release: %{packaging}
@@ -27,7 +27,7 @@ requires: phpgroupware >= 0.9.10
 AutoReq: 0
 
 %description
-This is an Elders Quorum Presidency Application.
+This is an Priesthood Quorum Presidency Application.
 
 %prep
 %setup -n %{phpgwdirname}
