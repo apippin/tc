@@ -92,6 +92,8 @@ digraph schema {
 
   visit:c         -> companionship:c
   visit:f         -> family:f
+  visit:c1        -> presidency:e
+  visit:c2        -> presidency:e
 
   participation:e -> elder:e
   participation:a -> activity:a
