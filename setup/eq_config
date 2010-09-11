@@ -1,7 +1,7 @@
 <?php
 
 ///////////////////////////////////////////////////////////////////////////////////
-// This is a configuration/preferences file for your EQ application.
+// This is a configuration/preferences file for your 3rd Counselor application.
 // You must modify these values to match your system configuration.
 // Save the resulting file as "db_config.local" in this setup dir.
 // This will prevent your settings from being overwritten by future code updates.
@@ -9,10 +9,10 @@
 
 // The full path to a directory readable and writable by your webserver user
 // that will be used to dump the MLS data uploaded via the web interface to.
-$this->upload_target_path = "/home/users/eqpres/eq_data";
+$this->upload_target_path = "/home/users/pres/3rd_data";
 
 // The full path to the installation location of this module
-$this->application_path = "/usr/share/phpgroupware/eq";
+$this->application_path = "/usr/share/phpgroupware/3rdCounselor";
 
 // The full path to the unzip application
 $this->unzip_path = "/usr/bin/unzip";

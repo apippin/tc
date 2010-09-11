@@ -7,7 +7,7 @@ digraph schema {
     shape = "record"
   ];
   elder   [
-    label = "<e> elder||<n> name|<p> phone|<em> email|<po> priesthood|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
+    label = "<e> elder||<n> name|<p> phone|<em> email|<po> priesthood|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
     shape = "record"
   ];
   companionship   [
@@ -15,11 +15,11 @@ digraph schema {
     shape = "record"
   ];
   visit   [
-    label = "<v> visit||<f> family|<c> companionship|<t> date|<n> notes|<v> visited"
+    label = "<v> visit||<f> family|<c> companionship|<c1> companion1|<c2> companion2|<t> date|<n> notes|<v> visited|<vt> visit_type"
     shape = "record"
   ];
-  ppi   [
-    label = "<p> ppi||<i> interviewer|<e> elder|<t> date|<n> notes|<p> eqpresppi"
+  interview   [
+    label = "<in> interview||<i> interviewer|<e> elder|<a> aaronic|<t> date|<n> notes|<it> interview_type"
     shape = "record"
   ];
   activity   [
@@ -62,10 +62,6 @@ digraph schema {
     label = "<d> district||<n> name|<s> supervisor|<v> valid"
     shape = "record"
   ];
-  interview     [
-    label = "<i> interview||<in> interviewer|<e> elder|<a> aaronic|<d> date|<n> notes"
-    shape = "record"
-  ];
   presidency    [
     label = "<p> presidency||<e> elder|<d> district|<n> name|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
     shape = "record"
@@ -83,7 +79,7 @@ digraph schema {
   appointment:f   -> family:f
 
   interview:e     -> elder:e
-  interview:in    -> elder:e
+  interview:i     -> elder:e
   interview:a     -> aaronic:a
 
   presidency:e    -> elder:e
@@ -96,9 +92,6 @@ digraph schema {
 
   visit:c         -> companionship:c
   visit:f         -> family:f
-
-  ppi:i           -> elder:e
-  ppi:e           -> elder:e
 
   participation:e -> elder:e
   participation:a -> activity:a

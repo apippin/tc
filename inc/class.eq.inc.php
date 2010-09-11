@@ -116,11 +116,11 @@ class eq
 
   function display_app_header()
     {
-      $this->t->set_file(array('eq_header' => 'header.tpl'));
+      $this->t->set_file(array('3rd_header' => 'header.tpl'));
       
-      if (isset($phpgw_info['user']['preferences']['eq']['eq_font']))
+      if (isset($phpgw_info['user']['preferences']['eq']['3rd_font']))
 	{
-	  $font = $phpgw_info['user']['preferences']['eq']['eq_font'];
+	  $font = $phpgw_info['user']['preferences']['eq']['3rd_font'];
 	}
       else
 	{
@@ -172,7 +172,7 @@ class eq
       $this->t->set_var('link_email',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
       $this->t->set_var('lang_email','Email');
 		
-      $this->t->pparse('out','eq_header');
+      $this->t->pparse('out','3rd_header');
     }
 
   function ht_view()
@@ -191,7 +191,7 @@ class eq
       $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ht_view'));
       $this->t->set_var('title','Hometeaching'); 
       
-      $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
+      $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -202,7 +202,7 @@ class eq
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -220,7 +220,7 @@ class eq
           $elders[$id] = $elder_name[$i];
       }      
 
-      $sql = "SELECT * FROM eq_aaronic where valid=1 ORDER BY aaronic ASC";
+      $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -237,7 +237,7 @@ class eq
 	$supervisor = $districts[$i]['supervisor'];
 		
 	// Select all the unique companionship numbers for this district
-	$sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];
+	$sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $districts[$i]['district'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$j=0; $unique_companionships = '';
 	while ($this->db->next_record())
@@ -252,7 +252,7 @@ class eq
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  $companion_table_entry = "";
 	  // Select all the companions in each companionship
-	  $sql = "SELECT * FROM eq_companionship where valid=1 and ".
+	  $sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
 	         "companionship=". $unique_companionships[$j]['companionship'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 
@@ -276,7 +276,7 @@ class eq
 	  $table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 	  
 	  // Get the names of the families assigned this home teaching companionship
-	  $sql = "SELECT * from eq_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+	  $sql = "SELECT * from 3rd_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
 	  $sql = $sql . " ORDER BY name ASC";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $k=0;
@@ -303,14 +303,14 @@ class eq
 		// " AND companionship=" . $unique_companionships[$j]['companionship'].
 
 		// First check to see if the currently assigned companionship has visited them
-		$sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+		$sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship=".$unique_companionships[$j]['companionship'].
 	           " AND family=". $family_id;
 		$query_id = $this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->num_rows($query_id) == 0) {
 		  // We did not find any visits made by the currently assigned companionship,
 		  // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
-		  $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+		  $sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 		     " AND companionship!=0".
 		     " AND family=". $family_id;
 		  $query_id = $this->db2->query($sql,__LINE__,__FILE__);
@@ -415,7 +415,7 @@ class eq
       if($action == 'save')
 	{
 	  // Get a list of all the companionships in this district
-	  $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $district;
+	  $sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $district;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $j=0; $unique_companionships = '';
 	  while ($this->db->next_record())
@@ -426,9 +426,9 @@ class eq
 	  for ($j=0; $j < count($unique_companionships); $j++)
 	    {
 	      //$comp=$unique_companionships[$j]['companionship'];
-	      //print "deleting from eq_visit where companionship=$comp and date=$date and district=$district<br>";
+	      //print "deleting from 3rd_visit where companionship=$comp and date=$date and district=$district<br>";
 	      // Delete all the visits that have taken place for all families for this companionsthip for this month
-	      $this->db->query("DELETE from eq_visit where companionship=" . $unique_companionships[$j]['companionship'] .
+	      $this->db->query("DELETE from 3rd_visit where companionship=" . $unique_companionships[$j]['companionship'] .
 			       " AND " . "date='" . $date . "'",__LINE__,__FILE__);
 	    }
 
@@ -446,7 +446,7 @@ class eq
 		 $visited = $data_array[3];
 		 if($visited == "") { $visited = $data_array[4]; }
 		 //print "family_id: $family_id companionship: $companionship date: $date visited: $visited<br>";
-		 $this->db->query("INSERT INTO eq_visit (family,companionship,date,notes,visited) "
+		 $this->db->query("INSERT INTO 3rd_visit (family,companionship,date,notes,visited) "
 		 		  . "VALUES (" . $family_id .",". $companionship .",'". $date ."','','". $visited ."')",__LINE__,__FILE__);
 	       }
 	   }
@@ -454,7 +454,7 @@ class eq
 	  return false;
 	}
       
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -472,7 +472,7 @@ class eq
           $elders[$id] = $elder_name[$i];
       }      
 
-      $sql = "SELECT * FROM eq_aaronic where valid=1 ORDER BY aaronic ASC";
+      $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -482,7 +482,7 @@ class eq
 	}
       
       // Select all the unique companionship numbers for this district
-      $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $district;
+      $sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $district;
       $this->db->query($sql,__LINE__,__FILE__);
       $j=0; $unique_companionships = '';
       while ($this->db->next_record())
@@ -496,7 +496,7 @@ class eq
       for ($j=0; $j < count($unique_companionships); $j++) {
 	$companion_table_entry = "";
 	// Select all the companions in each companionship
-	$sql = "SELECT * FROM eq_companionship where valid=1 and ".
+	$sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
 	       "companionship=". $unique_companionships[$j]['companionship'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	
@@ -520,7 +520,7 @@ class eq
 	$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 	
 	// Get the names of the families assigned this home teaching companionship
-	$sql = "SELECT * from eq_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+	$sql = "SELECT * from 3rd_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
 	$sql = $sql . " ORDER BY name ASC";
 	$this->db->query($sql,__LINE__,__FILE__);
 	while ($this->db->next_record())
@@ -533,14 +533,14 @@ class eq
 	    $header_row="<th width=$comp_width><font size=-2>Families</th>";
 
 	    // First check to see if the currently assigned companionship has visited them
-	    $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+	    $sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship=".$unique_companionships[$j]['companionship'].
 	           " AND family=". $family_id;
 	    $query_id = $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->num_rows($query_id) == 0) {
 	      // We did not find any visits made by the currently assigned companionship,
 	      // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
-	      $sql = "SELECT * FROM eq_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+	      $sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship!=0".
 	           " AND family=". $family_id;
 	      $query_id = $this->db2->query($sql,__LINE__,__FILE__);
@@ -616,7 +616,7 @@ class eq
       $this->t->set_var('lang_date','Date');
       $this->t->set_var('lang_notes','Description');
       
-      $sql = "SELECT * FROM eq_activity ORDER BY date DESC";
+      $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -628,7 +628,7 @@ class eq
 	  $activity_list[$i]['date']  = $this->db->f('date');
 	  $activity_list[$i]['notes']  = $this->db->f('notes');
 
-	  $sql = "SELECT * FROM eq_assignment WHERE assignment='" . $activity_list[$i]['assignment'] . "'";
+	  $sql = "SELECT * FROM 3rd_assignment WHERE assignment='" . $activity_list[$i]['assignment'] . "'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record())
 	    {
@@ -677,14 +677,14 @@ class eq
       $this->t->set_file(array('act_view_t' => 'act_view.tpl'));
       $this->t->set_block('act_view_t','part_list','list');
       
-      $sql = "SELECT * FROM eq_activity WHERE activity=" . intval(get_var('activity',array('GET','POST')));
+      $sql = "SELECT * FROM 3rd_activity WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
       $this->db->next_record();
       $this->t->set_var('assignment', $this->db->f('assignment'));
       $this->t->set_var('date', $this->db->f('date'));
       $this->t->set_var('notes', $this->db->f('notes'));
       
-      $sql = "SELECT * FROM eq_assignment WHERE assignment='" . $this->db->f('assignment') . "'";
+      $sql = "SELECT * FROM 3rd_assignment WHERE assignment='" . $this->db->f('assignment') . "'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record())
 	{
@@ -710,7 +710,7 @@ class eq
       $this->t->set_var('cal_date',$this->db->f('date'));
       
       // Now find out which elders participated in this activity
-      $sql = "SELECT * FROM eq_participation WHERE activity=" . intval(get_var('activity',array('GET','POST')));
+      $sql = "SELECT * FROM 3rd_participation WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -723,7 +723,7 @@ class eq
       
       for ($i=0; $i < count($part_list); $i++)
 	{
-	  $sql = "SELECT * FROM eq_elder WHERE elder=" . $part_list[$i]['elder'];
+	  $sql = "SELECT * FROM 3rd_elder WHERE elder=" . $part_list[$i]['elder'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $names[$i] = $this->db->f('name');
@@ -760,21 +760,21 @@ class eq
 	  $activity['assignment'] = get_var('assignment',array('POST'));
 	  $activity['date'] = get_var('date',array('POST'));
 	  $activity['notes']= get_var('notes',array('POST'));
-	  $this->db->query("UPDATE eq_activity set " .
+	  $this->db->query("UPDATE 3rd_activity set " .
 			   "   assignment='" . $activity['assignment'] .
 			   "', date='" . $activity['date'] . "'" .
 			   ", notes='" . $activity['notes'] . "'" .
 			   " WHERE activity=" . $activity['activity'],__LINE__,__FILE__);
 
 	  // Delete all the elders who have particiapted in this activity
-	  $this->db->query("DELETE from eq_participation where activity=".$activity['activity'],__LINE__,__FILE__);
+	  $this->db->query("DELETE from 3rd_participation where activity=".$activity['activity'],__LINE__,__FILE__);
 	  
 	  // Re-add the elders who are checked as having participated in this activity
 	  $elders = get_var('elder_name',array('POST'));
 	  if(is_array($elders)) { // Only do the foreach loop if we have a valid array of elders to work with
 	    foreach ($elders as $elder)
 	      {
-		$this->db->query("INSERT INTO eq_participation (elder,activity) "
+		$this->db->query("INSERT INTO 3rd_participation (elder,activity) "
 				 . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 	      }
 	  }
@@ -788,11 +788,11 @@ class eq
 	  $activity['assignment'] = get_var('assignment',array('POST'));
 	  $activity['date'] = get_var('date',array('POST'));
 	  $activity['notes']= get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_activity (assignment,date,notes) "
+	  $this->db->query("INSERT INTO 3rd_activity (assignment,date,notes) "
 			   . "VALUES ('" . $activity['assignment'] . "','"
 			   . $activity['date'] . "','" . $activity['notes'] . "')",__LINE__,__FILE__);
 
-	  $sql = "SELECT * FROM eq_activity WHERE assignment='".$activity['assignment']."' "
+	  $sql = "SELECT * FROM 3rd_activity WHERE assignment='".$activity['assignment']."' "
 	     . " AND date='".$activity['date']."' AND notes='".$activity['notes']."'";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
@@ -803,7 +803,7 @@ class eq
 	  $elders = get_var('elder_name',array('POST'));
 	  foreach ($elders as $elder)
 	    {
-	      $this->db->query("INSERT INTO eq_participation (elder,activity) "
+	      $this->db->query("INSERT INTO 3rd_participation (elder,activity) "
 			       . "VALUES (" . $elder . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 	    }
 	  
@@ -826,7 +826,7 @@ class eq
 
       if($action == 'edit')
 	{
-	  $sql = "SELECT * FROM eq_activity WHERE activity=" . $activity['activity'];
+	  $sql = "SELECT * FROM 3rd_activity WHERE activity=" . $activity['activity'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$this->db->f('date'),'','','','','',$this->cal_options));
@@ -842,7 +842,7 @@ class eq
 	}
 
       // Create the assignments drop-down list
-      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i = 0;
       while ($this->db->next_record())
@@ -865,7 +865,7 @@ class eq
       $this->t->set_var('assignment_data',$assignment_data);
       
       // Create elder selection boxes
-      $sql = "SELECT * FROM eq_elder";
+      $sql = "SELECT * FROM 3rd_elder";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -883,7 +883,7 @@ class eq
       for ($i=0; $i < count($elder_id); $i++)
 	{
 	  //$this->nextmatchs->template_alternate_row_color(&$this->t);
-	  $sql = "SELECT * FROM eq_participation where activity=". $activity['activity'] . " AND elder=" . $elder_id[$i];
+	  $sql = "SELECT * FROM 3rd_participation where activity=". $activity['activity'] . " AND elder=" . $elder_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) { $this->t->set_var('checked','checked'); $checked=1; }
 	  else { $this->t->set_var('checked',''); $checked=0; }
@@ -919,7 +919,7 @@ class eq
       $this->t->set_var('lang_name','Assignment Name');
       $this->t->set_var('lang_code','Code');
       
-      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -972,7 +972,7 @@ class eq
 	{
 	  $assignment['name'] = get_var('name',array('POST'));
 	  $assignment['code'] = get_var('code',array('POST'));
-	  $this->db->query("UPDATE eq_assignment set " .
+	  $this->db->query("UPDATE 3rd_assignment set " .
 			   "  name='" . $assignment['name'] . "'" .
 			   ", code='" . $assignment['code'] . "'" .
 			   " WHERE assignment=" . $assignment['assignment'],__LINE__,__FILE__);
@@ -985,7 +985,7 @@ class eq
 	{
 	  $assignment['name'] = get_var('name',array('POST'));
 	  $assignment['code'] = get_var('code',array('POST'));
-	  $this->db->query("INSERT INTO eq_assignment (name,code) "
+	  $this->db->query("INSERT INTO 3rd_assignment (name,code) "
 			   . "VALUES ('" . $assignment['name'] . "','"
 			   . $assignment['code'] . "')",__LINE__,__FILE__);
 	  $this->assign_view();
@@ -1005,7 +1005,7 @@ class eq
 
       if($action == 'edit')
 	{
-	  $sql = "SELECT * FROM eq_assignment WHERE assignment=" . $assignment['assignment'];
+	  $sql = "SELECT * FROM 3rd_assignment WHERE assignment=" . $assignment['assignment'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('name', $this->db->f('name'));
@@ -1036,7 +1036,7 @@ class eq
       $this->t->set_block('par_view_t','header_list','list1');
       $this->t->set_block('par_view_t','elder_list','list2');
 
-      $sql = "SELECT * FROM eq_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1047,7 +1047,7 @@ class eq
 	}
       array_multisort($elder_name, $elder_id);
 
-      $sql = "SELECT * FROM eq_activity ORDER BY date DESC";
+      $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -1060,7 +1060,7 @@ class eq
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while($this->db->next_record())
@@ -1088,7 +1088,7 @@ class eq
 	  $date = "0000-00-00"; $checkmark=0; $num_matches=0;
 	  for ($k=0; $k < count($activity_list); $k++) {
 	    if($assignment_list[$j]['assignment'] == $activity_list[$k]['assignment']) { 
-	      $sql = "SELECT * FROM eq_participation where "
+	      $sql = "SELECT * FROM 3rd_participation where "
 		 . " activity=" . $activity_list[$k]['activity']
 		 . " AND elder=" . $elder_id[$i];
 	      $this->db->query($sql,__LINE__,__FILE__);
@@ -1146,7 +1146,7 @@ class eq
       }
       $this->t->set_var('filter_input',$filter_input);
       
-      $sql = "SELECT * FROM eq_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1158,7 +1158,7 @@ class eq
 	}
       array_multisort($elder_name, $elder_id);
 
-      $sql = "SELECT * FROM eq_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while($this->db->next_record())
@@ -1169,7 +1169,7 @@ class eq
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM eq_activity ORDER BY date DESC";
+      $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -1201,21 +1201,21 @@ class eq
 							    . $elder_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
 	  $found_willingness=0; 
-	  $sql = "SELECT * FROM eq_willingness where "
+	  $sql = "SELECT * FROM 3rd_willingness where "
 	     . " assignment=" . $assignment_list[$j]['assignment']
 	     . " AND elder=" . $elder_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  while($this->db->next_record()) {
 	    $found_willingness=1;
 	    $date_part="";
-	    $sql = "SELECT * FROM eq_activity where "
+	    $sql = "SELECT * FROM 3rd_activity where "
 	       . " assignment=". $assignment_list[$j]['assignment']
 	       . " ORDER by date DESC";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
 	      $activity = $this->db2->f('activity');
 	      $date = $this->db2->f('date');
-	      $sql = "SELECT * FROM eq_participation where "
+	      $sql = "SELECT * FROM 3rd_participation where "
 		 . " activity=" . $activity
 		 . " AND elder=". $elder_id[$i];
 	      $this->db3->query($sql,__LINE__,__FILE__);
@@ -1284,7 +1284,7 @@ class eq
       if($action == 'save')
 	{
 	  // Delete all the previous willingness entries for this elder
-	  $this->db->query("DELETE from eq_willingness where elder=" . $elder_id ,__LINE__,__FILE__);
+	  $this->db->query("DELETE from 3rd_willingness where elder=" . $elder_id ,__LINE__,__FILE__);
 	      
 	  // Now, add the assignment willingness that is checked for this elder
 	  $new_data = get_var('willingness',array('POST'));
@@ -1294,7 +1294,7 @@ class eq
 	      $assignment = $data_array[0];
 	      $willing = $data_array[1];
 	      //print "elder_id: $elder_id assignment: $assignment willing: $willing<br>";
-	      $this->db->query("INSERT INTO eq_willingness (elder,assignment,willing) "
+	      $this->db->query("INSERT INTO 3rd_willingness (elder,assignment,willing) "
 			       . "VALUES (" . $elder_id .",". $assignment .",'". $willing . "')",__LINE__,__FILE__);
 	    }      
 	  $this->willing_view();
@@ -1305,7 +1305,7 @@ class eq
       $table_data=""; 
 
       // Find out the elder's name
-      $sql = "SELECT * FROM eq_elder WHERE elder=".$elder_id." AND valid=1";
+      $sql = "SELECT * FROM 3rd_elder WHERE elder=".$elder_id." AND valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$elder_name = $this->db->f('name');
@@ -1313,7 +1313,7 @@ class eq
       }
       
       // Select all the assignments
-      $sql = "SELECT * FROM eq_assignment ORDER by name ASC";
+      $sql = "SELECT * FROM 3rd_assignment ORDER by name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       while ($this->db->next_record())
@@ -1326,7 +1326,7 @@ class eq
 	  $table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$assignment_name</td>";
 	  
 	  $header_row="<th width=$comp_width><font size=-2>Assignments</th><th>Willingness</th>";
-	  $sql = "SELECT * FROM eq_willingness WHERE elder=".$elder_id." AND assignment=".$assignment;
+	  $sql = "SELECT * FROM 3rd_willingness WHERE elder=".$elder_id." AND assignment=".$assignment;
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  $value = $assignment;
 	     
@@ -1413,7 +1413,7 @@ class eq
       $year = date('Y');
 
       // Get the EQ President
-      $sql = "SELECT * FROM eq_presidency where president=1 and valid=1";
+      $sql = "SELECT * FROM 3rd_presidency where president=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$president_name = $this->db->f('name');
@@ -1424,18 +1424,18 @@ class eq
 	$interviewer = $this->db->f('elder');
 	$district_number = '*';
 	$district_name = $president_name;
-	$sql = "SELECT * FROM eq_elder where elder='$president_id'";
+	$sql = "SELECT * FROM 3rd_elder where elder='$president_id'";
 	$this->db2->query($sql,__LINE__,__FILE__);
 	if($this->db2->next_record()) {
 	  $indiv_id = $this->db2->f('indiv_id');
 	}
-	$sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+	$sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
 	$this->db2->query($sql,__LINE__,__FILE__);
 	if($this->db2->next_record()) {
 	  $president_address = $this->db2->f('address');
 	}
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ President in eq_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate EQ President in 3rd_presidency table</h3></font></hr>";
 	return;
       }
 
@@ -1453,11 +1453,11 @@ class eq
 		if($elder == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
+		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
-		  $this->db->query("UPDATE eq_appointment set " .
+		  $this->db->query("UPDATE 3rd_appointment set " .
 				   " elder='" . $elder . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
@@ -1477,7 +1477,7 @@ class eq
 	     $ppi_pri = $entry['pri'];
 	     
 	     // Perform database save actions here
-	     $this->db->query("UPDATE eq_elder set " .
+	     $this->db->query("UPDATE 3rd_elder set " .
 			      " ppi_notes='" . $ppi_notes . "'" .
 			      ",ppi_pri='" . $ppi_pri . "'" .
 			      " WHERE elder=" . $elder_id,__LINE__,__FILE__);
@@ -1489,7 +1489,7 @@ class eq
 	}
       
       // create the elder id -> elder name mapping
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $elder_id = NULL;
@@ -1521,7 +1521,7 @@ class eq
       $this->t->set_var('appt_table_title',$appt_table_title);
       
       // query the database for all the appointments
-      $sql = "SELECT * FROM eq_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $sql = "SELECT * FROM 3rd_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 	
       while ($this->db->next_record())
@@ -1568,7 +1568,7 @@ class eq
       $this->t->set_var('appt_table_width',$appt_table_width);
 
       // PPI SCHEDULING TABLE
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY ppi_pri ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY ppi_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       $i=0; 
@@ -1595,19 +1595,19 @@ class eq
 
 	  // If this elder has had a yearly PPI this year, don't show him on the schedule list
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-	  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id . " AND eqpresppi=1";
+	  $sql = "SELECT * FROM 3rd_interview WHERE date > '$year_start' AND date < '$year_end' ".
+	     "AND elder=" . $id . " AND interview_type='ppi'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
-	    $sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " AND eqpresppi=1 ORDER BY date DESC";
+	    $sql = "SELECT * FROM 3rd_interview WHERE elder=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
 	    $link_data['menuaction'] = 'eq.eq.ppi_update';
 	    $link_data['elder'] = $id;
 	    $link_data['name'] = $name;
-	    $link_data['ppi'] = '';
-	    $link_data['eqpresppi'] = 1;
+	    $link_data['interview'] = '';
+	    $link_data['interview_type'] = 1;
 	    $link_data['action'] = 'add';
 	    $link_data['interviewer'] = $interviewer;
 	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
@@ -1635,8 +1635,8 @@ class eq
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
 	    $link_data['elder'] = $this->db2->f('elder');
 	    $link_data['name'] = $name;
-	    $link_data['ppi'] = $this->db2->f('ppi');
-	    $link_data['eqpresppi'] = $this->db2->f('eqpresppi');
+	    $link_data['interview'] = $this->db2->f('interview');
+	    $link_data['interview_type'] = $this->db2->f('interview_type');
 	    $link_data['action'] = 'view';
 	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
 	    $elders_with_yearly_ppi++;
@@ -1730,7 +1730,7 @@ class eq
       //print "year: $year month: $month quarter_start: $quarter_start quarter_end: $quarter_end<br>";
 
       // create the elder id -> elder name mapping
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $elder_id_data = NULL;
@@ -1758,12 +1758,12 @@ class eq
 		  $supervisor = $entry['supervisor'];
 		  $supervisor_array = explode(",", $elderid2name[$supervisor]);
 		  $supervisor_last_name = $supervisor_array[0];
-		  $sql = "SELECT * FROM eq_elder where elder='$supervisor'";
+		  $sql = "SELECT * FROM 3rd_elder where elder='$supervisor'";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  if($this->db2->next_record()) {
 		    $indiv_id = $this->db2->f('indiv_id');
 		  }
-		  $sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+		  $sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  if($this->db2->next_record()) {
 		    $supervisor_address = $this->db2->f('address');
@@ -1774,11 +1774,11 @@ class eq
 		
 		//print "elder: $elder appointment: $appointment <br>";
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
+		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and elder='$elder' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
-		  $this->db->query("UPDATE eq_appointment set " .
+		  $this->db->query("UPDATE 3rd_appointment set " .
 				   " elder='" . $elder . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
@@ -1801,7 +1801,7 @@ class eq
 	     //print "int_notes: $int_notes elder_name: $elder_name aaronic: $aaronic <Br>";
 	     if($aaronic == 0) { 
 	       // Perform database save actions here
-	       $this->db->query("UPDATE eq_elder set " .
+	       $this->db->query("UPDATE 3rd_elder set " .
 				" int_notes='" . $int_notes . "'" .
 				",int_pri='" . $int_pri . "'" .
 				" WHERE elder=" . $elder_id,__LINE__,__FILE__);
@@ -1814,7 +1814,7 @@ class eq
 	}
 
       // Get the Districts
-      $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
+      $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1823,7 +1823,7 @@ class eq
 	  $districts[$i]['district'] = $this->db->f('district');
 	  $districts[$i]['name'] = $this->db->f('name');
 	  $districts[$i]['supervisor'] = $this->db->f('supervisor');
-	  $sql = "SELECT * FROM eq_presidency where district=$district and valid=1";
+	  $sql = "SELECT * FROM 3rd_presidency where district=$district and valid=1";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $districts[$i]['presidency'] = $this->db2->f('presidency');
@@ -1851,12 +1851,12 @@ class eq
       $supervisor = $districts[$d]['supervisor'];
       $supervisor_array = explode(",", $supervisor);
       $supervisor_last_name = $supervisor_array[0];
-      $sql = "SELECT * FROM eq_elder where elder='$supervisor'";
+      $sql = "SELECT * FROM 3rd_elder where elder='$supervisor'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record()) {
 	$indiv_id = $this->db2->f('indiv_id');
       }
-      $sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+      $sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record()) {
 	$supervisor_address = $this->db2->f('address');
@@ -1868,7 +1868,7 @@ class eq
       $this->t->set_var('appt_table_title',$appt_table_title);
       
       // query the database for all the appointments
-      $sql = "SELECT * FROM eq_appointment where presidency=".$districts[$d]['presidency']." and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $sql = "SELECT * FROM 3rd_appointment where presidency=".$districts[$d]['presidency']." and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 	
       while ($this->db->next_record())
@@ -1918,7 +1918,7 @@ class eq
       // INTERVIEW SCHEDULING TABLE
       
       // Select all the unique companionship numbers for this district
-      $sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$d]['district'];
+      $sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $districts[$d]['district'];
       $this->db->query($sql,__LINE__,__FILE__);
       $j=0; $unique_companionships = '';
       while ($this->db->next_record())
@@ -1930,7 +1930,7 @@ class eq
       $i=0;
       for ($j=0; $j < count($unique_companionships); $j++) {
 	// Select all the companions from each companionship
-	$sql = "SELECT * FROM eq_companionship where valid=1 and ".
+	$sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
 	   "companionship=". $unique_companionships[$j]['companionship'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$k=0; $int_completed=0;
@@ -1944,7 +1944,7 @@ class eq
 	      $elder_id = $this->db->f('elder');
 	      $aaronic_id = $this->db->f('aaronic');
 	     
-	      $sql = "SELECT * FROM eq_elder where elder=$elder_id";
+	      $sql = "SELECT * FROM 3rd_elder where elder=$elder_id";
 	      $this->db2->query($sql,__LINE__,__FILE__);	
 	      if($this->db2->next_record())
 		{
@@ -1956,7 +1956,7 @@ class eq
 		  $elder_aaronic = 0;
 		}
 	      else {
-		$sql = "SELECT * FROM eq_aaronic where aaronic=$aaronic_id";
+		$sql = "SELECT * FROM 3rd_aaronic where aaronic=$aaronic_id";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record())
 		  {
@@ -1990,19 +1990,19 @@ class eq
 	      }
 	      
 	      // If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-	      $sql = "SELECT * FROM eq_ppi WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
+	      $sql = "SELECT * FROM 3rd_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
 		 "AND elder=" . $id;
 	      $this->db2->query($sql,__LINE__,__FILE__);
 	      
 	      if(!$this->db2->next_record()) {
-		$sql = "SELECT * FROM eq_ppi WHERE elder=" . $id . " ORDER BY date DESC";
+		$sql = "SELECT * FROM 3rd_interview WHERE elder=" . $id . " ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
 		$link_data['menuaction'] = 'eq.eq.int_update';
 		$link_data['elder'] = $id;
 		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
-		$link_data['ppi'] = '';
+		$link_data['interview'] = '';
 		$link_data['action'] = 'add';
 		$link_data['interviewer'] = $districts[$d]['supervisor'];
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
@@ -2034,7 +2034,7 @@ class eq
 		$link_data['elder'] = $this->db2->f('elder');
 		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
-		$link_data['ppi'] = $this->db2->f('ppi');
+		$link_data['interview'] = $this->db2->f('interview');
 		$link_data['action'] = 'view';
 		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
 		$comps_with_quarterly_int++;
@@ -2124,7 +2124,7 @@ class eq
       $year = date('Y');
 
       // create the family id -> family name mapping
-      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_family where valid=1 and elder_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $family_id = NULL;
@@ -2133,7 +2133,7 @@ class eq
 	  $family_id[$i] = $this->db->f('family');
 	  $family_name[$i] = $this->db->f('name');
 	  $familyid2name[$family_id[$i]] = $family_name[$i];
-	  $sql = "SELECT * FROM eq_parent where family='$family_id[$i]'";
+	  $sql = "SELECT * FROM 3rd_parent where family='$family_id[$i]'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
@@ -2161,11 +2161,11 @@ class eq
 		if($family == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM eq_appointment where appointment='$appointment' and family='$family' and location='$location'";
+		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and family='$family' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
-		  $this->db->query("UPDATE eq_appointment set " .
+		  $this->db->query("UPDATE 3rd_appointment set " .
 				   " family='" . $family . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
@@ -2185,7 +2185,7 @@ class eq
 	     $visit_pri = $entry['pri'];
 	     
 	     // Perform database save actions here
-	     $this->db->query("UPDATE eq_family set " .
+	     $this->db->query("UPDATE 3rd_family set " .
 			      " visit_notes='" . $visit_notes . "'" .
 			      ",visit_pri='" . $visit_pri . "'" .
 			      " WHERE family=" . $family,__LINE__,__FILE__);
@@ -2206,18 +2206,18 @@ class eq
       $appt_table_data = ""; 
 
       // Find out what the EQ Presidency ID is
-      $sql = "SELECT * FROM eq_presidency where eqpres=1 and valid=1";
+      $sql = "SELECT * FROM 3rd_presidency where eqpres=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$presidency_name = $this->db->f('name');
 	$presidency_id = $this->db->f('presidency');
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ Presidency in eq_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate EQ Presidency in 3rd_presidency table</h3></font></hr>";
 	return;
       }
             
       // query the database for all the appointments
-      $sql = "SELECT * FROM eq_appointment where presidency=$presidency_id and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $sql = "SELECT * FROM 3rd_appointment where presidency=$presidency_id and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       while ($this->db->next_record())
@@ -2268,7 +2268,7 @@ class eq
 
       
       // VISIT SCHEDULING TABLE
-      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY visit_pri ASC";
+      $sql = "SELECT * FROM 3rd_family where valid=1 and elder_id != 0 ORDER BY visit_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       $total_families=0; $families_with_yearly_visit=0;
@@ -2290,7 +2290,7 @@ class eq
 	  $total_families++;
 	}
 
-      $sql = "SELECT * FROM eq_parent where valid=1";
+      $sql = "SELECT * FROM 3rd_parent where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -2310,12 +2310,12 @@ class eq
 
 	  // If this family has had a yearly visit this year, don't show them on the schedule list
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-	  $sql = "SELECT * FROM eq_visit WHERE date > '$year_start' AND date < '$year_end' ".
+	  $sql = "SELECT * FROM 3rd_visit WHERE date > '$year_start' AND date < '$year_end' ".
 	     "AND family=" . $id . " AND companionship=0";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
-	    $sql = "SELECT * FROM eq_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
+	    $sql = "SELECT * FROM 3rd_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
 	    $link_data['menuaction'] = 'eq.eq.vis_update';
@@ -2430,20 +2430,20 @@ class eq
       if($num_months == 1) { $this->t->set_var('lang_num_months','Year of History'); }
       else { $this->t->set_var('lang_num_months','Years of History'); }	
 
-      $sql = "SELECT * FROM eq_presidency where president=1 and valid=1";
+      $sql = "SELECT * FROM 3rd_presidency where president=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$president_name = $this->db->f('name');
 	$interviewer = $this->db->f('elder');
-	$eqpresppi = 1;
+	$interview_type = 'ppi';
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate EQ President in eq_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate EQ President in 3rd_presidency table</h3></font></hr>";
 	return;
       }
       $this->t->set_var('district_number','*');
       $this->t->set_var('district_name',$president_name);
 
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2478,8 +2478,8 @@ class eq
 	$link_data['interviewer'] = $interviewer;
 	$link_data['elder'] = $id;
 	$link_data['name'] = $name;
-	$link_data['ppi'] = '';
-	$link_data['eqpresppi'] = $eqpresppi;
+	$link_data['interview'] = '';
+	$link_data['interview_type'] = $interview_type;
 	$link_data['action'] = 'add';
 	$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
@@ -2489,8 +2489,8 @@ class eq
 	for($m=$num_months; $m >= 0; $m--) {
 	  $year = date('Y') - $m;
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-	  $sql = "SELECT * FROM eq_ppi WHERE date > '$year_start' AND date < '$year_end' ".
-	     "AND elder=" . $id . " AND eqpresppi=1";
+	  $sql = "SELECT * FROM 3rd_interview WHERE date > '$year_start' AND date < '$year_end' ".
+	     "AND elder=" . $id . " AND interview_type='ppi'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  	  
 	  if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2501,8 +2501,8 @@ class eq
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
 	    $link_data['elder'] = $id;
 	    $link_data['name'] = $name;
-	    $link_data['ppi'] = $this->db2->f('ppi');
-	    $link_data['eqpresppi'] = $eqpresppi;
+	    $link_data['interview'] = $this->db2->f('interview');
+	    $link_data['interview_type'] = $interview_type;
 	    $link_data['action'] = 'view';
 	    $date = $this->db2->f('date');
 	    $date_array = explode("-",$date);
@@ -2547,14 +2547,14 @@ class eq
       $companionship = get_var('companionship',array('GET','POST'));
       $interviewer = get_var('interviewer',array('GET','POST'));      
       $name = get_var('name',array('GET','POST'));
-      $ppi = get_var('ppi',array('GET','POST'));
+      $interview = get_var('interview',array('GET','POST'));
       $elder = get_var('elder',array('GET','POST'));
       $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
-      $eqpresppi = get_var('eqpresppi',array('GET','POST'));
+      $interview_type = get_var('interview_type',array('GET','POST'));
      
-      $sql = "SELECT * FROM eq_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
+      $sql = "SELECT * FROM 3rd_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
@@ -2566,22 +2566,22 @@ class eq
 	  $this->t->set_var('interviewer',$interviewer);
 	}
         $this->t->set_var('interviewer_name',$interviewer_name);
-        $this->t->set_var('eqpresppi_checked','');
+        $this->t->set_var('interview_type_checked','');
         $this->t->fp('int_list','interviewer_list',True);
       }
     
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE eq_ppi set " .
-			   "   ppi='" . $ppi . "'" .
+	  $this->db->query("UPDATE 3rd_interview set " .
+		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
-	              ", eqpresppi='" . $eqpresppi . "'" .
-			   " WHERE ppi=" . $ppi,__LINE__,__FILE__);
+	         ", interview_type='" . $interview_type . "'" .
+			   " WHERE interview=" . $interview,__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
 	}
@@ -2589,9 +2589,9 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
+	  $this->db->query("INSERT INTO 3rd_interview (interviewer,elder,aaronic,date,notes,interview_type) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
-			   . $date . "','" . $notes . "','" . $eqpresppi  ."')",__LINE__,__FILE__);
+			   . $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
 	}
@@ -2599,33 +2599,33 @@ class eq
       if($action == 'add')
 	{
 	  $this->t->set_var('cal_date',$this->jscal->input('date','','','','','','',$this->cal_options));
-	  $this->t->set_var('ppi', '');
+	  $this->t->set_var('interview', '');
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('elder',$elder);
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
-	  $this->t->set_var('eqpresppi',$eqpresppi);
-	  $this->t->set_var('eqpresppi_checked','checked');
+	  $this->t->set_var('interview_type',$interview_type);
+	  $this->t->set_var('interview_type_checked','checked');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&ppi='
-								. $ppi . '&action=' . 'insert'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&interview='
+								. $interview . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM eq_ppi WHERE ppi=".$ppi;
+	  $sql = "SELECT * FROM 3rd_interview WHERE interview=".$interview;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
-	  $this->t->set_var('ppi',$ppi);
+	  $this->t->set_var('interview',$interview);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
 	  $this->t->set_var('elder',$this->db->f('elder'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
-	  $this->t->set_var('eqpresppi',$this->db->f('eqpresppi'));
-	  if($this->db->f('eqpresppi') == 1) { $this->t->set_var('eqpresppi_checked','checked'); }
+	  $this->t->set_var('interview_type',$this->db->f('interview_type'));
+	  if($this->db->f('interview_type') == 1) { $this->t->set_var('interview_type_checked','checked'); }
 	}
       
       if($action == 'edit')
@@ -2633,8 +2633,8 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&ppi='
-								. $ppi . '&action=' . 'save'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&interview='
+								. $interview . '&action=' . 'save'));
 	}
 
       if($action == 'view')
@@ -2645,8 +2645,8 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&ppi='
-								. $ppi . '&action=' . 'edit'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&interview='
+								. $interview . '&action=' . 'edit'));
 	}
       
       $this->t->set_var('lang_reset','Clear Form');
@@ -2692,7 +2692,7 @@ class eq
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-      $sql = "SELECT * FROM eq_district where valid=1 ORDER BY district ASC";
+      $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2703,7 +2703,7 @@ class eq
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2719,7 +2719,7 @@ class eq
           $elders[$id] = $elder_name[$i];
       }      
 
-      $sql = "SELECT * FROM eq_aaronic where valid=1 ORDER BY aaronic ASC";
+      $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -2736,7 +2736,7 @@ class eq
 	$supervisor = $districts[$i]['supervisor'];
 		
 	// Select all the unique companionship numbers for this district
-	$sql = "SELECT distinct companionship FROM eq_companionship where valid=1 and district=". $districts[$i]['district'];
+	$sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $districts[$i]['district'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$j=0; $unique_companionships = '';
 	while ($this->db->next_record())
@@ -2750,7 +2750,7 @@ class eq
 	for($m=$num_months; $m >= 0; $m--) { $ints[$m] = 0; }
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  // Select all the companions in each companionship
-	  $sql = "SELECT * FROM eq_companionship where valid=1 and ".
+	  $sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
 	     "companionship=". $unique_companionships[$j]['companionship'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $k=0;
@@ -2777,7 +2777,7 @@ class eq
 	      $link_data['elder'] = $elder_id;
 	      $link_data['aaronic'] = $aaronic_id;
 	      $link_data['name'] = $name;
-	      $link_data['ppi'] = '';
+	      $link_data['interview'] = '';
 	      $link_data['action'] = 'add';
 	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
 	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -2792,7 +2792,7 @@ class eq
 		$month_start = "$year"."-"."$month"."-"."01";
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
-		$sql = "SELECT * FROM eq_ppi WHERE date >= '$month_start' AND date <= '$month_end' ".
+		$sql = "SELECT * FROM 3rd_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
 		   "AND elder=" . $elder_id . " AND aaronic=" . $aaronic_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$header_row .= "<th width=$int_width><font size=-2>$month</th>";
@@ -2808,7 +2808,7 @@ class eq
 		  $link_data['elder'] = $elder_id;
 		  $link_data['aaronic'] = $aaronic_id;
 		  $link_data['name'] = $name;
-		  $link_data['ppi'] = $this->db2->f('ppi');
+		  $link_data['interview'] = $this->db2->f('interview');
 		  $link_data['action'] = 'view';
 		  $date = $this->db2->f('date');
 		  $date_array = explode("-",$date);
@@ -2878,20 +2878,20 @@ class eq
       $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
-      $this->t->set_var('eqpresppi_checked','');
+      $this->t->set_var('interview_type_checked','');
       
       $action = get_var('action',array('GET','POST'));
       $companionship = get_var('companionship',array('GET','POST'));
       $interviewer = get_var('interviewer',array('GET','POST'));      
       $name = get_var('name',array('GET','POST'));
-      $ppi = get_var('ppi',array('GET','POST'));
+      $interview = get_var('interview',array('GET','POST'));
       $elder = get_var('elder',array('GET','POST'));
       $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
-      $eqpresppi = get_var('eqpresppi',array('GET','POST'));
+      $interview_type = get_var('interview_type',array('GET','POST'));
 
-      $sql = "SELECT * FROM eq_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
+      $sql = "SELECT * FROM 3rd_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
@@ -2909,15 +2909,15 @@ class eq
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE eq_ppi set " .
-		           "   ppi='" . $ppi . "'" .
+	  $this->db->query("UPDATE 3rd_interview set " .
+		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 			  ", elder='" . $elder . "'" .
 			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
-		      ", eqpresppi='" . $eqpresppi . "'" .
-			   " WHERE ppi=" . $ppi,__LINE__,__FILE__);
+		 ", interview_type='" . $interview_type . "'" .
+			   " WHERE interview=" . $interview,__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2925,9 +2925,9 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_ppi (interviewer,elder,aaronic,date,notes,eqpresppi) "
+	  $this->db->query("INSERT INTO 3rd_interview (interviewer,elder,aaronic,date,notes,interview_type) "
 			   . "VALUES ('" . $interviewer . "','" . $elder . "','" . $aaronic . "','"
-			   . $date . "','" . $notes ."','" . $eqpresppi . "')",__LINE__,__FILE__);
+			   . $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
 	}
@@ -2935,7 +2935,7 @@ class eq
       if($action == 'add')
 	{
 	  $this->t->set_var('cal_date',$this->jscal->input('date','','','','','','',$this->cal_options));
-	  $this->t->set_var('ppi', '');
+	  $this->t->set_var('interview', '');
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('elder',$elder);
@@ -2944,23 +2944,23 @@ class eq
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
-								. $ppi . '&action=' . 'insert'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
+								. $interview . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM eq_ppi WHERE ppi=".$ppi;
+	  $sql = "SELECT * FROM 3rd_interview WHERE interview=".$interview;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
-	  $this->t->set_var('ppi',$ppi);
+	  $this->t->set_var('interview',$interview);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
 	  $this->t->set_var('elder',$this->db->f('elder'));
 	  $this->t->set_var('aaronic',$this->db->f('aaronic'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
-	  if($this->db->f('eqpresppi') == 1) { $this->t->set_var('eqpresppi_checked','checked'); }
+	  if($this->db->f('interview_type') == 1) { $this->t->set_var('interview_type_checked','checked'); }
 	}
       
       if($action == 'edit')
@@ -2968,8 +2968,8 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
-								. $ppi . '&action=' . 'save'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
+								. $interview . '&action=' . 'save'));
 	}
 
       if($action == 'view')
@@ -2980,8 +2980,8 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&ppi='
-								. $ppi . '&action=' . 'edit'));
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
+								. $interview . '&action=' . 'edit'));
 	}
       
       $this->t->set_var('lang_reset','Clear Form');
@@ -3025,7 +3025,7 @@ class eq
       $year = date('Y') - $num_years + 1;
       $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
       
-      $sql = "SELECT * FROM eq_visit WHERE companionship=0 and date > '$year_start' ORDER BY date DESC";
+      $sql = "SELECT * FROM 3rd_visit WHERE companionship=0 and date > '$year_start' ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -3042,7 +3042,7 @@ class eq
 	{	  
 	  $this->nextmatchs->template_alternate_row_color(&$this->t);
 
-	  $sql = "SELECT * FROM eq_family WHERE family=".$visit_list[$i]['family'];
+	  $sql = "SELECT * FROM 3rd_family WHERE family=".$visit_list[$i]['family'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  	  
@@ -3070,7 +3070,7 @@ class eq
 	}
 
       // List the families that are available to record a visit against
-      $sql = "SELECT * FROM eq_family WHERE valid=1";
+      $sql = "SELECT * FROM 3rd_family WHERE valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -3124,7 +3124,7 @@ class eq
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE eq_visit set " .
+	  $this->db->query("UPDATE 3rd_visit set " .
 			   "  date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 			   " WHERE visit=" . $visit,__LINE__,__FILE__);
@@ -3135,7 +3135,7 @@ class eq
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO eq_visit (family,companionship,date,notes) "
+	  $this->db->query("INSERT INTO 3rd_visit (family,companionship,date,notes) "
 			   . "VALUES ('" . $family . "','" . $companionship . "','"
 			   . $date . "','" . $notes . "')",__LINE__,__FILE__);
 	  $this->vis_view();
@@ -3158,7 +3158,7 @@ class eq
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM eq_visit WHERE visit=".$visit;
+	  $sql = "SELECT * FROM 3rd_visit WHERE visit=".$visit;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('visit',$visit);
@@ -3232,7 +3232,7 @@ class eq
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-      $sql = "SELECT * FROM eq_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3320,9 +3320,9 @@ class eq
 	#print "checking for elder: " . $elder_id[$i] . "<br>";
 	for ($j=0; $j < count($sunday_list); $j++) {
 	  #print "checking for date: " .  $sunday_list[$j]['date'] . "<br>";
-	  #print "SELECT * FROM eq_attendance WHERE date='"
+	  #print "SELECT * FROM 3rd_attendance WHERE date='"
 	  #  . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i] . "<br>";
-	  $sql = "SELECT * FROM eq_attendance WHERE date='"
+	  $sql = "SELECT * FROM 3rd_attendance WHERE date='"
 	     . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
@@ -3404,11 +3404,11 @@ class eq
 	   $month = $monthnum[$month]; if($month < 10) { $month = "0" . $month; }
 
 	   if($action == 'save_month') {	
-             $this->db->query("DELETE from eq_attendance where date LIKE '".$year."-".$month."-%'",__LINE__,__FILE__);
+             $this->db->query("DELETE from 3rd_attendance where date LIKE '".$year."-".$month."-%'",__LINE__,__FILE__);
 	   }
 
 	   if($action == 'save_day') {	      
-             $this->db->query("DELETE from eq_attendance where date LIKE '".$year."-".$month."-".$day."'",__LINE__,__FILE__);
+             $this->db->query("DELETE from 3rd_attendance where date LIKE '".$year."-".$month."-".$day."'",__LINE__,__FILE__);
 	   }   
 
 	   foreach ($new_data as $data)
@@ -3416,7 +3416,7 @@ class eq
 	      $data_array = explode("-",$data);
 	      $elder = $data_array[0];
 	      $date  = "$data_array[1]-$data_array[2]-$data_array[3]";	      
-	      $this->db->query("INSERT INTO eq_attendance (elder,date) "
+	      $this->db->query("INSERT INTO 3rd_attendance (elder,date) "
 	      		       . "VALUES (" . $elder . ",'". $date . "')",__LINE__,__FILE__);
 	   }
 	
@@ -3424,7 +3424,7 @@ class eq
 	 return false;    
 	}
 
-      $sql = "SELECT * FROM eq_elder where valid=1";
+      $sql = "SELECT * FROM 3rd_elder where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3503,7 +3503,7 @@ class eq
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$this->t->set_var('elder_name',$elder_name[$i]);
 	for ($j=0; $j < count($sunday_list); $j++) {
-	  $sql = "SELECT * FROM eq_attendance WHERE date='"
+	  $sql = "SELECT * FROM 3rd_attendance WHERE date='"
 	     . $sunday_list[$j]['date'] . "' AND elder=" . $elder_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $value = $elder_id[$i] . "-" . $sunday_list[$j]['date'];
@@ -3534,7 +3534,7 @@ class eq
       $this->t->set_file(array('dir_view_t' => 'dir_view.tpl'));
       $this->t->set_block('dir_view_t','dir_list','list');
       
-      $sql = "SELECT * FROM eq_parent where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_parent where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3570,7 +3570,7 @@ class eq
       $this->t->set_block('org_view_t','org_list','list2');
 
       # Display a list ordered alphabetically
-      $sql = "SELECT * FROM eq_calling ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_calling ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3598,7 +3598,7 @@ class eq
       }
 
       # Display a list ordered by organization
-      $sql = "SELECT * FROM eq_calling ORDER BY sequence ASC";
+      $sql = "SELECT * FROM 3rd_calling ORDER BY sequence ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3660,7 +3660,7 @@ class eq
       $header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $table_data = "";
 
-      $sql = "SELECT * FROM eq_presidency where valid=1";
+      $sql = "SELECT * FROM 3rd_presidency where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3673,7 +3673,7 @@ class eq
 	  $i++;
 	}
       
-      $sql = "SELECT * FROM eq_family where valid=1 and elder_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM 3rd_family where valid=1 and elder_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3681,7 +3681,7 @@ class eq
 	  $family_id[$i] = $this->db->f('family');
 	  $family_name[$i] = $this->db->f('name');
 	  $familyid2name[$family_id[$i]] = $family_name[$i];
-	  $sql = "SELECT * FROM eq_parent where family='$family_id[$i]'";
+	  $sql = "SELECT * FROM 3rd_parent where family='$family_id[$i]'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
@@ -3722,12 +3722,12 @@ class eq
 		   else if($elder > 0) {
 		     $supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		     $supervisor_last_name = $supervisor_name_array[0];
-		     $sql = "SELECT * FROM eq_elder where elder='$presidency2elder[$presidency]'";
+		     $sql = "SELECT * FROM 3rd_elder where elder='$presidency2elder[$presidency]'";
 		     $this->db2->query($sql,__LINE__,__FILE__);
 		     if($this->db2->next_record()) {
 		       $indiv_id = $this->db2->f('indiv_id');
 		     }
-		     $sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+		     $sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
 		     $this->db2->query($sql,__LINE__,__FILE__);
 		     if($this->db2->next_record()) {
 		       $supervisor_address = $this->db2->f('address');
@@ -3749,7 +3749,7 @@ class eq
 		 if($appointment < $this->max_appointments)
 		   {
 		     //Only perform a database update if we have made a change to this appointment
-		     $sql = "SELECT * FROM eq_appointment where " .
+		     $sql = "SELECT * FROM 3rd_appointment where " .
 			"appointment='$appointment'" .
 			" and presidency='$presidency'" .
 			" and elder='$elder'" .
@@ -3761,7 +3761,7 @@ class eq
 		     if(!$this->db->next_record()) {
 		       $old_date = $this->db->f('date');
 		       $old_time = $this->db->f('time');
-		       $this->db2->query("UPDATE eq_appointment set" .
+		       $this->db2->query("UPDATE 3rd_appointment set" .
 					" family=" . $family . 
 					" ,elder=" . $elder . 
 					" ,date='" . $date . "'" .
@@ -3779,13 +3779,13 @@ class eq
 		 else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 		   {
 		     //print "adding entry: appt=$appointment date: $date time: $time elder: $elder family: $family<br>";
-		     $this->db2->query("INSERT INTO eq_appointment (appointment,presidency,family,elder,date,time,location,uid) "
+		     $this->db2->query("INSERT INTO 3rd_appointment (appointment,presidency,family,elder,date,time,location,uid) "
 			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $elder . "','"
 			   . $date . "','" . $time  . "','" . $location . "','" . $uid ."')",__LINE__,__FILE__);
 
 		     // Now reselect this entry from the database to see if we need
 		     // to send an appointment out for it.
-		     $sql = "SELECT * FROM eq_appointment where " .
+		     $sql = "SELECT * FROM 3rd_appointment where " .
 			"elder='$elder'" .
 			" and family='$family'" .
 			" and presidency='$presidency'" .
@@ -3808,7 +3808,7 @@ class eq
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3828,7 +3828,7 @@ class eq
 	$table_data="";
 	
 	// query the database for all the appointments
-	$sql = "SELECT * FROM eq_appointment where presidency=$presidency and date>=CURDATE() ORDER BY date ASC, time ASC";
+	$sql = "SELECT * FROM 3rd_appointment where presidency=$presidency and date>=CURDATE() ORDER BY date ASC, time ASC";
 	$this->db->query($sql,__LINE__,__FILE__);
 
 	// Prefill any existing appointment slots
@@ -3849,12 +3849,12 @@ class eq
 	      else if($elder > 0) {
 		$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		$supervisor_last_name = $supervisor_name_array[0];
-		$sql = "SELECT * FROM eq_elder where elder='$presidency2elder[$presidency]'";
+		$sql = "SELECT * FROM 3rd_elder where elder='$presidency2elder[$presidency]'";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 		  $indiv_id = $this->db2->f('indiv_id');
 		}
-		$sql = "SELECT * FROM eq_parent where indiv_id='$indiv_id'";
+		$sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 		  $supervisor_address = $this->db2->f('address');
@@ -4026,7 +4026,7 @@ class eq
 
       $this->t->pfp('out','admin_t');
 
-      $sql = "SELECT * FROM eq_elder where valid=1 ORDER BY elder ASC";
+      $sql = "SELECT * FROM 3rd_elder where valid=1 ORDER BY elder ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -4178,7 +4178,7 @@ class eq
 	     if(($elder > 0) || ($name != "")) {
 	       if($id < $this->max_presidency_members) {
 		 //print "Updating Existing Entry<br>";
-		 $this->db2->query("UPDATE eq_presidency set" .
+		 $this->db2->query("UPDATE 3rd_presidency set" .
 				   " elder=" . $elder . 
 				   " ,district=" . $district . 
 				   " ,name='" . $name . "'" .
@@ -4191,7 +4191,7 @@ class eq
 		 
 	       } else {
 		 //print "Adding New Entry<br>";
-		 $this->db2->query("INSERT INTO eq_presidency (presidency,elder,district,name,"
+		 $this->db2->query("INSERT INTO 3rd_presidency (presidency,elder,district,name,"
 				   . "email,president,counselor,secretary,eqpres,valid) "
 				   . "VALUES (NULL,'" . $elder . "','" . $district . "','"
 				   . $name . "','" . $email . "','" . $president  . "','"
@@ -4203,25 +4203,25 @@ class eq
 	     }
 	   }
 
-	  // Now update the eq_district table appropriately
+	  // Now update the 3rd_district table appropriately
 	  
 	  // Delete all the previous district entries from the table
-	  $this->db->query("DELETE from eq_district where valid=1",__LINE__,__FILE__);
-	  $this->db->query("DELETE from eq_district where valid=0",__LINE__,__FILE__);
+	  $this->db->query("DELETE from 3rd_district where valid=1",__LINE__,__FILE__);
+	  $this->db->query("DELETE from 3rd_district where valid=0",__LINE__,__FILE__);
 
 	  // Always add a "District 0" assigned to the High Priests Group
 	  $district = 0;
 	  $name = "High Priests";
 	  $elder = 0;
 	  $valid = 0;
-	  $this->db2->query("INSERT INTO eq_district (district,name,supervisor,valid) "
+	  $this->db2->query("INSERT INTO 3rd_district (district,name,supervisor,valid) "
 			    . "VALUES ('" . $district . "','" . $name . "','"
 			    . $elder . "','" . $valid . "'"
 			    .")",__LINE__,__FILE__);
 	  
 	  
-	  // Requery the eq_presidency table
-	  $sql = "SELECT * FROM eq_presidency where valid=1";
+	  // Requery the 3rd_presidency table
+	  $sql = "SELECT * FROM 3rd_presidency where valid=1";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  while ($this->db->next_record())
 	    {
@@ -4235,7 +4235,7 @@ class eq
 
 	      // If we have a valid district, add it to the district table
 	      if($district > 0) {
-		$this->db2->query("INSERT INTO eq_district (district,name,supervisor,valid) "
+		$this->db2->query("INSERT INTO 3rd_district (district,name,supervisor,valid) "
 				  . "VALUES ('" . $district . "','" . $name . "','"
  				  . $elder . "','" . $valid . "'"
 				  .")",__LINE__,__FILE__);
@@ -4254,7 +4254,7 @@ class eq
 
       // Now save off the data needed for an EQ Presidency Table Update
       
-      $sql = "SELECT * FROM eq_presidency where valid=1";
+      $sql = "SELECT * FROM 3rd_presidency where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $table_data = "";
       $header_row = "<th>Elder</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th><th>EQ Presidency</th>";
@@ -4393,7 +4393,7 @@ class eq
     {
       //print "Emailing notification of appointment: $appointment <br>";
 
-      $sql = "SELECT * FROM eq_appointment where appointment='$appointment'";
+      $sql = "SELECT * FROM 3rd_appointment where appointment='$appointment'";
       $this->db->query($sql,__LINE__,__FILE__);
 	
       while ($this->db->next_record())
@@ -4424,7 +4424,7 @@ class eq
 	  $dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  $dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  
-	  $sql = "SELECT * FROM eq_presidency where presidency='$presidency'";
+	  $sql = "SELECT * FROM 3rd_presidency where presidency='$presidency'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $email = $this->db2->f('email');
@@ -4435,7 +4435,7 @@ class eq
 	  $from = $email;
 
 	  if($elder > 0) { 
-	    $sql = "SELECT * FROM eq_elder where elder='$elder'";
+	    $sql = "SELECT * FROM 3rd_elder where elder='$elder'";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
 	      $elder_name = $this->db2->f('name');
@@ -4446,14 +4446,14 @@ class eq
 	  }
 
 	  if($family > 0) { 
-	    $sql = "SELECT * FROM eq_family where family='$family'";
+	    $sql = "SELECT * FROM 3rd_family where family='$family'";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
 	      $family_name = $this->db2->f('name');
 	      $phone = $this->db2->f('phone');
 	      $elder_id = $this->db2->f('elder_id');
 	      $appt_name = $family_name . " Family Visit";
-	      $sql = "SELECT * FROM eq_elder where elder='$elder_id'";
+	      $sql = "SELECT * FROM 3rd_elder where elder='$elder_id'";
 	      $this->db3->query($sql,__LINE__,__FILE__);
 	      if($this->db3->next_record()) {
 		$phone = $this->db3->f('phone');
@@ -4474,7 +4474,7 @@ class eq
 	    $uid = rand() . rand(); // Generate a random identifier for this appointment
 	    $subject = "Created: $appt_name";
 	    
-	    $this->db->query("UPDATE eq_appointment set" .
+	    $this->db->query("UPDATE 3rd_appointment set" .
 			     " uid=" . $uid . 
 			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
@@ -4488,7 +4488,7 @@ class eq
 	    print "Sent deleted appointment to " . $interviewer . " at " . $email . " for " . $appt_date . " " . $appt_time . "<br>";
 	    $subject = "Canceled: $appt_date $appt_time";
 	    
-	    $this->db->query("UPDATE eq_appointment set" .
+	    $this->db->query("UPDATE 3rd_appointment set" .
 			     " uid=0" . 
 			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 	    
@@ -4506,7 +4506,7 @@ class eq
 				  $dtend, $date, $location, $subject, $subject, $uid);
 	    
 	    $uid = rand() . rand(); // Generate a random identifier for this appointment
-	    $this->db->query("UPDATE eq_appointment set" .
+	    $this->db->query("UPDATE 3rd_appointment set" .
 			     " uid=" . $uid .
 			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 	    

@@ -1,1 +1,1 @@
-dot -Tjpg -o eq.jpg schema.dot 
+dot -Tjpg -o 3rd.jpg schema.dot 

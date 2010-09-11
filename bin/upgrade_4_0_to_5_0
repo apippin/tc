@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+
+use DBI;
+use Getopt::Std;
+
+$mydir = `cd \$(dirname $0) 2>/dev/null; pwd`; chomp($mydir);
+unshift @INC,("$mydir/../setup");
+if( -f "$mydir/../setup/db_config.local") { require "db_config.local"; }
+else { require "db_config"; }
+
+###################################################
+# Connect to the database
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$dbpass,{
+    AutoCommit=>0,
+    PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
+###################################################
+
+# Rename eq_aaronic table to 3rd_aaronic
+$sth = $dbh->prepare("RENAME TABLE `eq_aaronic` TO `3rd_aaronic`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_activity table to 3rd_activity
+$sth = $dbh->prepare("RENAME TABLE `eq_activity` TO `3rd_activity`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_appointment table to 3rd_appointment
+$sth = $dbh->prepare("RENAME TABLE `eq_appointment` TO `3rd_appointment`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_assignment table to 3rd_assignment
+$sth = $dbh->prepare("RENAME TABLE `eq_assignment` TO `3rd_assignment`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_attendance table to 3rd_attendance
+$sth = $dbh->prepare("RENAME TABLE `eq_attendance` TO `3rd_attendance`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_calling table to 3rd_calling
+$sth = $dbh->prepare("RENAME TABLE `eq_calling` TO `3rd_calling`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_child table to 3rd_child
+$sth = $dbh->prepare("RENAME TABLE `eq_child` TO `3rd_child`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_companionship table to 3rd_companionship
+$sth = $dbh->prepare("RENAME TABLE `eq_companionship` TO `3rd_companionship`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_district table to 3rd_district
+$sth = $dbh->prepare("RENAME TABLE `eq_district` TO `3rd_district`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_elder table to 3rd_elder
+$sth = $dbh->prepare("RENAME TABLE `eq_elder` TO `3rd_elder`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'propective' field to the 3rd_elder table
+$sth = $dbh->prepare("ALTER TABLE `3rd_elder` ADD `prospective` enum('y','n') NULL AFTER `priesthood`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_family table to 3rd_family
+$sth = $dbh->prepare("RENAME TABLE `eq_family` TO `3rd_family`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_parent table to 3rd_parent
+$sth = $dbh->prepare("RENAME TABLE `eq_parent` TO `3rd_parent`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_participation table to 3rd_participation
+$sth = $dbh->prepare("RENAME TABLE `eq_participation` TO `3rd_participation`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_ppi table to 3rd_interview
+$sth = $dbh->prepare("RENAME TABLE `eq_ppi` TO `3rd_interview`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Change ppi field in 3rd_interview table to interview
+$sth = $dbh->prepare("ALTER TABLE `3rd_interview` CHANGE `ppi` `interview` INT(16)");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'interview_type' column to the 3rd_interview table
+$sth = $dbh->prepare("ALTER TABLE `3rd_interview` ADD `interview_type` enum('hti','ppi') NOT NULL DEFAULT 'hti' AFTER `eqpresppi`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# set all interviews to be ppi's if eqpresppi is 1
+$sth = $dbh->prepare("UPDATE 3rd_interview SET interview_type='ppi' WHERE eqpresppi='1'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# remove 'eqpresppi' from 3rd_interview
+$sth = $dbh->prepare("ALTER TABLE `3rd_interview` DROP `eqpresppi`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_presidency table to 3rd_presidency
+$sth = $dbh->prepare("RENAME TABLE `eq_presidency` TO `3rd_presidency`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_visit table to 3rd_visit
+$sth = $dbh->prepare("RENAME TABLE `eq_visit` TO `3rd_visit`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'companion1' column to the 3rd_visit table
+$sth = $dbh->prepare("ALTER TABLE `3rd_visit` ADD `companion1` INT( 16 ) NULL AFTER `companionship`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'companion2' column to the 3rd_visit table
+$sth = $dbh->prepare("ALTER TABLE `3rd_visit` ADD `companion2` INT( 16 ) NULL AFTER `companion1`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'visit_type' column to the 3rd_visit table
+$sth = $dbh->prepare("ALTER TABLE `3rd_visit` ADD `visit_type` enum('presidency','hometeaching') NOT NULL DEFAULT 'hometeaching' AFTER `visited`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# set all visits currently marked as companionship=0 with "type" "presidency" and all other visits should set to "hometeaching".
+$sth = $dbh->prepare("update 3rd_visit set visit_type='presidency' where companionship='0'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename eq_willingness table to 3rd_willingness
+$sth = $dbh->prepare("RENAME TABLE `eq_willingness` TO `3rd_willingness`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+print "-> Done!\n";
+
+###################################################
+# Disconnect from the database
+$dbh->disconnect();
+###################################################
+
+
