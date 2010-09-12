@@ -30,7 +30,7 @@
 	else
 	{
 		$app = '3rd';
-		$class = 'eq';
+		$class = '3rd';
 		$invalid_data = True;
 	}
 
@@ -69,10 +69,10 @@
 		}
 		//$GLOBALS['phpgw']->log->commit();
 		
-		//$GLOBALS['phpgw']->redirect_link('/eq/index.php?menuaction=eq.eq.ht_view');
+		//$GLOBALS['phpgw']->redirect_link('/3rd/index.php?menuaction=3rd.3rd.ht_view');
 	} 
 
-//$obj = CreateObject('eq.eq');
+//$obj = CreateObject('3rd.3rd');
 //$obj->ht_view();
 //$GLOBALS['phpgw']->common->phpgw_footer();
 

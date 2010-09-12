@@ -1,6 +1,6 @@
 <?php
   /**************************************************************************\
-  * Application: phpGroupWare - eq                                           *
+  * Application: phpGroupWare - 3rd Counselor                                *
   * Framework: http://www.phpgroupware.org                                   *
   * Author: Alan J. Pippin (apippin@pippins.net)                             *
   * -----------------------------------------------                          *
@@ -9,9 +9,9 @@
   *  Free Software Foundation; either version 2 of the License, or (at your  *
   *  option) any later version.                                              *
   \**************************************************************************/
-      /* $Id: class.eq.inc.php,v 1.1.1.1 2005/07/20 07:40:32 ajp Exp $ */
+      /* $Id: class.3rd.inc.php,v 1.1.1.1 2005/07/20 07:40:32 ajp Exp $ */
 
-class eq
+class 3rd 
 {
   var $db;
   var $db2;
@@ -68,7 +68,7 @@ class eq
      'get_time_selection_form' => True,
      );
  
-  function eq()
+  function 3rd()
     {
       if(file_exists("setup/3rd_config.local")) {
 	include("setup/3rd_config.local");
@@ -86,10 +86,10 @@ class eq
       $this->nextmatchs = CreateObject('phpgwapi.nextmatchs');
       $this->t          = $GLOBALS['phpgw']->template;
       $this->account    = $GLOBALS['phpgw_info']['user']['account_id'];
-      $this->grants     = $GLOBALS['phpgw']->acl->get_grants('eq');
+      $this->grants     = $GLOBALS['phpgw']->acl->get_grants('3rd');
       $this->grants[$this->account] = PHPGW_ACL_READ + PHPGW_ACL_ADD + PHPGW_ACL_EDIT + PHPGW_ACL_DELETE;
        
-      $this->jscal = CreateObject('eq.jscalendar');   // before phpgw_header() !!!
+      $this->jscal = CreateObject('3rd.jscalendar');   // before phpgw_header() !!!
       $this->cal_options = 'daFormat    : "%Y-%m-%d",
                                 ifFormat    : "%Y-%m-%d",
                                 mondayFirst : false,
@@ -118,9 +118,9 @@ class eq
     {
       $this->t->set_file(array('3rd_header' => 'header.tpl'));
       
-      if (isset($phpgw_info['user']['preferences']['eq']['3rd_font']))
+      if (isset($phpgw_info['user']['preferences']['3rd']['3rd_font']))
 	{
-	  $font = $phpgw_info['user']['preferences']['eq']['3rd_font'];
+	  $font = $phpgw_info['user']['preferences']['3rd']['3rd_font'];
 	}
       else
 	{
@@ -129,47 +129,47 @@ class eq
       
       $this->t->set_var('bg_color',$phpgw_info['theme']['th_bg']);
       $this->t->set_var('font',$font);
-      $link_data['menuaction'] = 'eq.eq.ht_view';
-      $this->t->set_var('link_hometeaching',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.ht_view';
+      $this->t->set_var('link_hometeaching',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_hometeaching','HomeTeaching');
-      $link_data['menuaction'] = 'eq.eq.act_list';
-      $this->t->set_var('link_activity',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.act_list';
+      $this->t->set_var('link_activity',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_activity','Activities');
-      $link_data['menuaction'] = 'eq.eq.willing_view';
-      $this->t->set_var('link_willing',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.willing_view';
+      $this->t->set_var('link_willing',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_willing','Willingness');
-      $link_data['menuaction'] = 'eq.eq.assign_view';
-      $this->t->set_var('link_assignment',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.assign_view';
+      $this->t->set_var('link_assignment',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_assignment','Assignments');
-      $link_data['menuaction'] = 'eq.eq.par_view';
-      $this->t->set_var('link_participation',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.par_view';
+      $this->t->set_var('link_participation',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_participation','Participation');
-      $link_data['menuaction'] = 'eq.eq.ppi_view';
-      $this->t->set_var('link_ppi',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.ppi_view';
+      $this->t->set_var('link_ppi',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_ppi','PPIs');
-      $link_data['menuaction'] = 'eq.eq.int_view';
-      $this->t->set_var('link_int',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.int_view';
+      $this->t->set_var('link_int',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_int','Interviews');
-      $link_data['menuaction'] = 'eq.eq.vis_view';
-      $this->t->set_var('link_visit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.vis_view';
+      $this->t->set_var('link_visit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_visit','Visits');
-      $link_data['menuaction'] = 'eq.eq.att_view';	
-      $this->t->set_var('link_attendance',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.att_view';	
+      $this->t->set_var('link_attendance',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_attendance','Attendance');
-      $link_data['menuaction'] = 'eq.eq.dir_view';	
-      $this->t->set_var('link_dir',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.dir_view';	
+      $this->t->set_var('link_dir',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_dir','Directory');
-      $link_data['menuaction'] = 'eq.eq.org_view';	
-      $this->t->set_var('link_org',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.org_view';	
+      $this->t->set_var('link_org',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_org','Callings');
-      $link_data['menuaction'] = 'eq.eq.admin';	
-      $this->t->set_var('link_admin',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.admin';	
+      $this->t->set_var('link_admin',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_admin','Admin');
-      $link_data['menuaction'] = 'eq.eq.schedule';	
-      $this->t->set_var('link_schedule',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.schedule';	
+      $this->t->set_var('link_schedule',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_schedule','Scheduling');
-      $link_data['menuaction'] = 'eq.eq.email';	
-      $this->t->set_var('link_email',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $link_data['menuaction'] = '3rd.3rd.email';	
+      $this->t->set_var('link_email',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_email','Email');
 		
       $this->t->pparse('out','3rd_header');
@@ -180,7 +180,7 @@ class eq
       $this->t->set_file(array('ht_view_t' => 'ht_view.tpl'));
       $this->t->set_block('ht_view_t','district_list','list');
    
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ht_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_view'));
       $num_months = get_var('num_months',array('GET','POST'));
       if($num_months == '') { $num_months = $this->default_ht_num_months; }
       $this->t->set_var('num_months',$num_months);
@@ -188,7 +188,7 @@ class eq
       if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
       else {  $this->t->set_var('lang_num_months','Months of History'); }
       
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ht_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_view'));
       $this->t->set_var('title','Hometeaching'); 
       
       $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
@@ -316,7 +316,7 @@ class eq
 		  $query_id = $this->db2->query($sql,__LINE__,__FILE__);
 		}
 		$this->db2->query($sql,__LINE__,__FILE__);
-		$link_data['menuaction'] = 'eq.eq.ht_update';
+		$link_data['menuaction'] = '3rd.3rd.ht_update';
 		$link_data['date'] = $month_start;
 		$link_data['month_start'] = $month_start;
 		$link_data['month_end'] = $month_end;
@@ -324,7 +324,7 @@ class eq
 		$link_data['district'] = $districts[$i]['district'];
 		$link_data['district_name'] = $districts[$i]['name'];
 		$link_data['action'] = 'view';
-		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+		$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 		$header_row .= "<th width=$visit_width><font size=-2><a href=$link>$month</a></th>";
 		if(!$total_visits[$m]) { $total_visits[$m] = 0; }
 		if($this->db2->next_record()) {
@@ -404,8 +404,8 @@ class eq
       $month_end = get_var('month_end',array('GET','POST'));
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ht_view'));
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ht_update&action=save'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_update&action=save'));
       $this->t->set_var('lang_done','Cancel');
       $this->t->set_var('district_name',$district_name);
       $this->t->set_var('district_number',$district);
@@ -647,25 +647,25 @@ class eq
 	  if(strlen($activity_notes) > 40) { $activity_notes = substr($activity_notes,0,40) . "..."; }
 	  $this->t->set_var('notes',$activity_notes);
 	  
-	  $link_data['menuaction'] = 'eq.eq.act_view';
+	  $link_data['menuaction'] = '3rd.3rd.act_view';
 	  $link_data['activity'] = $activity_list[$i]['activity'];
 	  $link_data['action'] = 'view';
-	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('lang_view','View');
 
-	  $link_data['menuaction'] = 'eq.eq.act_update';
+	  $link_data['menuaction'] = '3rd.3rd.act_update';
 	  $link_data['activity'] = $activity_list[$i]['activity'];
 	  $link_data['action'] = 'edit';
-	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
 	  $this->t->fp('list','act_list',True);
 	}
 
-      $link_data['menuaction'] = 'eq.eq.act_update';
+      $link_data['menuaction'] = '3rd.3rd.act_update';
       $link_data['activity'] = '0';
       $link_data['action'] = 'add';
-      $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/eq/index.php',$link_data)
+      $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/3rd/index.php',$link_data)
 			. '"><input type="submit" name="Add" value="' . 'Add Activity' .'"></font></form>');
 
       $this->t->pfp('out','act_list_t');
@@ -700,12 +700,12 @@ class eq
       $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
       $this->t->set_var('tr_color',$tr_color);
             
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.act_list'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_list'));
 
-      $link_data['menuaction'] = 'eq.eq.act_update';
+      $link_data['menuaction'] = '3rd.3rd.act_update';
       $link_data['activity'] = get_var('activity',array('GET','POST'));
       $link_data['action'] = 'edit';
-      $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+      $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
       $this->t->set_var('lang_edit','Edit');
       $this->t->set_var('cal_date',$this->db->f('date'));
       
@@ -752,7 +752,7 @@ class eq
       $this->t->set_var('lang_done','Done');
 
       $action = get_var('action',array('GET','POST'));
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.act_list'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_list'));
       $activity['activity'] = intval(get_var('activity',array('GET','POST')));
       
       if($action == 'save')
@@ -820,7 +820,7 @@ class eq
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Activity');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.act_update&activity='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_update&activity='
 								. $activity['activity'] . '&action=' . 'insert'));
 	}
 
@@ -836,7 +836,7 @@ class eq
 	  $this->t->set_var('notes', $this->db->f('notes'));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Activity');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.act_update&activity='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_update&activity='
 								. $activity['activity'] . '&action=' . 'save'));
 
 	}
@@ -938,16 +938,16 @@ class eq
 	  $this->t->set_var('name',$assignment_list[$i]['name']);
 	  $this->t->set_var('code',$assignment_list[$i]['code']);
 	  
-	  $link_data['menuaction'] = 'eq.eq.assign_update';
+	  $link_data['menuaction'] = '3rd.3rd.assign_update';
 	  $link_data['assignment'] = $assignment_list[$i]['assignment'];
 	  $link_data['action'] = 'edit';
-	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
-	  $link_data['menuaction'] = 'eq.eq.assign_update';
+	  $link_data['menuaction'] = '3rd.3rd.assign_update';
 	  $link_data['assignment'] = '0';
 	  $link_data['action'] = 'add';
-	  $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/eq/index.php',$link_data)
+	  $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/3rd/index.php',$link_data)
                            . '"><input type="submit" name="Add" value="' . 'Add Assignment' .'"></font></form>');
 
 	  $this->t->fp('list','assign_view',True);
@@ -965,7 +965,7 @@ class eq
       $this->t->set_var('lang_done','Done');
 
       $action = get_var('action',array('GET','POST'));
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.assign_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.assign_view'));
       $assignment['assignment'] = intval(get_var('assignment',array('GET','POST')));
 
       if($action == 'save')
@@ -999,7 +999,7 @@ class eq
 	  $this->t->set_var('code','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Assignment');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.assign_update&assignment='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.assign_update&assignment='
 								. $assignment['assignment'] . '&action=' . 'insert'));
 	}
 
@@ -1012,7 +1012,7 @@ class eq
 	  $this->t->set_var('code', $this->db->f('code'));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Assignment');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.assign_update&assignment='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.assign_update&assignment='
 								. $assignment['assignment'] . '&action=' . 'save'));
 
 	}
@@ -1197,7 +1197,7 @@ class eq
 	$willing_table = ''; $indiv_willing=0;
 	$this->t->set_var('indiv_name',$indiv_name[$i]);
 	$this->t->set_var('indiv_phone',$indiv_phone[$indiv_id[$i]]);
-	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&indiv_id='
+	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.willing_update&indiv_id='
 							    . $indiv_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
 	  $found_willingness=0; 
@@ -1276,8 +1276,8 @@ class eq
       $this->t->set_var('indiv_id',$indiv_id);
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_view'));
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.willing_update&action=save'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.willing_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.willing_update&action=save'));
       $this->t->set_var('lang_done','Cancel');
       $this->t->set_var('title','Willingness Update ');
       
@@ -1392,13 +1392,13 @@ class eq
       $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
-      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
       $this->t->set_var('ppi_link_title','Yearly PPIs');
       
-      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
 
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched&action=save'));
       $this->t->set_var('title','Yearly PPI Scheduler');
 
       $indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
@@ -1484,7 +1484,7 @@ class eq
 	     
 	   }
 
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
@@ -1603,14 +1603,14 @@ class eq
 	    $sql = "SELECT * FROM 3rd_interview WHERE indiv=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
-	    $link_data['menuaction'] = 'eq.eq.ppi_update';
+	    $link_data['menuaction'] = '3rd.3rd.ppi_update';
 	    $link_data['indiv'] = $id;
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = '';
 	    $link_data['interview_type'] = 1;
 	    $link_data['action'] = 'add';
 	    $link_data['interviewer'] = $interviewer;
-	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -1631,14 +1631,14 @@ class eq
 	    $table_data.= '</td>';
 	    $table_data.= '</tr>';
 	  } else {
-	    $link_data['menuaction'] = 'eq.eq.ppi_update';
+	    $link_data['menuaction'] = '3rd.3rd.ppi_update';
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
 	    $link_data['indiv'] = $this->db2->f('indiv');
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = $this->db2->f('interview');
 	    $link_data['interview_type'] = $this->db2->f('interview_type');
 	    $link_data['action'] = 'view';
-	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
+	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);    
 	    $indivs_with_yearly_ppi++;
 	    $date = $this->db2->f('date');
 	    $ppi_notes = $this->db2->f('notes');
@@ -1702,13 +1702,13 @@ class eq
       $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
-      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
+      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
       $this->t->set_var('int_link_title','Hometeaching Interviews');
       
-      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched'));
+      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched'));
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
 
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched&action=save'));
       $this->t->set_var('title','Hometeaching Interviews Scheduler');
 
       $indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $int_date_width=20;
@@ -1809,7 +1809,7 @@ class eq
 	     
 	   }
 
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
 
@@ -1998,14 +1998,14 @@ class eq
 		$sql = "SELECT * FROM 3rd_interview WHERE indiv=" . $id . " ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
-		$link_data['menuaction'] = 'eq.eq.int_update';
+		$link_data['menuaction'] = '3rd.3rd.int_update';
 		$link_data['indiv'] = $id;
 		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
 		$link_data['interview'] = '';
 		$link_data['action'] = 'add';
 		$link_data['interviewer'] = $districts[$d]['supervisor'];
-		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+		$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 		$table_data.= "<td align=center>$phone</td>";
 		$table_data.= "<td align=center>";
@@ -2029,14 +2029,14 @@ class eq
 		$table_data.= '</tr>'."\n";
 		$i++;
 	      } else {
-		$link_data['menuaction'] = 'eq.eq.int_update';
+		$link_data['menuaction'] = '3rd.3rd.int_update';
 		$link_data['interviewer'] = $this->db2->f('interviewer');
 		$link_data['indiv'] = $this->db2->f('indiv');
 		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
 		$link_data['interview'] = $this->db2->f('interview');
 		$link_data['action'] = 'view';
-		$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
+		$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);    
 		$comps_with_quarterly_int++;
 		$int_completed=1;
 		$date = $this->db2->f('date');
@@ -2103,13 +2103,13 @@ class eq
       $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
-      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
       $this->t->set_var('vis_link_title','View Yearly Visits');
       
-      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched&action=save'));
       $this->t->set_var('title','Presidency Yearly Visit Scheduler');
 
       $family_width=500; $phone_width=40; $pri_width=10; $notes_width=128; $visit_date_width=20;
@@ -2192,7 +2192,7 @@ class eq
 	     
 	   }
 
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
 
@@ -2318,12 +2318,12 @@ class eq
 	    $sql = "SELECT * FROM 3rd_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
-	    $link_data['menuaction'] = 'eq.eq.vis_update';
+	    $link_data['menuaction'] = '3rd.3rd.vis_update';
 	    $link_data['visit'] = '';
 	    $link_data['family'] = $id;
 	    $link_data['name'] = $name;
 	    $link_data['action'] = 'add';
-	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
 	    $table_data.= "<td align=center>$phone</td>";
 	    $table_data.= "<td align=center>";
@@ -2343,13 +2343,13 @@ class eq
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
 	  } else {
-	    $link_data['menuaction'] = 'eq.eq.vis_update';
+	    $link_data['menuaction'] = '3rd.3rd.vis_update';
 	    $link_data['visit'] = $this->db2->f('visit');
 	    $link_data['family'] = $this->db2->f('family');
 	    $link_data['name'] = $name;
 	    $link_data['date'] = $this->db2->f('date');
 	    $link_data['action'] = 'view';
-	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);    
+	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);    
 	    $families_with_yearly_visit++;
 	    $date = $this->db2->f('date');
 	    $vis_notes = $this->db2->f('notes');
@@ -2408,19 +2408,19 @@ class eq
       $this->t->set_file(array('ppi_view_t' => 'ppi_view.tpl'));
       $this->t->set_block('ppi_view_t','district_list','list');
 
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
       $num_months = get_var('num_months',array('GET','POST'));
       if($num_months == '') { $num_months = $this->default_ppi_num_months; }
       $this->t->set_var('num_months',$num_months);
       if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
       else {  $this->t->set_var('lang_num_months','Months of History'); }
       $this->t->set_var('lang_filter','Filter');
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
             
-      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
       $this->t->set_var('ppi_link_title','Yearly PPIs'); 
 
-      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
       $this->t->set_var('title','Yearly PPIs');
@@ -2474,14 +2474,14 @@ class eq
 	$name = $indiv_name[$j];
 	$phone = $indiv_phone[$id];
 	
-	$link_data['menuaction'] = 'eq.eq.ppi_update';
+	$link_data['menuaction'] = '3rd.3rd.ppi_update';
 	$link_data['interviewer'] = $interviewer;
 	$link_data['indiv'] = $id;
 	$link_data['name'] = $name;
 	$link_data['interview'] = '';
 	$link_data['interview_type'] = $interview_type;
 	$link_data['action'] = 'add';
-	$link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+	$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 
@@ -2496,7 +2496,7 @@ class eq
 	  if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
 	  if($this->db2->next_record()) {
 	    $ppis[$m]++; $total_ppis[$m]++; $ppi_recorded[$companionship][$m]=1;
-	    $link_data['menuaction'] = 'eq.eq.ppi_update';
+	    $link_data['menuaction'] = '3rd.3rd.ppi_update';
 	    $link_data['companionship'] = $companionship;
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
 	    $link_data['indiv'] = $id;
@@ -2508,7 +2508,7 @@ class eq
 	    $date_array = explode("-",$date);
 	    $month = $date_array[1];
 	    $day   = $date_array[2];
-	    $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 	    $table_data .= '<td align=center><a href='.$link.'><img src="images/checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
 	  }
 	  else { $table_data .= "<td>&nbsp;</td>"; }
@@ -2539,7 +2539,7 @@ class eq
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
       
@@ -2609,7 +2609,7 @@ class eq
 	  $this->t->set_var('interview_type_checked','checked');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_update&interview='
 								. $interview . '&action=' . 'insert'));
 	}
 
@@ -2633,7 +2633,7 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_update&interview='
 								. $interview . '&action=' . 'save'));
 	}
 
@@ -2645,7 +2645,7 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_update&interview='
 								. $interview . '&action=' . 'edit'));
 	}
       
@@ -2669,7 +2669,7 @@ class eq
       $this->t->set_file(array('int_view_t' => 'int_view.tpl'));
       $this->t->set_block('int_view_t','district_list','list');
 
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
       $num_quarters = get_var('num_quarters',array('GET','POST'));
       if($num_quarters == '') { $num_quarters = $this->default_int_num_quarters; }
       $this->t->set_var('num_quarters',$num_quarters);
@@ -2677,10 +2677,10 @@ class eq
       else {  $this->t->set_var('lang_num_quarters','Quarters of History'); }
       $this->t->set_var('lang_filter','Filter');
       
-      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
+      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
       $this->t->set_var('int_link_title','Hometeaching Interviews'); 
       
-      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched'));
+      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched'));
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
       
       $this->t->set_var('title','Hometeaching Interviews'); 
@@ -2771,7 +2771,7 @@ class eq
 		$name = $aaronic[$aaronic_id]['name'];
 		$phone = $aaronic[$aaronic_id]['phone'];
 	      }
-	      $link_data['menuaction'] = 'eq.eq.int_update';
+	      $link_data['menuaction'] = '3rd.3rd.int_update';
 	      $link_data['companionship'] = $companionship;
 	      $link_data['interviewer'] = $supervisor;
 	      $link_data['indiv'] = $indiv_id;
@@ -2779,7 +2779,7 @@ class eq
 	      $link_data['name'] = $name;
 	      $link_data['interview'] = '';
 	      $link_data['action'] = 'add';
-	      $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+	      $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 
 	      // Find out how many times Interviews were performed in the past $num_months for this individual
@@ -2802,7 +2802,7 @@ class eq
 		  if(!$int_recorded[$companionship][$m]) {
 		    $ints[$m]++; $total_ints[$m]++; $int_recorded[$companionship][$m]=1;
 		  }
-		  $link_data['menuaction'] = 'eq.eq.int_update';
+		  $link_data['menuaction'] = '3rd.3rd.int_update';
 		  $link_data['companionship'] = $companionship;
 		  $link_data['interviewer'] = $this->db2->f('interviewer');
 		  $link_data['indiv'] = $indiv_id;
@@ -2814,7 +2814,7 @@ class eq
 		  $date_array = explode("-",$date);
 		  $month = $date_array[1];
 		  $day   = $date_array[2];
-		  $link = $GLOBALS['phpgw']->link('/eq/index.php',$link_data);
+		  $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
 		  $table_data .= '<td align=center><a href='.$link.'><img src="images/checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
 		}
 		else { $table_data .= "<td>&nbsp;</td>"; }
@@ -2875,7 +2875,7 @@ class eq
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
       $this->t->set_var('interview_type_checked','');
@@ -2944,7 +2944,7 @@ class eq
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_update&interview='
 								. $interview . '&action=' . 'insert'));
 	}
 
@@ -2968,7 +2968,7 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_update&interview='
 								. $interview . '&action=' . 'save'));
 	}
 
@@ -2980,7 +2980,7 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_update&interview='
 								. $interview . '&action=' . 'edit'));
 	}
       
@@ -3008,13 +3008,13 @@ class eq
       $this->t->set_var('lang_name','Family Name');
       $this->t->set_var('lang_date','Date');
 
-      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
       $this->t->set_var('vis_link_title','View Yearly Visits');
       
-      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
       $num_years = get_var('num_years',array('GET','POST'));
       if($num_years == '') { $num_years = $this->default_vis_num_years; }
       $this->t->set_var('num_years',$num_years);
@@ -3050,20 +3050,20 @@ class eq
 	  $this->t->set_var('family_name',$this->db->f('name'));
 	  $this->t->set_var('date',$visit_list[$i]['date']);
 	  
-	  $link_data['menuaction'] = 'eq.eq.vis_update';
+	  $link_data['menuaction'] = '3rd.3rd.vis_update';
 	  $link_data['visit'] = $visit_list[$i]['visit'];
 	  $link_data['name'] = $this->db->f('name');
 	  $link_data['date'] = $visit_list[$i]['date'];
 	  $link_data['action'] = 'view';
-	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('lang_view','View');
 
-	  $link_data['menuaction'] = 'eq.eq.vis_update';
+	  $link_data['menuaction'] = '3rd.3rd.vis_update';
 	  $link_data['visit'] = $visit_list[$i]['visit'];
 	  $link_data['name'] = $this->db->f('name');
 	  $link_data['date'] = $visit_list[$i]['date'];
 	  $link_data['action'] = 'edit';
-	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
 	  $this->t->fp('list1','visit_list',True);
@@ -3084,12 +3084,12 @@ class eq
       
       for ($i=0; $i < count($family_names); $i++)
 	{
-	  $link_data['menuaction'] = 'eq.eq.vis_update';
+	  $link_data['menuaction'] = '3rd.3rd.vis_update';
 	  $link_data['visit'] = '';
 	  $link_data['family'] = $family_ids[$i];
 	  $link_data['action'] = 'add';
 	  $link_data['name'] = $family_names[$i];
-	  $this->t->set_var('add',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('add',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 
 	  $this->t->set_var('name',$family_names[$i]);
 	  if(($i+1) % 3 == 0) { $this->t->set_var('table_sep',"</td></tr><tr>"); }
@@ -3109,7 +3109,7 @@ class eq
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
       
@@ -3152,7 +3152,7 @@ class eq
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Visit');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_update&family='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_update&family='
 								. $family . '&action=' . 'insert'));
 	}
 
@@ -3173,7 +3173,7 @@ class eq
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Visit');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_update&visit='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_update&visit='
 								. $visit . '&action=' . 'save'));
 	}
 
@@ -3185,7 +3185,7 @@ class eq
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Visit');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_update&visit='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_update&visit='
 								. $visit . '&action=' . 'edit'));
 	}
       
@@ -3217,7 +3217,7 @@ class eq
       $this->t->set_block('att_view_t','header_list','list2');
       $this->t->set_block('att_view_t','indiv_list','list3');
       
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_view'));
       $num_quarters = get_var('num_quarters',array('GET','POST'));
       if($num_quarters == '') { $num_quarters = $this->default_att_num_quarters; }
       $this->t->set_var('num_quarters',$num_quarters);
@@ -3278,14 +3278,14 @@ class eq
 	  if($i == count($sunday_list)-1) { $span++; }
 	  $cur_month = $sunday_list[$i]['month'];
 	  $old_month = $sunday_list[$i]['month'];	  
-	  $link_data['menuaction'] = 'eq.eq.att_update';
+	  $link_data['menuaction'] = '3rd.3rd.att_update';
 	  $link_data['month'] = $sunday_list[$i-1]['month'];
 	  $link_data['year'] = $sunday_list[$i-1]['year'];
 	  $link_data['action'] = 'update_month';
 	  $cur_month = $sunday_list[$i-1]['month'];
 	  $cur_year = $sunday_list[$i-1]['year'];
 	  $header_row .= "<th><font size=-3>$cur_month&nbsp;$cur_year</font></th>";
-	  $this->t->set_var('update_month',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('update_month',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('month',$sunday_list[$i-1]['month']);
 	  $this->t->set_var('year',$sunday_list[$i-1]['year']);
 	  $this->t->set_var('span',$span); $span=0;
@@ -3297,13 +3297,13 @@ class eq
       
       $indiv_width=200; $att_width=25; $total_width=$indiv_width; 
       for ($i=0; $i < count($sunday_list); $i++) {
-      	$link_data['menuaction'] = 'eq.eq.att_update';
+      	$link_data['menuaction'] = '3rd.3rd.att_update';
 	$link_data['month'] = $sunday_list[$i]['month'];
 	$link_data['year'] = $sunday_list[$i]['year'];
 	$link_data['day'] = $sunday_list[$i]['day'];
 	$link_data['date'] = $sunday_list[$i]['date'];
 	$link_data['action'] = 'update_day';
-	$this->t->set_var('update_day',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	$this->t->set_var('update_day',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
         $this->t->set_var('date',$sunday_list[$i]['date']);
 	$this->t->set_var('day',$sunday_list[$i]['day']);
         $this->t->set_var('month',$sunday_list[$i]['month']);
@@ -3390,7 +3390,7 @@ class eq
       $this->t->set_block('form','header_list','list2');
       $this->t->set_block('form','indiv_list','list3');
 
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_view'));
 
       $action = get_var('action',array('GET','POST'));
       $month = get_var('month',array('GET','POST'));
@@ -3438,7 +3438,7 @@ class eq
       
       if($action == 'update_month')
       {
-        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_update&action=save_month'));
+        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_update&action=save_month'));
         $i=0; 
 	$last_time = 0; 
 	$found_sunday = 0;
@@ -3468,13 +3468,13 @@ class eq
 	$this->t->fp('list1','month_list',True);
 	$indiv_width=200; $att_width=25; $total_width=$indiv_width;
 	for ($i=0; $i < count($sunday_list); $i++) {
-	  $link_data['menuaction'] = 'eq.eq.att_update';
+	  $link_data['menuaction'] = '3rd.3rd.att_update';
 	  $link_data['month'] = $sunday_list[$i]['month'];
 	  $link_data['year'] = $sunday_list[$i]['year'];
 	  $link_data['day'] = $sunday_list[$i]['day'];
 	  $link_data['date'] = $sunday_list[$i]['date'];
 	  $link_data['action'] = 'update_day';
-	  $this->t->set_var('update_day',$GLOBALS['phpgw']->link('/eq/index.php',$link_data));
+	  $this->t->set_var('update_day',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
 	  $this->t->set_var('date',$sunday_list[$i]['date']);
 	  $this->t->set_var('day',$sunday_list[$i]['day']);
 	  $this->t->set_var('month',$sunday_list[$i]['month']);
@@ -3486,7 +3486,7 @@ class eq
 
       if($action == 'update_day')
       {
-        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.att_update&action=save_day'));
+        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_update&action=save_day'));
         $sunday_list[0]['date'] = date("Y-m-d", mktime(0, 0, 0, $monthnum[$month], $day, $year));
         $this->t->set_var('month',$month);
 	$this->t->set_var('year',$year);
@@ -3636,19 +3636,19 @@ class eq
 
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.schedule&action=save'));
       $this->t->set_var('title','Scheduling Tool');
 
       $this->t->set_var('lang_save','Save Schedule');
       $this->t->set_var('lang_reset','Cancel');
       
-      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.vis_sched'));
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
-      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.int_sched'));
+      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched'));
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
       
-      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
       $date_width=150; $time_width=220; $indiv_width=170; $family_width=180; $location_width=100;
@@ -3804,7 +3804,7 @@ class eq
 	       }
 	   }
 	  
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.schedule');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.schedule');
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
@@ -3986,22 +3986,22 @@ class eq
 
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email'));
       $this->t->set_var('title','Email Tool');
 
       $this->t->set_var('lang_email','Send Email');
       $this->t->set_var('lang_reset','Cancel');
       
-      $this->t->set_var('email_member_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=member'));
+      $this->t->set_var('email_member_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=member'));
       $this->t->set_var('email_member_link_title','Email Quorum Member');
 
-      $this->t->set_var('email_quorum_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=quorum'));
+      $this->t->set_var('email_quorum_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=quorum'));
       $this->t->set_var('email_quorum_link_title','Email Quorum');
       
-      $this->t->set_var('email_reminder_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=reminder'));
+      $this->t->set_var('email_reminder_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=reminder'));
       $this->t->set_var('email_reminder_link_title','Email Reminders');
 
-      $this->t->set_var('email_edit_link',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.email&action=edit'));
+      $this->t->set_var('email_edit_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=edit'));
       $this->t->set_var('email_edit_link_title','Edit Email Addresses');
 
       $table_width=600;
@@ -4019,8 +4019,8 @@ class eq
       $this->t->set_block('admin_t','cmd','cmdhandle');
       $this->t->set_block('admin_t','presidency','presidencyhandle');
       
-      $this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.admin&action=upload'));
-      $this->t->set_var('presidency_action',$GLOBALS['phpgw']->link('/eq/index.php','menuaction=eq.eq.admin&action=presidency'));
+      $this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.admin&action=upload'));
+      $this->t->set_var('presidency_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.admin&action=presidency'));
       
       $action = get_var('action',array('GET','POST'));
 

@@ -13,7 +13,7 @@
 {
 // Only Modify the $file and $title variables.....
 	$file = Array(
-//		'Administrate'	=> $GLOBALS['phpgw']->link('/eq/admin.php'),
+//		'Administrate'	=> $GLOBALS['phpgw']->link('/3rd/admin.php'),
 	);
 //Do not modify below this line
 	display_section($appname,$file);
