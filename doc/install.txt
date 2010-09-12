@@ -33,24 +33,24 @@ Installing
    1) Download the tgz or zip file and extract it or GIT pull the archive into 
       your base phpgroupware directory (like /usr/share/phpgroupware/).
    2) Setup the mysql table structures for the 3rd Counselor application:
-      mysql -u <dbuser> -p <dbpass> < 3rd/sql/3rd.sql
+      mysql -u <dbuser> -p <dbpass> < tc/sql/tc.sql
    3) Point your browser to: http://www.yourdomain.com/phpgroupware/setup 
       The setup prog will autodetect this application. From there you will 
       need to assign this app to the users you want to have be able to use it.
       Enable it for each user by going to Site Admin -> User Accounts -> <username> -> edit
-      Make sure the "3rd" application has a checkmark next to it under "Permissions this user has"
+      Make sure the "tc" application has a checkmark next to it under "Permissions this user has"
    4) Copy the setup/db_config to setup/db_config.local and change the values in .local appropriately. 
       Check for syntax errors by running eq/bin/check_config_syntax
-   5) Copy the setup/3rd_config to setup/3rd_config.local and change the values in .local appropriately.
+   5) Copy the setup/tc_config to setup/tc_config.local and change the values in .local appropriately.
       Make sure you update the path locations for your specific installation locations: 
       upload_target_path & application_path
-      Check for syntax errors by running 3rd/bin/check_config_syntax
-   6) Try to run 3rd/bin/import_ward_data & parse_ward_data scripts from the commandline
+      Check for syntax errors by running tc/bin/check_config_syntax
+   6) Try to run tc/bin/import_ward_data & parse_ward_data scripts from the commandline
       to check for any missing perl library dependencies and mysql connection. 
       Just run them without command line args.
       Install the right perl modules until the scripts run without any errors.
    7) A graphical representation of the mysql schema used by this application can 
-      be found here: 3rd/sql/3rd.jpg
+      be found here: tc/sql/tc.jpg
    8) Run mls/mlstrimmer.py or MLSFileTrimmer.exe to trim down the csv files and combine them
       into a zip file.  If you run mls/mlstrimmer.py, you'll need to point it to 
       mls/windowsGUI/MLSFileTrimmer/MLSRequiredFields.xml.  If you choose to not use 

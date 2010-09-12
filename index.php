@@ -13,7 +13,7 @@
 
 	$GLOBALS['phpgw_info']['flags'] = array
 	(
-		'currentapp' => '3rd',
+		'currentapp' => 'tc',
 		'noheader'   => True,
 		'nonavbar'   => True 
 	);
@@ -29,8 +29,8 @@
 	}
 	else
 	{
-		$app = '3rd';
-		$class = '3rd';
+		$app = 'tc';
+		$class = 'tc';
 		$invalid_data = True;
 	}
 
@@ -69,10 +69,10 @@
 		}
 		//$GLOBALS['phpgw']->log->commit();
 		
-		//$GLOBALS['phpgw']->redirect_link('/3rd/index.php?menuaction=3rd.3rd.ht_view');
+		//$GLOBALS['phpgw']->redirect_link('/tc/index.php?menuaction=tc.tc.ht_view');
 	} 
 
-//$obj = CreateObject('3rd.3rd');
+//$obj = CreateObject('tc.tc');
 //$obj->ht_view();
 //$GLOBALS['phpgw']->common->phpgw_footer();
 

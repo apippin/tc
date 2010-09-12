@@ -1,6 +1,6 @@
 <?php
   /**************************************************************************\
-  * phpGroupWare - 3rd                                                       *
+  * phpGroupWare - tc                                                        *
   * http://www.phpgroupware.org                                              *
   * -----------------------------------------------                          *
   *  This program is free software; you can redistribute it and/or modify it *
@@ -13,7 +13,7 @@
 {
 // Only Modify the $file and $title variables.....
 	$file = Array(
-//		'Administrate'	=> $GLOBALS['phpgw']->link('/3rd/admin.php'),
+//		'Administrate'	=> $GLOBALS['phpgw']->link('/tc/admin.php'),
 	);
 //Do not modify below this line
 	display_section($appname,$file);

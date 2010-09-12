@@ -9,9 +9,9 @@
   *  Free Software Foundation; either version 2 of the License, or (at your  *
   *  option) any later version.                                              *
   \**************************************************************************/
-      /* $Id: class.3rd.inc.php,v 1.1.1.1 2005/07/20 07:40:32 ajp Exp $ */
+      /* $Id: class.tc.inc.php,v 1.1.1.1 2005/07/20 07:40:32 ajp Exp $ */
 
-class 3rd 
+class tc 
 {
   var $db;
   var $db2;
@@ -68,12 +68,12 @@ class 3rd
      'get_time_selection_form' => True,
      );
  
-  function 3rd()
+  function tc()
     {
-      if(file_exists("setup/3rd_config.local")) {
-	include("setup/3rd_config.local");
+      if(file_exists("setup/tc_config.local")) {
+	include("setup/tc_config.local");
       } else {
-	include("setup/3rd_config");
+	include("setup/tc_config");
       }
       
       $this->script_path = "$this->application_path"."/bin";
@@ -86,10 +86,10 @@ class 3rd
       $this->nextmatchs = CreateObject('phpgwapi.nextmatchs');
       $this->t          = $GLOBALS['phpgw']->template;
       $this->account    = $GLOBALS['phpgw_info']['user']['account_id'];
-      $this->grants     = $GLOBALS['phpgw']->acl->get_grants('3rd');
+      $this->grants     = $GLOBALS['phpgw']->acl->get_grants('tc');
       $this->grants[$this->account] = PHPGW_ACL_READ + PHPGW_ACL_ADD + PHPGW_ACL_EDIT + PHPGW_ACL_DELETE;
        
-      $this->jscal = CreateObject('3rd.jscalendar');   // before phpgw_header() !!!
+      $this->jscal = CreateObject('tc.jscalendar');   // before phpgw_header() !!!
       $this->cal_options = 'daFormat    : "%Y-%m-%d",
                                 ifFormat    : "%Y-%m-%d",
                                 mondayFirst : false,
@@ -116,11 +116,11 @@ class 3rd
 
   function display_app_header()
     {
-      $this->t->set_file(array('3rd_header' => 'header.tpl'));
+      $this->t->set_file(array('tc_header' => 'header.tpl'));
       
-      if (isset($phpgw_info['user']['preferences']['3rd']['3rd_font']))
+      if (isset($phpgw_info['user']['preferences']['tc']['tc_font']))
 	{
-	  $font = $phpgw_info['user']['preferences']['3rd']['3rd_font'];
+	  $font = $phpgw_info['user']['preferences']['tc']['tc_font'];
 	}
       else
 	{
@@ -129,50 +129,50 @@ class 3rd
       
       $this->t->set_var('bg_color',$phpgw_info['theme']['th_bg']);
       $this->t->set_var('font',$font);
-      $link_data['menuaction'] = '3rd.3rd.ht_view';
-      $this->t->set_var('link_hometeaching',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.ht_view';
+      $this->t->set_var('link_hometeaching',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_hometeaching','HomeTeaching');
-      $link_data['menuaction'] = '3rd.3rd.act_list';
-      $this->t->set_var('link_activity',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.act_list';
+      $this->t->set_var('link_activity',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_activity','Activities');
-      $link_data['menuaction'] = '3rd.3rd.willing_view';
-      $this->t->set_var('link_willing',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.willing_view';
+      $this->t->set_var('link_willing',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_willing','Willingness');
-      $link_data['menuaction'] = '3rd.3rd.assign_view';
-      $this->t->set_var('link_assignment',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.assign_view';
+      $this->t->set_var('link_assignment',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_assignment','Assignments');
-      $link_data['menuaction'] = '3rd.3rd.par_view';
-      $this->t->set_var('link_participation',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.par_view';
+      $this->t->set_var('link_participation',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_participation','Participation');
-      $link_data['menuaction'] = '3rd.3rd.ppi_view';
-      $this->t->set_var('link_ppi',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.ppi_view';
+      $this->t->set_var('link_ppi',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_ppi','PPIs');
-      $link_data['menuaction'] = '3rd.3rd.int_view';
-      $this->t->set_var('link_int',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.int_view';
+      $this->t->set_var('link_int',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_int','Interviews');
-      $link_data['menuaction'] = '3rd.3rd.vis_view';
-      $this->t->set_var('link_visit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.vis_view';
+      $this->t->set_var('link_visit',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_visit','Visits');
-      $link_data['menuaction'] = '3rd.3rd.att_view';	
-      $this->t->set_var('link_attendance',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.att_view';	
+      $this->t->set_var('link_attendance',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_attendance','Attendance');
-      $link_data['menuaction'] = '3rd.3rd.dir_view';	
-      $this->t->set_var('link_dir',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.dir_view';	
+      $this->t->set_var('link_dir',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_dir','Directory');
-      $link_data['menuaction'] = '3rd.3rd.org_view';	
-      $this->t->set_var('link_org',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.org_view';	
+      $this->t->set_var('link_org',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_org','Callings');
-      $link_data['menuaction'] = '3rd.3rd.admin';	
-      $this->t->set_var('link_admin',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.admin';	
+      $this->t->set_var('link_admin',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_admin','Admin');
-      $link_data['menuaction'] = '3rd.3rd.schedule';	
-      $this->t->set_var('link_schedule',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.schedule';	
+      $this->t->set_var('link_schedule',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_schedule','Scheduling');
-      $link_data['menuaction'] = '3rd.3rd.email';	
-      $this->t->set_var('link_email',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $link_data['menuaction'] = 'tc.tc.email';	
+      $this->t->set_var('link_email',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_email','Email');
 		
-      $this->t->pparse('out','3rd_header');
+      $this->t->pparse('out','tc_header');
     }
 
   function ht_view()
@@ -180,7 +180,7 @@ class 3rd
       $this->t->set_file(array('ht_view_t' => 'ht_view.tpl'));
       $this->t->set_block('ht_view_t','district_list','list');
    
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_view'));
       $num_months = get_var('num_months',array('GET','POST'));
       if($num_months == '') { $num_months = $this->default_ht_num_months; }
       $this->t->set_var('num_months',$num_months);
@@ -188,10 +188,10 @@ class 3rd
       if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
       else {  $this->t->set_var('lang_num_months','Months of History'); }
       
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_view'));
       $this->t->set_var('title','Hometeaching'); 
       
-      $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
+      $sql = "SELECT * FROM tc_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -202,7 +202,7 @@ class 3rd
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -220,7 +220,7 @@ class 3rd
           $indivs[$id] = $indiv_name[$i];
       }      
 
-      $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
+      $sql = "SELECT * FROM tc_aaronic where valid=1 ORDER BY aaronic ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -237,7 +237,7 @@ class 3rd
 	$supervisor = $districts[$i]['supervisor'];
 		
 	// Select all the unique companionship numbers for this district
-	$sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $districts[$i]['district'];
+	$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $districts[$i]['district'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$j=0; $unique_companionships = '';
 	while ($this->db->next_record())
@@ -252,7 +252,7 @@ class 3rd
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  $companion_table_entry = "";
 	  // Select all the companions in each companionship
-	  $sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
+	  $sql = "SELECT * FROM tc_companionship where valid=1 and ".
 	         "companionship=". $unique_companionships[$j]['companionship'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 
@@ -276,7 +276,7 @@ class 3rd
 	  $table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 	  
 	  // Get the names of the families assigned this home teaching companionship
-	  $sql = "SELECT * from 3rd_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+	  $sql = "SELECT * from tc_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
 	  $sql = $sql . " ORDER BY name ASC";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $k=0;
@@ -303,20 +303,20 @@ class 3rd
 		// " AND companionship=" . $unique_companionships[$j]['companionship'].
 
 		// First check to see if the currently assigned companionship has visited them
-		$sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+		$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship=".$unique_companionships[$j]['companionship'].
 	           " AND family=". $family_id;
 		$query_id = $this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->num_rows($query_id) == 0) {
 		  // We did not find any visits made by the currently assigned companionship,
 		  // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
-		  $sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+		  $sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 		     " AND companionship!=0".
 		     " AND family=". $family_id;
 		  $query_id = $this->db2->query($sql,__LINE__,__FILE__);
 		}
 		$this->db2->query($sql,__LINE__,__FILE__);
-		$link_data['menuaction'] = '3rd.3rd.ht_update';
+		$link_data['menuaction'] = 'tc.tc.ht_update';
 		$link_data['date'] = $month_start;
 		$link_data['month_start'] = $month_start;
 		$link_data['month_end'] = $month_end;
@@ -324,7 +324,7 @@ class 3rd
 		$link_data['district'] = $districts[$i]['district'];
 		$link_data['district_name'] = $districts[$i]['name'];
 		$link_data['action'] = 'view';
-		$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+		$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 		$header_row .= "<th width=$visit_width><font size=-2><a href=$link>$month</a></th>";
 		if(!$total_visits[$m]) { $total_visits[$m] = 0; }
 		if($this->db2->next_record()) {
@@ -404,8 +404,8 @@ class 3rd
       $month_end = get_var('month_end',array('GET','POST'));
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_view'));
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ht_update&action=save'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_update&action=save'));
       $this->t->set_var('lang_done','Cancel');
       $this->t->set_var('district_name',$district_name);
       $this->t->set_var('district_number',$district);
@@ -415,7 +415,7 @@ class 3rd
       if($action == 'save')
 	{
 	  // Get a list of all the companionships in this district
-	  $sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $district;
+	  $sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $district;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $j=0; $unique_companionships = '';
 	  while ($this->db->next_record())
@@ -426,9 +426,9 @@ class 3rd
 	  for ($j=0; $j < count($unique_companionships); $j++)
 	    {
 	      //$comp=$unique_companionships[$j]['companionship'];
-	      //print "deleting from 3rd_visit where companionship=$comp and date=$date and district=$district<br>";
+	      //print "deleting from tc_visit where companionship=$comp and date=$date and district=$district<br>";
 	      // Delete all the visits that have taken place for all families for this companionsthip for this month
-	      $this->db->query("DELETE from 3rd_visit where companionship=" . $unique_companionships[$j]['companionship'] .
+	      $this->db->query("DELETE from tc_visit where companionship=" . $unique_companionships[$j]['companionship'] .
 			       " AND " . "date='" . $date . "'",__LINE__,__FILE__);
 	    }
 
@@ -446,7 +446,7 @@ class 3rd
 		 $visited = $data_array[3];
 		 if($visited == "") { $visited = $data_array[4]; }
 		 //print "family_id: $family_id companionship: $companionship date: $date visited: $visited<br>";
-		 $this->db->query("INSERT INTO 3rd_visit (family,companionship,date,notes,visited) "
+		 $this->db->query("INSERT INTO tc_visit (family,companionship,date,notes,visited) "
 		 		  . "VALUES (" . $family_id .",". $companionship .",'". $date ."','','". $visited ."')",__LINE__,__FILE__);
 	       }
 	   }
@@ -454,7 +454,7 @@ class 3rd
 	  return false;
 	}
       
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -472,7 +472,7 @@ class 3rd
           $indivs[$id] = $indiv_name[$i];
       }      
 
-      $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
+      $sql = "SELECT * FROM tc_aaronic where valid=1 ORDER BY aaronic ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -482,7 +482,7 @@ class 3rd
 	}
       
       // Select all the unique companionship numbers for this district
-      $sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $district;
+      $sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $district;
       $this->db->query($sql,__LINE__,__FILE__);
       $j=0; $unique_companionships = '';
       while ($this->db->next_record())
@@ -496,7 +496,7 @@ class 3rd
       for ($j=0; $j < count($unique_companionships); $j++) {
 	$companion_table_entry = "";
 	// Select all the companions in each companionship
-	$sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
+	$sql = "SELECT * FROM tc_companionship where valid=1 and ".
 	       "companionship=". $unique_companionships[$j]['companionship'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	
@@ -520,7 +520,7 @@ class 3rd
 	$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 	
 	// Get the names of the families assigned this home teaching companionship
-	$sql = "SELECT * from 3rd_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+	$sql = "SELECT * from tc_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
 	$sql = $sql . " ORDER BY name ASC";
 	$this->db->query($sql,__LINE__,__FILE__);
 	while ($this->db->next_record())
@@ -533,14 +533,14 @@ class 3rd
 	    $header_row="<th width=$comp_width><font size=-2>Families</th>";
 
 	    // First check to see if the currently assigned companionship has visited them
-	    $sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+	    $sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship=".$unique_companionships[$j]['companionship'].
 	           " AND family=". $family_id;
 	    $query_id = $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->num_rows($query_id) == 0) {
 	      // We did not find any visits made by the currently assigned companionship,
 	      // look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
-	      $sql = "SELECT * FROM 3rd_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
+	      $sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 	           " AND companionship!=0".
 	           " AND family=". $family_id;
 	      $query_id = $this->db2->query($sql,__LINE__,__FILE__);
@@ -616,7 +616,7 @@ class 3rd
       $this->t->set_var('lang_date','Date');
       $this->t->set_var('lang_notes','Description');
       
-      $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
+      $sql = "SELECT * FROM tc_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -628,7 +628,7 @@ class 3rd
 	  $activity_list[$i]['date']  = $this->db->f('date');
 	  $activity_list[$i]['notes']  = $this->db->f('notes');
 
-	  $sql = "SELECT * FROM 3rd_assignment WHERE assignment='" . $activity_list[$i]['assignment'] . "'";
+	  $sql = "SELECT * FROM tc_assignment WHERE assignment='" . $activity_list[$i]['assignment'] . "'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record())
 	    {
@@ -647,25 +647,25 @@ class 3rd
 	  if(strlen($activity_notes) > 40) { $activity_notes = substr($activity_notes,0,40) . "..."; }
 	  $this->t->set_var('notes',$activity_notes);
 	  
-	  $link_data['menuaction'] = '3rd.3rd.act_view';
+	  $link_data['menuaction'] = 'tc.tc.act_view';
 	  $link_data['activity'] = $activity_list[$i]['activity'];
 	  $link_data['action'] = 'view';
-	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('lang_view','View');
 
-	  $link_data['menuaction'] = '3rd.3rd.act_update';
+	  $link_data['menuaction'] = 'tc.tc.act_update';
 	  $link_data['activity'] = $activity_list[$i]['activity'];
 	  $link_data['action'] = 'edit';
-	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
 	  $this->t->fp('list','act_list',True);
 	}
 
-      $link_data['menuaction'] = '3rd.3rd.act_update';
+      $link_data['menuaction'] = 'tc.tc.act_update';
       $link_data['activity'] = '0';
       $link_data['action'] = 'add';
-      $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/3rd/index.php',$link_data)
+      $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/tc/index.php',$link_data)
 			. '"><input type="submit" name="Add" value="' . 'Add Activity' .'"></font></form>');
 
       $this->t->pfp('out','act_list_t');
@@ -677,14 +677,14 @@ class 3rd
       $this->t->set_file(array('act_view_t' => 'act_view.tpl'));
       $this->t->set_block('act_view_t','part_list','list');
       
-      $sql = "SELECT * FROM 3rd_activity WHERE activity=" . intval(get_var('activity',array('GET','POST')));
+      $sql = "SELECT * FROM tc_activity WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
       $this->db->next_record();
       $this->t->set_var('assignment', $this->db->f('assignment'));
       $this->t->set_var('date', $this->db->f('date'));
       $this->t->set_var('notes', $this->db->f('notes'));
       
-      $sql = "SELECT * FROM 3rd_assignment WHERE assignment='" . $this->db->f('assignment') . "'";
+      $sql = "SELECT * FROM tc_assignment WHERE assignment='" . $this->db->f('assignment') . "'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record())
 	{
@@ -700,17 +700,17 @@ class 3rd
       $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
       $this->t->set_var('tr_color',$tr_color);
             
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_list'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.act_list'));
 
-      $link_data['menuaction'] = '3rd.3rd.act_update';
+      $link_data['menuaction'] = 'tc.tc.act_update';
       $link_data['activity'] = get_var('activity',array('GET','POST'));
       $link_data['action'] = 'edit';
-      $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+      $this->t->set_var('edit',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
       $this->t->set_var('lang_edit','Edit');
       $this->t->set_var('cal_date',$this->db->f('date'));
       
       // Now find out which indivs participated in this activity
-      $sql = "SELECT * FROM 3rd_participation WHERE activity=" . intval(get_var('activity',array('GET','POST')));
+      $sql = "SELECT * FROM tc_participation WHERE activity=" . intval(get_var('activity',array('GET','POST')));
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -723,7 +723,7 @@ class 3rd
       
       for ($i=0; $i < count($part_list); $i++)
 	{
-	  $sql = "SELECT * FROM 3rd_indiv WHERE indiv=" . $part_list[$i]['indiv'];
+	  $sql = "SELECT * FROM tc_indiv WHERE indiv=" . $part_list[$i]['indiv'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $names[$i] = $this->db->f('name');
@@ -752,7 +752,7 @@ class 3rd
       $this->t->set_var('lang_done','Done');
 
       $action = get_var('action',array('GET','POST'));
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_list'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.act_list'));
       $activity['activity'] = intval(get_var('activity',array('GET','POST')));
       
       if($action == 'save')
@@ -760,21 +760,21 @@ class 3rd
 	  $activity['assignment'] = get_var('assignment',array('POST'));
 	  $activity['date'] = get_var('date',array('POST'));
 	  $activity['notes']= get_var('notes',array('POST'));
-	  $this->db->query("UPDATE 3rd_activity set " .
+	  $this->db->query("UPDATE tc_activity set " .
 			   "   assignment='" . $activity['assignment'] .
 			   "', date='" . $activity['date'] . "'" .
 			   ", notes='" . $activity['notes'] . "'" .
 			   " WHERE activity=" . $activity['activity'],__LINE__,__FILE__);
 
 	  // Delete all the individuals who have particiapted in this activity
-	  $this->db->query("DELETE from 3rd_participation where activity=".$activity['activity'],__LINE__,__FILE__);
+	  $this->db->query("DELETE from tc_participation where activity=".$activity['activity'],__LINE__,__FILE__);
 	  
 	  // Re-add the individuals who are checked as having participated in this activity
 	  $indivs = get_var('indiv_name',array('POST'));
 	  if(is_array($indivs)) { // Only do the foreach loop if we have a valid array of indivs to work with
 	    foreach ($indivs as $indiv)
 	      {
-		$this->db->query("INSERT INTO 3rd_participation (indiv,activity) "
+		$this->db->query("INSERT INTO tc_participation (indiv,activity) "
 				 . "VALUES (" . $indiv . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 	      }
 	  }
@@ -788,11 +788,11 @@ class 3rd
 	  $activity['assignment'] = get_var('assignment',array('POST'));
 	  $activity['date'] = get_var('date',array('POST'));
 	  $activity['notes']= get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_activity (assignment,date,notes) "
+	  $this->db->query("INSERT INTO tc_activity (assignment,date,notes) "
 			   . "VALUES ('" . $activity['assignment'] . "','"
 			   . $activity['date'] . "','" . $activity['notes'] . "')",__LINE__,__FILE__);
 
-	  $sql = "SELECT * FROM 3rd_activity WHERE assignment='".$activity['assignment']."' "
+	  $sql = "SELECT * FROM tc_activity WHERE assignment='".$activity['assignment']."' "
 	     . " AND date='".$activity['date']."' AND notes='".$activity['notes']."'";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
@@ -803,7 +803,7 @@ class 3rd
 	  $indivs = get_var('indiv_name',array('POST'));
 	  foreach ($indivs as $indiv)
 	    {
-	      $this->db->query("INSERT INTO 3rd_participation (indiv,activity) "
+	      $this->db->query("INSERT INTO tc_participation (indiv,activity) "
 			       . "VALUES (" . $indiv . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 	    }
 	  
@@ -820,13 +820,13 @@ class 3rd
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Activity');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_update&activity='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.act_update&activity='
 								. $activity['activity'] . '&action=' . 'insert'));
 	}
 
       if($action == 'edit')
 	{
-	  $sql = "SELECT * FROM 3rd_activity WHERE activity=" . $activity['activity'];
+	  $sql = "SELECT * FROM tc_activity WHERE activity=" . $activity['activity'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$this->db->f('date'),'','','','','',$this->cal_options));
@@ -836,13 +836,13 @@ class 3rd
 	  $this->t->set_var('notes', $this->db->f('notes'));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Activity');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.act_update&activity='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.act_update&activity='
 								. $activity['activity'] . '&action=' . 'save'));
 
 	}
 
       // Create the assignments drop-down list
-      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i = 0;
       while ($this->db->next_record())
@@ -865,7 +865,7 @@ class 3rd
       $this->t->set_var('assignment_data',$assignment_data);
       
       // Create individual selection boxes
-      $sql = "SELECT * FROM 3rd_indiv";
+      $sql = "SELECT * FROM tc_indiv";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -883,7 +883,7 @@ class 3rd
       for ($i=0; $i < count($indiv_id); $i++)
 	{
 	  //$this->nextmatchs->template_alternate_row_color(&$this->t);
-	  $sql = "SELECT * FROM 3rd_participation where activity=". $activity['activity'] . " AND indiv=" . $indiv_id[$i];
+	  $sql = "SELECT * FROM tc_participation where activity=". $activity['activity'] . " AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) { $this->t->set_var('checked','checked'); $checked=1; }
 	  else { $this->t->set_var('checked',''); $checked=0; }
@@ -919,7 +919,7 @@ class 3rd
       $this->t->set_var('lang_name','Assignment Name');
       $this->t->set_var('lang_code','Code');
       
-      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -938,16 +938,16 @@ class 3rd
 	  $this->t->set_var('name',$assignment_list[$i]['name']);
 	  $this->t->set_var('code',$assignment_list[$i]['code']);
 	  
-	  $link_data['menuaction'] = '3rd.3rd.assign_update';
+	  $link_data['menuaction'] = 'tc.tc.assign_update';
 	  $link_data['assignment'] = $assignment_list[$i]['assignment'];
 	  $link_data['action'] = 'edit';
-	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
-	  $link_data['menuaction'] = '3rd.3rd.assign_update';
+	  $link_data['menuaction'] = 'tc.tc.assign_update';
 	  $link_data['assignment'] = '0';
 	  $link_data['action'] = 'add';
-	  $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/3rd/index.php',$link_data)
+	  $this->t->set_var('add','<form method="POST" action="' . $GLOBALS['phpgw']->link('/tc/index.php',$link_data)
                            . '"><input type="submit" name="Add" value="' . 'Add Assignment' .'"></font></form>');
 
 	  $this->t->fp('list','assign_view',True);
@@ -965,14 +965,14 @@ class 3rd
       $this->t->set_var('lang_done','Done');
 
       $action = get_var('action',array('GET','POST'));
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.assign_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.assign_view'));
       $assignment['assignment'] = intval(get_var('assignment',array('GET','POST')));
 
       if($action == 'save')
 	{
 	  $assignment['name'] = get_var('name',array('POST'));
 	  $assignment['code'] = get_var('code',array('POST'));
-	  $this->db->query("UPDATE 3rd_assignment set " .
+	  $this->db->query("UPDATE tc_assignment set " .
 			   "  name='" . $assignment['name'] . "'" .
 			   ", code='" . $assignment['code'] . "'" .
 			   " WHERE assignment=" . $assignment['assignment'],__LINE__,__FILE__);
@@ -985,7 +985,7 @@ class 3rd
 	{
 	  $assignment['name'] = get_var('name',array('POST'));
 	  $assignment['code'] = get_var('code',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_assignment (name,code) "
+	  $this->db->query("INSERT INTO tc_assignment (name,code) "
 			   . "VALUES ('" . $assignment['name'] . "','"
 			   . $assignment['code'] . "')",__LINE__,__FILE__);
 	  $this->assign_view();
@@ -999,20 +999,20 @@ class 3rd
 	  $this->t->set_var('code','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Assignment');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.assign_update&assignment='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.assign_update&assignment='
 								. $assignment['assignment'] . '&action=' . 'insert'));
 	}
 
       if($action == 'edit')
 	{
-	  $sql = "SELECT * FROM 3rd_assignment WHERE assignment=" . $assignment['assignment'];
+	  $sql = "SELECT * FROM tc_assignment WHERE assignment=" . $assignment['assignment'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('name', $this->db->f('name'));
 	  $this->t->set_var('code', $this->db->f('code'));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Assignment');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.assign_update&assignment='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.assign_update&assignment='
 								. $assignment['assignment'] . '&action=' . 'save'));
 
 	}
@@ -1036,7 +1036,7 @@ class 3rd
       $this->t->set_block('par_view_t','header_list','list1');
       $this->t->set_block('par_view_t','indiv_list','list2');
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1";
+      $sql = "SELECT * FROM tc_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1047,7 +1047,7 @@ class 3rd
 	}
       array_multisort($indiv_name, $indiv_id);
 
-      $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
+      $sql = "SELECT * FROM tc_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -1060,7 +1060,7 @@ class 3rd
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while($this->db->next_record())
@@ -1088,7 +1088,7 @@ class 3rd
 	  $date = "0000-00-00"; $checkmark=0; $num_matches=0;
 	  for ($k=0; $k < count($activity_list); $k++) {
 	    if($assignment_list[$j]['assignment'] == $activity_list[$k]['assignment']) { 
-	      $sql = "SELECT * FROM 3rd_participation where "
+	      $sql = "SELECT * FROM tc_participation where "
 		 . " activity=" . $activity_list[$k]['activity']
 		 . " AND indiv=" . $indiv_id[$i];
 	      $this->db->query($sql,__LINE__,__FILE__);
@@ -1146,7 +1146,7 @@ class 3rd
       }
       $this->t->set_var('filter_input',$filter_input);
       
-      $sql = "SELECT * FROM 3rd_indiv where valid=1";
+      $sql = "SELECT * FROM tc_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1158,7 +1158,7 @@ class 3rd
 	}
       array_multisort($indiv_name, $indiv_id);
 
-      $sql = "SELECT * FROM 3rd_assignment ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_assignment ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while($this->db->next_record())
@@ -1169,7 +1169,7 @@ class 3rd
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM 3rd_activity ORDER BY date DESC";
+      $sql = "SELECT * FROM tc_activity ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -1197,25 +1197,25 @@ class 3rd
 	$willing_table = ''; $indiv_willing=0;
 	$this->t->set_var('indiv_name',$indiv_name[$i]);
 	$this->t->set_var('indiv_phone',$indiv_phone[$indiv_id[$i]]);
-	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.willing_update&indiv_id='
+	$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.willing_update&indiv_id='
 							    . $indiv_id[$i] . '&action=' . 'edit'));
 	for ($j=0; $j < count($assignment_list); $j++) {
 	  $found_willingness=0; 
-	  $sql = "SELECT * FROM 3rd_willingness where "
+	  $sql = "SELECT * FROM tc_willingness where "
 	     . " assignment=" . $assignment_list[$j]['assignment']
 	     . " AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  while($this->db->next_record()) {
 	    $found_willingness=1;
 	    $date_part="";
-	    $sql = "SELECT * FROM 3rd_activity where "
+	    $sql = "SELECT * FROM tc_activity where "
 	       . " assignment=". $assignment_list[$j]['assignment']
 	       . " ORDER by date DESC";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
 	      $activity = $this->db2->f('activity');
 	      $date = $this->db2->f('date');
-	      $sql = "SELECT * FROM 3rd_participation where "
+	      $sql = "SELECT * FROM tc_participation where "
 		 . " activity=" . $activity
 		 . " AND indiv=". $indiv_id[$i];
 	      $this->db3->query($sql,__LINE__,__FILE__);
@@ -1276,15 +1276,15 @@ class 3rd
       $this->t->set_var('indiv_id',$indiv_id);
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.willing_view'));
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.willing_update&action=save'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.willing_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.willing_update&action=save'));
       $this->t->set_var('lang_done','Cancel');
       $this->t->set_var('title','Willingness Update ');
       
       if($action == 'save')
 	{
 	  // Delete all the previous willingness entries for this individual
-	  $this->db->query("DELETE from 3rd_willingness where indiv=" . $indiv_id ,__LINE__,__FILE__);
+	  $this->db->query("DELETE from tc_willingness where indiv=" . $indiv_id ,__LINE__,__FILE__);
 	      
 	  // Now, add the assignment willingness that is checked for this individual
 	  $new_data = get_var('willingness',array('POST'));
@@ -1294,7 +1294,7 @@ class 3rd
 	      $assignment = $data_array[0];
 	      $willing = $data_array[1];
 	      //print "indiv_id: $indiv_id assignment: $assignment willing: $willing<br>";
-	      $this->db->query("INSERT INTO 3rd_willingness (indiv,assignment,willing) "
+	      $this->db->query("INSERT INTO tc_willingness (indiv,assignment,willing) "
 			       . "VALUES (" . $indiv_id .",". $assignment .",'". $willing . "')",__LINE__,__FILE__);
 	    }      
 	  $this->willing_view();
@@ -1305,7 +1305,7 @@ class 3rd
       $table_data=""; 
 
       // Find out the individual's name
-      $sql = "SELECT * FROM 3rd_indiv WHERE indiv=".$indiv_id." AND valid=1";
+      $sql = "SELECT * FROM tc_indiv WHERE indiv=".$indiv_id." AND valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$indiv_name = $this->db->f('name');
@@ -1313,7 +1313,7 @@ class 3rd
       }
       
       // Select all the assignments
-      $sql = "SELECT * FROM 3rd_assignment ORDER by name ASC";
+      $sql = "SELECT * FROM tc_assignment ORDER by name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       while ($this->db->next_record())
@@ -1326,7 +1326,7 @@ class 3rd
 	  $table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$assignment_name</td>";
 	  
 	  $header_row="<th width=$comp_width><font size=-2>Assignments</th><th>Willingness</th>";
-	  $sql = "SELECT * FROM 3rd_willingness WHERE indiv=".$indiv_id." AND assignment=".$assignment;
+	  $sql = "SELECT * FROM tc_willingness WHERE indiv=".$indiv_id." AND assignment=".$assignment;
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  $value = $assignment;
 	     
@@ -1392,13 +1392,13 @@ class 3rd
       $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
-      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
+      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
       $this->t->set_var('ppi_link_title','Yearly PPIs');
       
-      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
 
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched&action=save'));
       $this->t->set_var('title','Yearly PPI Scheduler');
 
       $indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
@@ -1413,7 +1413,7 @@ class 3rd
       $year = date('Y');
 
       // Get the EQ President
-      $sql = "SELECT * FROM 3rd_presidency where president=1 and valid=1";
+      $sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$president_name = $this->db->f('name');
@@ -1424,18 +1424,18 @@ class 3rd
 	$interviewer = $this->db->f('indiv');
 	$district_number = '*';
 	$district_name = $president_name;
-	$sql = "SELECT * FROM 3rd_indiv where indiv='$president_id'";
+	$sql = "SELECT * FROM tc_indiv where indiv='$president_id'";
 	$this->db2->query($sql,__LINE__,__FILE__);
 	if($this->db2->next_record()) {
 	  $indiv_id = $this->db2->f('indiv_id');
 	}
-	$sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
+	$sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
 	$this->db2->query($sql,__LINE__,__FILE__);
 	if($this->db2->next_record()) {
 	  $president_address = $this->db2->f('address');
 	}
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate President in 3rd_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
 	return;
       }
 
@@ -1453,11 +1453,11 @@ class 3rd
 		if($indiv == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
+		$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
-		  $this->db->query("UPDATE 3rd_appointment set " .
+		  $this->db->query("UPDATE tc_appointment set " .
 				   " indiv='" . $indiv . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
@@ -1477,19 +1477,19 @@ class 3rd
 	     $ppi_pri = $entry['pri'];
 	     
 	     // Perform database save actions here
-	     $this->db->query("UPDATE 3rd_indiv set " .
+	     $this->db->query("UPDATE tc_indiv set " .
 			      " ppi_notes='" . $ppi_notes . "'" .
 			      ",ppi_pri='" . $ppi_pri . "'" .
 			      " WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
 	     
 	   }
 
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
       // create the individual id -> individual name mapping
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $indiv_id = NULL;
@@ -1521,7 +1521,7 @@ class 3rd
       $this->t->set_var('appt_table_title',$appt_table_title);
       
       // query the database for all the appointments
-      $sql = "SELECT * FROM 3rd_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $sql = "SELECT * FROM tc_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 	
       while ($this->db->next_record())
@@ -1568,7 +1568,7 @@ class 3rd
       $this->t->set_var('appt_table_width',$appt_table_width);
 
       // PPI SCHEDULING TABLE
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY ppi_pri ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY ppi_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       $i=0; 
@@ -1595,22 +1595,22 @@ class 3rd
 
 	  // If this individual has had a yearly PPI this year, don't show him on the schedule list
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-	  $sql = "SELECT * FROM 3rd_interview WHERE date > '$year_start' AND date < '$year_end' ".
+	  $sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
 	     "AND indiv=" . $id . " AND interview_type='ppi'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
-	    $sql = "SELECT * FROM 3rd_interview WHERE indiv=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
+	    $sql = "SELECT * FROM tc_interview WHERE indiv=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
-	    $link_data['menuaction'] = '3rd.3rd.ppi_update';
+	    $link_data['menuaction'] = 'tc.tc.ppi_update';
 	    $link_data['indiv'] = $id;
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = '';
 	    $link_data['interview_type'] = 1;
 	    $link_data['action'] = 'add';
 	    $link_data['interviewer'] = $interviewer;
-	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+	    $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -1631,14 +1631,14 @@ class 3rd
 	    $table_data.= '</td>';
 	    $table_data.= '</tr>';
 	  } else {
-	    $link_data['menuaction'] = '3rd.3rd.ppi_update';
+	    $link_data['menuaction'] = 'tc.tc.ppi_update';
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
 	    $link_data['indiv'] = $this->db2->f('indiv');
 	    $link_data['name'] = $name;
 	    $link_data['interview'] = $this->db2->f('interview');
 	    $link_data['interview_type'] = $this->db2->f('interview_type');
 	    $link_data['action'] = 'view';
-	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);    
+	    $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 	    $indivs_with_yearly_ppi++;
 	    $date = $this->db2->f('date');
 	    $ppi_notes = $this->db2->f('notes');
@@ -1702,13 +1702,13 @@ class 3rd
       $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
-      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
+      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_view'));
       $this->t->set_var('int_link_title','Hometeaching Interviews');
       
-      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched'));
+      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched'));
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
 
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched&action=save'));
       $this->t->set_var('title','Hometeaching Interviews Scheduler');
 
       $indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $int_date_width=20;
@@ -1730,7 +1730,7 @@ class 3rd
       //print "year: $year month: $month quarter_start: $quarter_start quarter_end: $quarter_end<br>";
 
       // create the individual id -> individual name mapping
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $indiv_id_data = NULL;
@@ -1758,12 +1758,12 @@ class 3rd
 		  $supervisor = $entry['supervisor'];
 		  $supervisor_array = explode(",", $individ2name[$supervisor]);
 		  $supervisor_last_name = $supervisor_array[0];
-		  $sql = "SELECT * FROM 3rd_indiv where indiv='$supervisor'";
+		  $sql = "SELECT * FROM tc_indiv where indiv='$supervisor'";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  if($this->db2->next_record()) {
 		    $indiv_id = $this->db2->f('indiv_id');
 		  }
-		  $sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
+		  $sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  if($this->db2->next_record()) {
 		    $supervisor_address = $this->db2->f('address');
@@ -1774,11 +1774,11 @@ class 3rd
 		
 		//print "indiv: $indiv appointment: $appointment <br>";
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
+		$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
-		  $this->db->query("UPDATE 3rd_appointment set " .
+		  $this->db->query("UPDATE tc_appointment set " .
 				   " indiv='" . $indiv . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
@@ -1801,7 +1801,7 @@ class 3rd
 	     //print "int_notes: $int_notes indiv_name: $indiv_name aaronic: $aaronic <Br>";
 	     if($aaronic == 0) { 
 	       // Perform database save actions here
-	       $this->db->query("UPDATE 3rd_indiv set " .
+	       $this->db->query("UPDATE tc_indiv set " .
 				" int_notes='" . $int_notes . "'" .
 				",int_pri='" . $int_pri . "'" .
 				" WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
@@ -1809,12 +1809,12 @@ class 3rd
 	     
 	   }
 
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
 
       // Get the Districts
-      $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
+      $sql = "SELECT * FROM tc_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1823,7 +1823,7 @@ class 3rd
 	  $districts[$i]['district'] = $this->db->f('district');
 	  $districts[$i]['name'] = $this->db->f('name');
 	  $districts[$i]['supervisor'] = $this->db->f('supervisor');
-	  $sql = "SELECT * FROM 3rd_presidency where district=$district and valid=1";
+	  $sql = "SELECT * FROM tc_presidency where district=$district and valid=1";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $districts[$i]['presidency'] = $this->db2->f('presidency');
@@ -1851,12 +1851,12 @@ class 3rd
       $supervisor = $districts[$d]['supervisor'];
       $supervisor_array = explode(",", $supervisor);
       $supervisor_last_name = $supervisor_array[0];
-      $sql = "SELECT * FROM 3rd_indiv where indiv='$supervisor'";
+      $sql = "SELECT * FROM tc_indiv where indiv='$supervisor'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record()) {
 	$indiv_id = $this->db2->f('indiv_id');
       }
-      $sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
+      $sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record()) {
 	$supervisor_address = $this->db2->f('address');
@@ -1868,7 +1868,7 @@ class 3rd
       $this->t->set_var('appt_table_title',$appt_table_title);
       
       // query the database for all the appointments
-      $sql = "SELECT * FROM 3rd_appointment where presidency=".$districts[$d]['presidency']." and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $sql = "SELECT * FROM tc_appointment where presidency=".$districts[$d]['presidency']." and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 	
       while ($this->db->next_record())
@@ -1918,7 +1918,7 @@ class 3rd
       // INTERVIEW SCHEDULING TABLE
       
       // Select all the unique companionship numbers for this district
-      $sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $districts[$d]['district'];
+      $sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $districts[$d]['district'];
       $this->db->query($sql,__LINE__,__FILE__);
       $j=0; $unique_companionships = '';
       while ($this->db->next_record())
@@ -1930,7 +1930,7 @@ class 3rd
       $i=0;
       for ($j=0; $j < count($unique_companionships); $j++) {
 	// Select all the companions from each companionship
-	$sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
+	$sql = "SELECT * FROM tc_companionship where valid=1 and ".
 	   "companionship=". $unique_companionships[$j]['companionship'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$k=0; $int_completed=0;
@@ -1944,7 +1944,7 @@ class 3rd
 	      $indiv_id = $this->db->f('indiv');
 	      $aaronic_id = $this->db->f('aaronic');
 	     
-	      $sql = "SELECT * FROM 3rd_indiv where indiv=$indiv_id";
+	      $sql = "SELECT * FROM tc_indiv where indiv=$indiv_id";
 	      $this->db2->query($sql,__LINE__,__FILE__);	
 	      if($this->db2->next_record())
 		{
@@ -1956,7 +1956,7 @@ class 3rd
 		  $indiv_aaronic = 0;
 		}
 	      else {
-		$sql = "SELECT * FROM 3rd_aaronic where aaronic=$aaronic_id";
+		$sql = "SELECT * FROM tc_aaronic where aaronic=$aaronic_id";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record())
 		  {
@@ -1990,22 +1990,22 @@ class 3rd
 	      }
 	      
 	      // If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-	      $sql = "SELECT * FROM 3rd_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
+	      $sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
 		 "AND indiv=" . $id;
 	      $this->db2->query($sql,__LINE__,__FILE__);
 	      
 	      if(!$this->db2->next_record()) {
-		$sql = "SELECT * FROM 3rd_interview WHERE indiv=" . $id . " ORDER BY date DESC";
+		$sql = "SELECT * FROM tc_interview WHERE indiv=" . $id . " ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
-		$link_data['menuaction'] = '3rd.3rd.int_update';
+		$link_data['menuaction'] = 'tc.tc.int_update';
 		$link_data['indiv'] = $id;
 		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
 		$link_data['interview'] = '';
 		$link_data['action'] = 'add';
 		$link_data['interviewer'] = $districts[$d]['supervisor'];
-		$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+		$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 		$table_data.= "<td align=center>$phone</td>";
 		$table_data.= "<td align=center>";
@@ -2029,14 +2029,14 @@ class 3rd
 		$table_data.= '</tr>'."\n";
 		$i++;
 	      } else {
-		$link_data['menuaction'] = '3rd.3rd.int_update';
+		$link_data['menuaction'] = 'tc.tc.int_update';
 		$link_data['interviewer'] = $this->db2->f('interviewer');
 		$link_data['indiv'] = $this->db2->f('indiv');
 		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
 		$link_data['interview'] = $this->db2->f('interview');
 		$link_data['action'] = 'view';
-		$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);    
+		$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 		$comps_with_quarterly_int++;
 		$int_completed=1;
 		$date = $this->db2->f('date');
@@ -2103,13 +2103,13 @@ class 3rd
       $this->t->set_var('lang_save','Save Appt / Pri / Notes');
       $this->t->set_var('lang_reset','Clear Changes');
       
-      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
+      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_view'));
       $this->t->set_var('vis_link_title','View Yearly Visits');
       
-      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched'));
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched&action=save'));
       $this->t->set_var('title','Presidency Yearly Visit Scheduler');
 
       $family_width=500; $phone_width=40; $pri_width=10; $notes_width=128; $visit_date_width=20;
@@ -2124,7 +2124,7 @@ class 3rd
       $year = date('Y');
 
       // create the family id -> family name mapping
-      $sql = "SELECT * FROM 3rd_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $family_id = NULL;
@@ -2133,7 +2133,7 @@ class 3rd
 	  $family_id[$i] = $this->db->f('family');
 	  $family_name[$i] = $this->db->f('name');
 	  $familyid2name[$family_id[$i]] = $family_name[$i];
-	  $sql = "SELECT * FROM 3rd_parent where family='$family_id[$i]'";
+	  $sql = "SELECT * FROM tc_parent where family='$family_id[$i]'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
@@ -2161,11 +2161,11 @@ class 3rd
 		if($family == 0) { $location = ""; }
 		
 		//Only perform a database update if we have made a change to this appointment
-		$sql = "SELECT * FROM 3rd_appointment where appointment='$appointment' and family='$family' and location='$location'";
+		$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and family='$family' and location='$location'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if(!$this->db->next_record()) {
 		  // Perform database save actions here
-		  $this->db->query("UPDATE 3rd_appointment set " .
+		  $this->db->query("UPDATE tc_appointment set " .
 				   " family='" . $family . "'" .
 				   ",location='" . $location . "'" .
 				   " WHERE appointment=" . $appointment,__LINE__,__FILE__);
@@ -2185,14 +2185,14 @@ class 3rd
 	     $visit_pri = $entry['pri'];
 	     
 	     // Perform database save actions here
-	     $this->db->query("UPDATE 3rd_family set " .
+	     $this->db->query("UPDATE tc_family set " .
 			      " visit_notes='" . $visit_notes . "'" .
 			      ",visit_pri='" . $visit_pri . "'" .
 			      " WHERE family=" . $family,__LINE__,__FILE__);
 	     
 	   }
 
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched');
 	  //Header('Location: ' . $take_me_to_url);
 	}
 
@@ -2206,18 +2206,18 @@ class 3rd
       $appt_table_data = ""; 
 
       // Find out what the EQ Presidency ID is
-      $sql = "SELECT * FROM 3rd_presidency where eqpres=1 and valid=1";
+      $sql = "SELECT * FROM tc_presidency where eqpres=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$presidency_name = $this->db->f('name');
 	$presidency_id = $this->db->f('presidency');
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate Presidency in 3rd_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate Presidency in tc_presidency table</h3></font></hr>";
 	return;
       }
             
       // query the database for all the appointments
-      $sql = "SELECT * FROM 3rd_appointment where presidency=$presidency_id and date>=CURDATE() ORDER BY date ASC, time ASC";
+      $sql = "SELECT * FROM tc_appointment where presidency=$presidency_id and date>=CURDATE() ORDER BY date ASC, time ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       while ($this->db->next_record())
@@ -2268,7 +2268,7 @@ class 3rd
 
       
       // VISIT SCHEDULING TABLE
-      $sql = "SELECT * FROM 3rd_family where valid=1 and indiv_id != 0 ORDER BY visit_pri ASC";
+      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0 ORDER BY visit_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       $total_families=0; $families_with_yearly_visit=0;
@@ -2290,7 +2290,7 @@ class 3rd
 	  $total_families++;
 	}
 
-      $sql = "SELECT * FROM 3rd_parent where valid=1";
+      $sql = "SELECT * FROM tc_parent where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -2310,20 +2310,20 @@ class 3rd
 
 	  // If this family has had a yearly visit this year, don't show them on the schedule list
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-	  $sql = "SELECT * FROM 3rd_visit WHERE date > '$year_start' AND date < '$year_end' ".
+	  $sql = "SELECT * FROM tc_visit WHERE date > '$year_start' AND date < '$year_end' ".
 	     "AND family=" . $id . " AND companionship=0";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  
 	  if(!$this->db2->next_record()) {
-	    $sql = "SELECT * FROM 3rd_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
+	    $sql = "SELECT * FROM tc_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
 	    $this->db->query($sql,__LINE__,__FILE__);
 	    if($this->db->next_record()) { $date = $this->db->f('date'); } else { $date = ""; }
-	    $link_data['menuaction'] = '3rd.3rd.vis_update';
+	    $link_data['menuaction'] = 'tc.tc.vis_update';
 	    $link_data['visit'] = '';
 	    $link_data['family'] = $id;
 	    $link_data['name'] = $name;
 	    $link_data['action'] = 'add';
-	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+	    $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 	    $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
 	    $table_data.= "<td align=center>$phone</td>";
 	    $table_data.= "<td align=center>";
@@ -2343,13 +2343,13 @@ class 3rd
 	    $tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 	    $this->t->set_var('tr_color',$tr_color);
 	  } else {
-	    $link_data['menuaction'] = '3rd.3rd.vis_update';
+	    $link_data['menuaction'] = 'tc.tc.vis_update';
 	    $link_data['visit'] = $this->db2->f('visit');
 	    $link_data['family'] = $this->db2->f('family');
 	    $link_data['name'] = $name;
 	    $link_data['date'] = $this->db2->f('date');
 	    $link_data['action'] = 'view';
-	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);    
+	    $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 	    $families_with_yearly_visit++;
 	    $date = $this->db2->f('date');
 	    $vis_notes = $this->db2->f('notes');
@@ -2408,19 +2408,19 @@ class 3rd
       $this->t->set_file(array('ppi_view_t' => 'ppi_view.tpl'));
       $this->t->set_block('ppi_view_t','district_list','list');
 
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
       $num_months = get_var('num_months',array('GET','POST'));
       if($num_months == '') { $num_months = $this->default_ppi_num_months; }
       $this->t->set_var('num_months',$num_months);
       if($num_months == 1) { $this->t->set_var('lang_num_months','Month of History'); }
       else {  $this->t->set_var('lang_num_months','Months of History'); }
       $this->t->set_var('lang_filter','Filter');
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
             
-      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
+      $this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
       $this->t->set_var('ppi_link_title','Yearly PPIs'); 
 
-      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
       $this->t->set_var('title','Yearly PPIs');
@@ -2430,20 +2430,20 @@ class 3rd
       if($num_months == 1) { $this->t->set_var('lang_num_months','Year of History'); }
       else { $this->t->set_var('lang_num_months','Years of History'); }	
 
-      $sql = "SELECT * FROM 3rd_presidency where president=1 and valid=1";
+      $sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       if($this->db->next_record()) {
 	$president_name = $this->db->f('name');
 	$interviewer = $this->db->f('indiv');
 	$interview_type = 'ppi';
       } else {
-	print "<hr><font color=red><h3>-E- Unable to locate President in 3rd_presidency table</h3></font></hr>";
+	print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
 	return;
       }
       $this->t->set_var('district_number','*');
       $this->t->set_var('district_name',$president_name);
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2474,14 +2474,14 @@ class 3rd
 	$name = $indiv_name[$j];
 	$phone = $indiv_phone[$id];
 	
-	$link_data['menuaction'] = '3rd.3rd.ppi_update';
+	$link_data['menuaction'] = 'tc.tc.ppi_update';
 	$link_data['interviewer'] = $interviewer;
 	$link_data['indiv'] = $id;
 	$link_data['name'] = $name;
 	$link_data['interview'] = '';
 	$link_data['interview_type'] = $interview_type;
 	$link_data['action'] = 'add';
-	$link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+	$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 
@@ -2489,14 +2489,14 @@ class 3rd
 	for($m=$num_months; $m >= 0; $m--) {
 	  $year = date('Y') - $m;
 	  $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-	  $sql = "SELECT * FROM 3rd_interview WHERE date > '$year_start' AND date < '$year_end' ".
+	  $sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
 	     "AND indiv=" . $id . " AND interview_type='ppi'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  	  
 	  if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
 	  if($this->db2->next_record()) {
 	    $ppis[$m]++; $total_ppis[$m]++; $ppi_recorded[$companionship][$m]=1;
-	    $link_data['menuaction'] = '3rd.3rd.ppi_update';
+	    $link_data['menuaction'] = 'tc.tc.ppi_update';
 	    $link_data['companionship'] = $companionship;
 	    $link_data['interviewer'] = $this->db2->f('interviewer');
 	    $link_data['indiv'] = $id;
@@ -2508,7 +2508,7 @@ class 3rd
 	    $date_array = explode("-",$date);
 	    $month = $date_array[1];
 	    $day   = $date_array[2];
-	    $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+	    $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 	    $table_data .= '<td align=center><a href='.$link.'><img src="images/checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
 	  }
 	  else { $table_data .= "<td>&nbsp;</td>"; }
@@ -2539,7 +2539,7 @@ class 3rd
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
       
@@ -2554,7 +2554,7 @@ class 3rd
       $notes = get_var('notes',array('GET','POST'));
       $interview_type = get_var('interview_type',array('GET','POST'));
      
-      $sql = "SELECT * FROM 3rd_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
+      $sql = "SELECT * FROM tc_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
@@ -2573,7 +2573,7 @@ class 3rd
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE 3rd_interview set " .
+	  $this->db->query("UPDATE tc_interview set " .
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 		          ", indiv='" . $indiv . "'" .
@@ -2589,7 +2589,7 @@ class 3rd
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
+	  $this->db->query("INSERT INTO tc_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
 			   . "VALUES ('" . $interviewer . "','" . $indiv . "','" . $aaronic . "','"
 			   . $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
@@ -2609,13 +2609,13 @@ class 3rd
 	  $this->t->set_var('interview_type_checked','checked');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_update&interview='
 								. $interview . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM 3rd_interview WHERE interview=".$interview;
+	  $sql = "SELECT * FROM tc_interview WHERE interview=".$interview;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('interview',$interview);
@@ -2633,7 +2633,7 @@ class 3rd
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_update&interview='
 								. $interview . '&action=' . 'save'));
 	}
 
@@ -2645,7 +2645,7 @@ class 3rd
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing PPI');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_update&interview='
 								. $interview . '&action=' . 'edit'));
 	}
       
@@ -2669,7 +2669,7 @@ class 3rd
       $this->t->set_file(array('int_view_t' => 'int_view.tpl'));
       $this->t->set_block('int_view_t','district_list','list');
 
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_view'));
       $num_quarters = get_var('num_quarters',array('GET','POST'));
       if($num_quarters == '') { $num_quarters = $this->default_int_num_quarters; }
       $this->t->set_var('num_quarters',$num_quarters);
@@ -2677,10 +2677,10 @@ class 3rd
       else {  $this->t->set_var('lang_num_quarters','Quarters of History'); }
       $this->t->set_var('lang_filter','Filter');
       
-      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
+      $this->t->set_var('int_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_view'));
       $this->t->set_var('int_link_title','Hometeaching Interviews'); 
       
-      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched'));
+      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched'));
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
       
       $this->t->set_var('title','Hometeaching Interviews'); 
@@ -2692,7 +2692,7 @@ class 3rd
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-      $sql = "SELECT * FROM 3rd_district where valid=1 ORDER BY district ASC";
+      $sql = "SELECT * FROM tc_district where valid=1 ORDER BY district ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2703,7 +2703,7 @@ class 3rd
 	  $i++;
 	}
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -2719,7 +2719,7 @@ class 3rd
           $indivs[$id] = $indiv_name[$i];
       }      
 
-      $sql = "SELECT * FROM 3rd_aaronic where valid=1 ORDER BY aaronic ASC";
+      $sql = "SELECT * FROM tc_aaronic where valid=1 ORDER BY aaronic ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -2736,7 +2736,7 @@ class 3rd
 	$supervisor = $districts[$i]['supervisor'];
 		
 	// Select all the unique companionship numbers for this district
-	$sql = "SELECT distinct companionship FROM 3rd_companionship where valid=1 and district=". $districts[$i]['district'];
+	$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $districts[$i]['district'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$j=0; $unique_companionships = '';
 	while ($this->db->next_record())
@@ -2750,7 +2750,7 @@ class 3rd
 	for($m=$num_months; $m >= 0; $m--) { $ints[$m] = 0; }
 	for ($j=0; $j < count($unique_companionships); $j++) {
 	  // Select all the companions in each companionship
-	  $sql = "SELECT * FROM 3rd_companionship where valid=1 and ".
+	  $sql = "SELECT * FROM tc_companionship where valid=1 and ".
 	     "companionship=". $unique_companionships[$j]['companionship'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $k=0;
@@ -2771,7 +2771,7 @@ class 3rd
 		$name = $aaronic[$aaronic_id]['name'];
 		$phone = $aaronic[$aaronic_id]['phone'];
 	      }
-	      $link_data['menuaction'] = '3rd.3rd.int_update';
+	      $link_data['menuaction'] = 'tc.tc.int_update';
 	      $link_data['companionship'] = $companionship;
 	      $link_data['interviewer'] = $supervisor;
 	      $link_data['indiv'] = $indiv_id;
@@ -2779,7 +2779,7 @@ class 3rd
 	      $link_data['name'] = $name;
 	      $link_data['interview'] = '';
 	      $link_data['action'] = 'add';
-	      $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+	      $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 	      $table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 
 	      // Find out how many times Interviews were performed in the past $num_months for this individual
@@ -2792,7 +2792,7 @@ class 3rd
 		$month_start = "$year"."-"."$month"."-"."01";
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
-		$sql = "SELECT * FROM 3rd_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
+		$sql = "SELECT * FROM tc_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
 		   "AND indiv=" . $indiv_id . " AND aaronic=" . $aaronic_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$header_row .= "<th width=$int_width><font size=-2>$month</th>";
@@ -2802,7 +2802,7 @@ class 3rd
 		  if(!$int_recorded[$companionship][$m]) {
 		    $ints[$m]++; $total_ints[$m]++; $int_recorded[$companionship][$m]=1;
 		  }
-		  $link_data['menuaction'] = '3rd.3rd.int_update';
+		  $link_data['menuaction'] = 'tc.tc.int_update';
 		  $link_data['companionship'] = $companionship;
 		  $link_data['interviewer'] = $this->db2->f('interviewer');
 		  $link_data['indiv'] = $indiv_id;
@@ -2814,7 +2814,7 @@ class 3rd
 		  $date_array = explode("-",$date);
 		  $month = $date_array[1];
 		  $day   = $date_array[2];
-		  $link = $GLOBALS['phpgw']->link('/3rd/index.php',$link_data);
+		  $link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 		  $table_data .= '<td align=center><a href='.$link.'><img src="images/checkmark.gif">&nbsp;'.$month.'-'.$day.'</a></td>';
 		}
 		else { $table_data .= "<td>&nbsp;</td>"; }
@@ -2875,7 +2875,7 @@ class 3rd
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
       $this->t->set_var('interview_type_checked','');
@@ -2891,7 +2891,7 @@ class 3rd
       $notes = get_var('notes',array('GET','POST'));
       $interview_type = get_var('interview_type',array('GET','POST'));
 
-      $sql = "SELECT * FROM 3rd_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
+      $sql = "SELECT * FROM tc_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
       $this->db2->query($sql,__LINE__,__FILE__);
       while ($this->db2->next_record())
       {
@@ -2909,7 +2909,7 @@ class 3rd
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE 3rd_interview set " .
+	  $this->db->query("UPDATE tc_interview set " .
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 		          ", indiv='" . $indiv . "'" .
@@ -2925,7 +2925,7 @@ class 3rd
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
+	  $this->db->query("INSERT INTO tc_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
 			   . "VALUES ('" . $interviewer . "','" . $indiv . "','" . $aaronic . "','"
 			   . $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
 	  $this->int_view();
@@ -2944,13 +2944,13 @@ class 3rd
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_update&interview='
 								. $interview . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM 3rd_interview WHERE interview=".$interview;
+	  $sql = "SELECT * FROM tc_interview WHERE interview=".$interview;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('interview',$interview);
@@ -2968,7 +2968,7 @@ class 3rd
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_update&interview='
 								. $interview . '&action=' . 'save'));
 	}
 
@@ -2980,7 +2980,7 @@ class 3rd
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Interview');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_update&interview='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_update&interview='
 								. $interview . '&action=' . 'edit'));
 	}
       
@@ -3008,13 +3008,13 @@ class 3rd
       $this->t->set_var('lang_name','Family Name');
       $this->t->set_var('lang_date','Date');
 
-      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
+      $this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_view'));
       $this->t->set_var('vis_link_title','View Yearly Visits');
       
-      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched'));
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_view'));
       $num_years = get_var('num_years',array('GET','POST'));
       if($num_years == '') { $num_years = $this->default_vis_num_years; }
       $this->t->set_var('num_years',$num_years);
@@ -3025,7 +3025,7 @@ class 3rd
       $year = date('Y') - $num_years + 1;
       $year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
       
-      $sql = "SELECT * FROM 3rd_visit WHERE companionship=0 and date > '$year_start' ORDER BY date DESC";
+      $sql = "SELECT * FROM tc_visit WHERE companionship=0 and date > '$year_start' ORDER BY date DESC";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -3042,7 +3042,7 @@ class 3rd
 	{	  
 	  $this->nextmatchs->template_alternate_row_color(&$this->t);
 
-	  $sql = "SELECT * FROM 3rd_family WHERE family=".$visit_list[$i]['family'];
+	  $sql = "SELECT * FROM tc_family WHERE family=".$visit_list[$i]['family'];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  	  
@@ -3050,27 +3050,27 @@ class 3rd
 	  $this->t->set_var('family_name',$this->db->f('name'));
 	  $this->t->set_var('date',$visit_list[$i]['date']);
 	  
-	  $link_data['menuaction'] = '3rd.3rd.vis_update';
+	  $link_data['menuaction'] = 'tc.tc.vis_update';
 	  $link_data['visit'] = $visit_list[$i]['visit'];
 	  $link_data['name'] = $this->db->f('name');
 	  $link_data['date'] = $visit_list[$i]['date'];
 	  $link_data['action'] = 'view';
-	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('view',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('lang_view','View');
 
-	  $link_data['menuaction'] = '3rd.3rd.vis_update';
+	  $link_data['menuaction'] = 'tc.tc.vis_update';
 	  $link_data['visit'] = $visit_list[$i]['visit'];
 	  $link_data['name'] = $this->db->f('name');
 	  $link_data['date'] = $visit_list[$i]['date'];
 	  $link_data['action'] = 'edit';
-	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('edit',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('lang_edit','Edit');
 
 	  $this->t->fp('list1','visit_list',True);
 	}
 
       // List the families that are available to record a visit against
-      $sql = "SELECT * FROM 3rd_family WHERE valid=1";
+      $sql = "SELECT * FROM tc_family WHERE valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $total_records = $this->db->num_rows();
 
@@ -3084,12 +3084,12 @@ class 3rd
       
       for ($i=0; $i < count($family_names); $i++)
 	{
-	  $link_data['menuaction'] = '3rd.3rd.vis_update';
+	  $link_data['menuaction'] = 'tc.tc.vis_update';
 	  $link_data['visit'] = '';
 	  $link_data['family'] = $family_ids[$i];
 	  $link_data['action'] = 'add';
 	  $link_data['name'] = $family_names[$i];
-	  $this->t->set_var('add',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('add',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 
 	  $this->t->set_var('name',$family_names[$i]);
 	  if(($i+1) % 3 == 0) { $this->t->set_var('table_sep',"</td></tr><tr>"); }
@@ -3109,7 +3109,7 @@ class 3rd
       $this->t->set_block('form','add','addhandle');
       $this->t->set_block('form','edit','edithandle');
       
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_view'));
       $this->t->set_var('readonly','');
       $this->t->set_var('disabled','');
       
@@ -3124,7 +3124,7 @@ class 3rd
       if($action == 'save')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("UPDATE 3rd_visit set " .
+	  $this->db->query("UPDATE tc_visit set " .
 			   "  date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 			   " WHERE visit=" . $visit,__LINE__,__FILE__);
@@ -3135,7 +3135,7 @@ class 3rd
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO 3rd_visit (family,companionship,date,notes) "
+	  $this->db->query("INSERT INTO tc_visit (family,companionship,date,notes) "
 			   . "VALUES ('" . $family . "','" . $companionship . "','"
 			   . $date . "','" . $notes . "')",__LINE__,__FILE__);
 	  $this->vis_view();
@@ -3152,13 +3152,13 @@ class 3rd
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Adding New Visit');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_update&family='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_update&family='
 								. $family . '&action=' . 'insert'));
 	}
 
       if($action == 'edit' || $action == 'view')
 	{
-	  $sql = "SELECT * FROM 3rd_visit WHERE visit=".$visit;
+	  $sql = "SELECT * FROM tc_visit WHERE visit=".$visit;
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $this->db->next_record();
 	  $this->t->set_var('visit',$visit);
@@ -3173,7 +3173,7 @@ class 3rd
 	  $this->t->set_var('cal_date',$this->jscal->input('date',$date,'','','','','',$this->cal_options));
 	  $this->t->set_var('lang_done','Cancel');
 	  $this->t->set_var('lang_action','Editing Visit');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_update&visit='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_update&visit='
 								. $visit . '&action=' . 'save'));
 	}
 
@@ -3185,7 +3185,7 @@ class 3rd
 	  $this->t->set_var('disabled','DISABLED');
 	  $this->t->set_var('lang_done','Done');
 	  $this->t->set_var('lang_action','Viewing Visit');
-	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_update&visit='
+	  $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_update&visit='
 								. $visit . '&action=' . 'edit'));
 	}
       
@@ -3217,7 +3217,7 @@ class 3rd
       $this->t->set_block('att_view_t','header_list','list2');
       $this->t->set_block('att_view_t','indiv_list','list3');
       
-      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_view'));
+      $this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.att_view'));
       $num_quarters = get_var('num_quarters',array('GET','POST'));
       if($num_quarters == '') { $num_quarters = $this->default_att_num_quarters; }
       $this->t->set_var('num_quarters',$num_quarters);
@@ -3232,7 +3232,7 @@ class 3rd
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1";
+      $sql = "SELECT * FROM tc_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3278,14 +3278,14 @@ class 3rd
 	  if($i == count($sunday_list)-1) { $span++; }
 	  $cur_month = $sunday_list[$i]['month'];
 	  $old_month = $sunday_list[$i]['month'];	  
-	  $link_data['menuaction'] = '3rd.3rd.att_update';
+	  $link_data['menuaction'] = 'tc.tc.att_update';
 	  $link_data['month'] = $sunday_list[$i-1]['month'];
 	  $link_data['year'] = $sunday_list[$i-1]['year'];
 	  $link_data['action'] = 'update_month';
 	  $cur_month = $sunday_list[$i-1]['month'];
 	  $cur_year = $sunday_list[$i-1]['year'];
 	  $header_row .= "<th><font size=-3>$cur_month&nbsp;$cur_year</font></th>";
-	  $this->t->set_var('update_month',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('update_month',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('month',$sunday_list[$i-1]['month']);
 	  $this->t->set_var('year',$sunday_list[$i-1]['year']);
 	  $this->t->set_var('span',$span); $span=0;
@@ -3297,13 +3297,13 @@ class 3rd
       
       $indiv_width=200; $att_width=25; $total_width=$indiv_width; 
       for ($i=0; $i < count($sunday_list); $i++) {
-      	$link_data['menuaction'] = '3rd.3rd.att_update';
+      	$link_data['menuaction'] = 'tc.tc.att_update';
 	$link_data['month'] = $sunday_list[$i]['month'];
 	$link_data['year'] = $sunday_list[$i]['year'];
 	$link_data['day'] = $sunday_list[$i]['day'];
 	$link_data['date'] = $sunday_list[$i]['date'];
 	$link_data['action'] = 'update_day';
-	$this->t->set_var('update_day',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	$this->t->set_var('update_day',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
         $this->t->set_var('date',$sunday_list[$i]['date']);
 	$this->t->set_var('day',$sunday_list[$i]['day']);
         $this->t->set_var('month',$sunday_list[$i]['month']);
@@ -3320,9 +3320,9 @@ class 3rd
 	#print "checking for indiv: " . $indiv_id[$i] . "<br>";
 	for ($j=0; $j < count($sunday_list); $j++) {
 	  #print "checking for date: " .  $sunday_list[$j]['date'] . "<br>";
-	  #print "SELECT * FROM 3rd_attendance WHERE date='"
+	  #print "SELECT * FROM tc_attendance WHERE date='"
 	  #  . $sunday_list[$j]['date'] . "' AND indiv=" . $indiv_id[$i] . "<br>";
-	  $sql = "SELECT * FROM 3rd_attendance WHERE date='"
+	  $sql = "SELECT * FROM tc_attendance WHERE date='"
 	     . $sunday_list[$j]['date'] . "' AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  if($this->db->next_record()) {
@@ -3390,7 +3390,7 @@ class 3rd
       $this->t->set_block('form','header_list','list2');
       $this->t->set_block('form','indiv_list','list3');
 
-      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_view'));
+      $this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.att_view'));
 
       $action = get_var('action',array('GET','POST'));
       $month = get_var('month',array('GET','POST'));
@@ -3404,11 +3404,11 @@ class 3rd
 	   $month = $monthnum[$month]; if($month < 10) { $month = "0" . $month; }
 
 	   if($action == 'save_month') {	
-             $this->db->query("DELETE from 3rd_attendance where date LIKE '".$year."-".$month."-%'",__LINE__,__FILE__);
+             $this->db->query("DELETE from tc_attendance where date LIKE '".$year."-".$month."-%'",__LINE__,__FILE__);
 	   }
 
 	   if($action == 'save_day') {	      
-             $this->db->query("DELETE from 3rd_attendance where date LIKE '".$year."-".$month."-".$day."'",__LINE__,__FILE__);
+             $this->db->query("DELETE from tc_attendance where date LIKE '".$year."-".$month."-".$day."'",__LINE__,__FILE__);
 	   }   
 
 	   foreach ($new_data as $data)
@@ -3416,7 +3416,7 @@ class 3rd
 	      $data_array = explode("-",$data);
 	      $indiv = $data_array[0];
 	      $date  = "$data_array[1]-$data_array[2]-$data_array[3]";	      
-	      $this->db->query("INSERT INTO 3rd_attendance (indiv,date) "
+	      $this->db->query("INSERT INTO tc_attendance (indiv,date) "
 	      		       . "VALUES (" . $indiv . ",'". $date . "')",__LINE__,__FILE__);
 	   }
 	
@@ -3424,7 +3424,7 @@ class 3rd
 	 return false;    
 	}
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1";
+      $sql = "SELECT * FROM tc_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3438,7 +3438,7 @@ class 3rd
       
       if($action == 'update_month')
       {
-        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_update&action=save_month'));
+        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.att_update&action=save_month'));
         $i=0; 
 	$last_time = 0; 
 	$found_sunday = 0;
@@ -3468,13 +3468,13 @@ class 3rd
 	$this->t->fp('list1','month_list',True);
 	$indiv_width=200; $att_width=25; $total_width=$indiv_width;
 	for ($i=0; $i < count($sunday_list); $i++) {
-	  $link_data['menuaction'] = '3rd.3rd.att_update';
+	  $link_data['menuaction'] = 'tc.tc.att_update';
 	  $link_data['month'] = $sunday_list[$i]['month'];
 	  $link_data['year'] = $sunday_list[$i]['year'];
 	  $link_data['day'] = $sunday_list[$i]['day'];
 	  $link_data['date'] = $sunday_list[$i]['date'];
 	  $link_data['action'] = 'update_day';
-	  $this->t->set_var('update_day',$GLOBALS['phpgw']->link('/3rd/index.php',$link_data));
+	  $this->t->set_var('update_day',$GLOBALS['phpgw']->link('/tc/index.php',$link_data));
 	  $this->t->set_var('date',$sunday_list[$i]['date']);
 	  $this->t->set_var('day',$sunday_list[$i]['day']);
 	  $this->t->set_var('month',$sunday_list[$i]['month']);
@@ -3486,7 +3486,7 @@ class 3rd
 
       if($action == 'update_day')
       {
-        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.att_update&action=save_day'));
+        $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.att_update&action=save_day'));
         $sunday_list[0]['date'] = date("Y-m-d", mktime(0, 0, 0, $monthnum[$month], $day, $year));
         $this->t->set_var('month',$month);
 	$this->t->set_var('year',$year);
@@ -3503,7 +3503,7 @@ class 3rd
 	$this->nextmatchs->template_alternate_row_color(&$this->t);
 	$this->t->set_var('indiv_name',$indiv_name[$i]);
 	for ($j=0; $j < count($sunday_list); $j++) {
-	  $sql = "SELECT * FROM 3rd_attendance WHERE date='"
+	  $sql = "SELECT * FROM tc_attendance WHERE date='"
 	     . $sunday_list[$j]['date'] . "' AND indiv=" . $indiv_id[$i];
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  $value = $indiv_id[$i] . "-" . $sunday_list[$j]['date'];
@@ -3534,7 +3534,7 @@ class 3rd
       $this->t->set_file(array('dir_view_t' => 'dir_view.tpl'));
       $this->t->set_block('dir_view_t','dir_list','list');
       
-      $sql = "SELECT * FROM 3rd_parent where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_parent where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3570,7 +3570,7 @@ class 3rd
       $this->t->set_block('org_view_t','org_list','list2');
 
       # Display a list ordered alphabetically
-      $sql = "SELECT * FROM 3rd_calling ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_calling ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3598,7 +3598,7 @@ class 3rd
       }
 
       # Display a list ordered by organization
-      $sql = "SELECT * FROM 3rd_calling ORDER BY sequence ASC";
+      $sql = "SELECT * FROM tc_calling ORDER BY sequence ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3636,19 +3636,19 @@ class 3rd
 
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.schedule&action=save'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.schedule&action=save'));
       $this->t->set_var('title','Scheduling Tool');
 
       $this->t->set_var('lang_save','Save Schedule');
       $this->t->set_var('lang_reset','Cancel');
       
-      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.vis_sched'));
+      $this->t->set_var('schedule_vis_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched'));
       $this->t->set_var('schedule_vis_link_title','Schedule Yearly Visits');
 
-      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.int_sched'));
+      $this->t->set_var('schedule_int_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched'));
       $this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
       
-      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.ppi_sched'));
+      $this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
       $this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
       
       $date_width=150; $time_width=220; $indiv_width=170; $family_width=180; $location_width=100;
@@ -3660,7 +3660,7 @@ class 3rd
       $header_row.= "<th width=$location_width><font size=-2>Location</th>";
       $table_data = "";
 
-      $sql = "SELECT * FROM 3rd_presidency where valid=1";
+      $sql = "SELECT * FROM tc_presidency where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3673,7 +3673,7 @@ class 3rd
 	  $i++;
 	}
       
-      $sql = "SELECT * FROM 3rd_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3681,7 +3681,7 @@ class 3rd
 	  $family_id[$i] = $this->db->f('family');
 	  $family_name[$i] = $this->db->f('name');
 	  $familyid2name[$family_id[$i]] = $family_name[$i];
-	  $sql = "SELECT * FROM 3rd_parent where family='$family_id[$i]'";
+	  $sql = "SELECT * FROM tc_parent where family='$family_id[$i]'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
@@ -3722,12 +3722,12 @@ class 3rd
 		   else if($indiv > 0) {
 		     $supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		     $supervisor_last_name = $supervisor_name_array[0];
-		     $sql = "SELECT * FROM 3rd_indiv where indiv='$presidency2indiv[$presidency]'";
+		     $sql = "SELECT * FROM tc_indiv where indiv='$presidency2indiv[$presidency]'";
 		     $this->db2->query($sql,__LINE__,__FILE__);
 		     if($this->db2->next_record()) {
 		       $indiv_id = $this->db2->f('indiv_id');
 		     }
-		     $sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
+		     $sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
 		     $this->db2->query($sql,__LINE__,__FILE__);
 		     if($this->db2->next_record()) {
 		       $supervisor_address = $this->db2->f('address');
@@ -3749,7 +3749,7 @@ class 3rd
 		 if($appointment < $this->max_appointments)
 		   {
 		     //Only perform a database update if we have made a change to this appointment
-		     $sql = "SELECT * FROM 3rd_appointment where " .
+		     $sql = "SELECT * FROM tc_appointment where " .
 			"appointment='$appointment'" .
 			" and presidency='$presidency'" .
 			" and indiv='$indiv'" .
@@ -3761,7 +3761,7 @@ class 3rd
 		     if(!$this->db->next_record()) {
 		       $old_date = $this->db->f('date');
 		       $old_time = $this->db->f('time');
-		       $this->db2->query("UPDATE 3rd_appointment set" .
+		       $this->db2->query("UPDATE tc_appointment set" .
 					" family=" . $family . 
 					" ,indiv=" . $indiv . 
 					" ,date='" . $date . "'" .
@@ -3779,13 +3779,13 @@ class 3rd
 		 else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 		   {
 		     //print "adding entry: appt=$appointment date: $date time: $time indiv: $indiv family: $family<br>";
-		     $this->db2->query("INSERT INTO 3rd_appointment (appointment,presidency,family,indiv,date,time,location,uid) "
+		     $this->db2->query("INSERT INTO tc_appointment (appointment,presidency,family,indiv,date,time,location,uid) "
 			   . "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $indiv . "','"
 			   . $date . "','" . $time  . "','" . $location . "','" . $uid ."')",__LINE__,__FILE__);
 
 		     // Now reselect this entry from the database to see if we need
 		     // to send an appointment out for it.
-		     $sql = "SELECT * FROM 3rd_appointment where " .
+		     $sql = "SELECT * FROM tc_appointment where " .
 			"indiv='$indiv'" .
 			" and family='$family'" .
 			" and presidency='$presidency'" .
@@ -3804,11 +3804,11 @@ class 3rd
 	       }
 	   }
 	  
-	  $take_me_to_url = $GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.schedule');
+	  $take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.schedule');
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3828,7 +3828,7 @@ class 3rd
 	$table_data="";
 	
 	// query the database for all the appointments
-	$sql = "SELECT * FROM 3rd_appointment where presidency=$presidency and date>=CURDATE() ORDER BY date ASC, time ASC";
+	$sql = "SELECT * FROM tc_appointment where presidency=$presidency and date>=CURDATE() ORDER BY date ASC, time ASC";
 	$this->db->query($sql,__LINE__,__FILE__);
 
 	// Prefill any existing appointment slots
@@ -3849,12 +3849,12 @@ class 3rd
 	      else if($indiv > 0) {
 		$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 		$supervisor_last_name = $supervisor_name_array[0];
-		$sql = "SELECT * FROM 3rd_indiv where indiv='$presidency2indiv[$presidency]'";
+		$sql = "SELECT * FROM tc_indiv where indiv='$presidency2indiv[$presidency]'";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 		  $indiv_id = $this->db2->f('indiv_id');
 		}
-		$sql = "SELECT * FROM 3rd_parent where indiv_id='$indiv_id'";
+		$sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 		  $supervisor_address = $this->db2->f('address');
@@ -3986,22 +3986,22 @@ class 3rd
 
       $action = get_var('action',array('GET','POST'));
       
-      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email'));
+      $this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.email'));
       $this->t->set_var('title','Email Tool');
 
       $this->t->set_var('lang_email','Send Email');
       $this->t->set_var('lang_reset','Cancel');
       
-      $this->t->set_var('email_member_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=member'));
+      $this->t->set_var('email_member_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.email&action=member'));
       $this->t->set_var('email_member_link_title','Email Quorum Member');
 
-      $this->t->set_var('email_quorum_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=quorum'));
+      $this->t->set_var('email_quorum_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.email&action=quorum'));
       $this->t->set_var('email_quorum_link_title','Email Quorum');
       
-      $this->t->set_var('email_reminder_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=reminder'));
+      $this->t->set_var('email_reminder_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.email&action=reminder'));
       $this->t->set_var('email_reminder_link_title','Email Reminders');
 
-      $this->t->set_var('email_edit_link',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.email&action=edit'));
+      $this->t->set_var('email_edit_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.email&action=edit'));
       $this->t->set_var('email_edit_link_title','Edit Email Addresses');
 
       $table_width=600;
@@ -4019,14 +4019,14 @@ class 3rd
       $this->t->set_block('admin_t','cmd','cmdhandle');
       $this->t->set_block('admin_t','presidency','presidencyhandle');
       
-      $this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.admin&action=upload'));
-      $this->t->set_var('presidency_action',$GLOBALS['phpgw']->link('/3rd/index.php','menuaction=3rd.3rd.admin&action=presidency'));
+      $this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.admin&action=upload'));
+      $this->t->set_var('presidency_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.admin&action=presidency'));
       
       $action = get_var('action',array('GET','POST'));
 
       $this->t->pfp('out','admin_t');
 
-      $sql = "SELECT * FROM 3rd_indiv where valid=1 ORDER BY indiv ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -4178,7 +4178,7 @@ class 3rd
 	     if(($indiv > 0) || ($name != "")) {
 	       if($id < $this->max_presidency_members) {
 		 //print "Updating Existing Entry<br>";
-		 $this->db2->query("UPDATE 3rd_presidency set" .
+		 $this->db2->query("UPDATE tc_presidency set" .
 				   " indiv=" . $indiv . 
 				   " ,district=" . $district . 
 				   " ,name='" . $name . "'" .
@@ -4191,7 +4191,7 @@ class 3rd
 		 
 	       } else {
 		 //print "Adding New Entry<br>";
-		 $this->db2->query("INSERT INTO 3rd_presidency (presidency,indiv,district,name,"
+		 $this->db2->query("INSERT INTO tc_presidency (presidency,indiv,district,name,"
 				   . "email,president,counselor,secretary,eqpres,valid) "
 				   . "VALUES (NULL,'" . $indiv . "','" . $district . "','"
 				   . $name . "','" . $email . "','" . $president  . "','"
@@ -4203,25 +4203,25 @@ class 3rd
 	     }
 	   }
 
-	  // Now update the 3rd_district table appropriately
+	  // Now update the tc_district table appropriately
 	  
 	  // Delete all the previous district entries from the table
-	  $this->db->query("DELETE from 3rd_district where valid=1",__LINE__,__FILE__);
-	  $this->db->query("DELETE from 3rd_district where valid=0",__LINE__,__FILE__);
+	  $this->db->query("DELETE from tc_district where valid=1",__LINE__,__FILE__);
+	  $this->db->query("DELETE from tc_district where valid=0",__LINE__,__FILE__);
 
 	  // Always add a "District 0" assigned to the High Priests Group
 	  $district = 0;
 	  $name = "High Priests";
 	  $indiv = 0;
 	  $valid = 0;
-	  $this->db2->query("INSERT INTO 3rd_district (district,name,supervisor,valid) "
+	  $this->db2->query("INSERT INTO tc_district (district,name,supervisor,valid) "
 			    . "VALUES ('" . $district . "','" . $name . "','"
 			    . $indiv . "','" . $valid . "'"
 			    .")",__LINE__,__FILE__);
 	  
 	  
-	  // Requery the 3rd_presidency table
-	  $sql = "SELECT * FROM 3rd_presidency where valid=1";
+	  // Requery the tc_presidency table
+	  $sql = "SELECT * FROM tc_presidency where valid=1";
 	  $this->db->query($sql,__LINE__,__FILE__);
 	  while ($this->db->next_record())
 	    {
@@ -4235,7 +4235,7 @@ class 3rd
 
 	      // If we have a valid district, add it to the district table
 	      if($district > 0) {
-		$this->db2->query("INSERT INTO 3rd_district (district,name,supervisor,valid) "
+		$this->db2->query("INSERT INTO tc_district (district,name,supervisor,valid) "
 				  . "VALUES ('" . $district . "','" . $name . "','"
  				  . $indiv . "','" . $valid . "'"
 				  .")",__LINE__,__FILE__);
@@ -4254,7 +4254,7 @@ class 3rd
 
       // Now save off the data needed for an EQ Presidency Table Update
       
-      $sql = "SELECT * FROM 3rd_presidency where valid=1";
+      $sql = "SELECT * FROM tc_presidency where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $table_data = "";
       $header_row = "<th>Individual</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th><th>Presidency</th>";
@@ -4393,7 +4393,7 @@ class 3rd
     {
       //print "Emailing notification of appointment: $appointment <br>";
 
-      $sql = "SELECT * FROM 3rd_appointment where appointment='$appointment'";
+      $sql = "SELECT * FROM tc_appointment where appointment='$appointment'";
       $this->db->query($sql,__LINE__,__FILE__);
 	
       while ($this->db->next_record())
@@ -4424,7 +4424,7 @@ class 3rd
 	  $dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  $dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 	  
-	  $sql = "SELECT * FROM 3rd_presidency where presidency='$presidency'";
+	  $sql = "SELECT * FROM tc_presidency where presidency='$presidency'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $email = $this->db2->f('email');
@@ -4435,7 +4435,7 @@ class 3rd
 	  $from = $email;
 
 	  if($indiv > 0) { 
-	    $sql = "SELECT * FROM 3rd_indiv where indiv='$indiv'";
+	    $sql = "SELECT * FROM tc_indiv where indiv='$indiv'";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
 	      $indiv_name = $this->db2->f('name');
@@ -4446,14 +4446,14 @@ class 3rd
 	  }
 
 	  if($family > 0) { 
-	    $sql = "SELECT * FROM 3rd_family where family='$family'";
+	    $sql = "SELECT * FROM tc_family where family='$family'";
 	    $this->db2->query($sql,__LINE__,__FILE__);
 	    if($this->db2->next_record()) {
 	      $family_name = $this->db2->f('name');
 	      $phone = $this->db2->f('phone');
 	      $indiv_id = $this->db2->f('indiv_id');
 	      $appt_name = $family_name . " Family Visit";
-	      $sql = "SELECT * FROM 3rd_indiv where indiv='$indiv_id'";
+	      $sql = "SELECT * FROM tc_indiv where indiv='$indiv_id'";
 	      $this->db3->query($sql,__LINE__,__FILE__);
 	      if($this->db3->next_record()) {
 		$phone = $this->db3->f('phone');
@@ -4474,7 +4474,7 @@ class 3rd
 	    $uid = rand() . rand(); // Generate a random identifier for this appointment
 	    $subject = "Created: $appt_name";
 	    
-	    $this->db->query("UPDATE 3rd_appointment set" .
+	    $this->db->query("UPDATE tc_appointment set" .
 			     " uid=" . $uid . 
 			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
@@ -4488,7 +4488,7 @@ class 3rd
 	    print "Sent deleted appointment to " . $interviewer . " at " . $email . " for " . $appt_date . " " . $appt_time . "<br>";
 	    $subject = "Canceled: $appt_date $appt_time";
 	    
-	    $this->db->query("UPDATE 3rd_appointment set" .
+	    $this->db->query("UPDATE tc_appointment set" .
 			     " uid=0" . 
 			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 	    
@@ -4506,7 +4506,7 @@ class 3rd
 				  $dtend, $date, $location, $subject, $subject, $uid);
 	    
 	    $uid = rand() . rand(); // Generate a random identifier for this appointment
-	    $this->db->query("UPDATE 3rd_appointment set" .
+	    $this->db->query("UPDATE tc_appointment set" .
 			     " uid=" . $uid .
 			     " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 	    

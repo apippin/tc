@@ -9,10 +9,10 @@
 
 // The full path to a directory readable and writable by your webserver user
 // that will be used to dump the MLS data uploaded via the web interface to.
-$this->upload_target_path = "/home/users/pres/3rd_data";
+$this->upload_target_path = "/home/users/pres/tc_data";
 
 // The full path to the installation location of this module
-$this->application_path = "/usr/share/phpgroupware/3rdCounselor";
+$this->application_path = "/usr/share/phpgroupware/tc";
 
 // The full path to the unzip application
 $this->unzip_path = "/usr/bin/unzip";

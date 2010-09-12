@@ -1,5 +1,5 @@
-%define packagename 3rd
-%define phpgwdirname 3rd
+%define packagename tc
+%define phpgwdirname tc
 %define version 0.0.1.000
 
 # This is for Mandrake RPMS 
@@ -18,7 +18,7 @@ Version: %{version}
 Release: %{packaging}
 Copyright: GPL
 Group: Web/Database
-URL: http://www.phpgroupware.org/apps/3rd/
+URL: http://www.phpgroupware.org/apps/tc/
 Source0: ftp://ftp.sourceforge.net/pub/sourceforge/phpgroupware/%{packagename}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{packagename}-buildroot
 Prefix: %{httpdroot}

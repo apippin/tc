@@ -12,9 +12,9 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/ `phpgroupware` /*!40100 DEFAULT CHARACT
 USE `phpgroupware`;
 
 --
--- Table structure for table `3rd_aaronic`
+-- Table structure for table `tc_aaronic`
 --
-CREATE TABLE `3rd_aaronic` (
+CREATE TABLE `tc_aaronic` (
   `aaronic` int(16) unsigned NOT NULL auto_increment,
   `name` varchar(60) default NULL,
   `phone` varchar(12) default NULL,
@@ -25,9 +25,9 @@ CREATE TABLE `3rd_aaronic` (
 
 
 --
--- Table structure for table `3rd_activity`
+-- Table structure for table `tc_activity`
 --
-CREATE TABLE `3rd_activity` (
+CREATE TABLE `tc_activity` (
   `activity` int(16) unsigned NOT NULL auto_increment,
   `assignment` int(16) unsigned NOT NULL,
   `date` date default NULL,
@@ -37,9 +37,9 @@ CREATE TABLE `3rd_activity` (
 ) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_appointment`
+-- Table structure for table `tc_appointment`
 --
-CREATE TABLE `3rd_appointment` (
+CREATE TABLE `tc_appointment` (
   `appointment` int(16) unsigned NOT NULL auto_increment,
   `presidency` int(16) unsigned NOT NULL default '0',
   `family` int(16) unsigned default '0',
@@ -52,9 +52,9 @@ CREATE TABLE `3rd_appointment` (
 ) ENGINE=MyISAM AUTO_INCREMENT=132 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_assignment`
+-- Table structure for table `tc_assignment`
 --
-CREATE TABLE `3rd_assignment` (
+CREATE TABLE `tc_assignment` (
   `assignment` int(12) unsigned NOT NULL auto_increment,
   `name` varchar(60) NOT NULL,
   `code` varchar(12) default NULL,
@@ -62,27 +62,27 @@ CREATE TABLE `3rd_assignment` (
 ) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `3rd_assignment`
+-- Dumping data for table `tc_assignment`
 --
-LOCK TABLES `3rd_assignment` WRITE;
-/*!40000 ALTER TABLE `3rd_assignment` DISABLE KEYS */;
-INSERT INTO `3rd_assignment` (`assignment`, `name`, `code`) VALUES (1,'Enrichment Night Babysitting','RS'),(2,'Building Lockup','LU'),(3,'Building Cleaning Coordinator','CC'),(4,'Missionary Splits','MS'),(5,'Stake Farm','SF'),(6,'Loveland Kitchen','LK'),(7,'Moves','MV'),(8,'Temple Kitchen & Laundary','TKL'),(9,'Temple Sealings','TS'),(10,'Temple Initatories','TI');
-/*!40000 ALTER TABLE `3rd_assignment` ENABLE KEYS */;
+LOCK TABLES `tc_assignment` WRITE;
+/*!40000 ALTER TABLE `tc_assignment` DISABLE KEYS */;
+INSERT INTO `tc_assignment` (`assignment`, `name`, `code`) VALUES (1,'Enrichment Night Babysitting','RS'),(2,'Building Lockup','LU'),(3,'Building Cleaning Coordinator','CC'),(4,'Missionary Splits','MS'),(5,'Stake Farm','SF'),(6,'Loveland Kitchen','LK'),(7,'Moves','MV'),(8,'Temple Kitchen & Laundary','TKL'),(9,'Temple Sealings','TS'),(10,'Temple Initatories','TI');
+/*!40000 ALTER TABLE `tc_assignment` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `3rd_attendance`
+-- Table structure for table `tc_attendance`
 --
-CREATE TABLE `3rd_attendance` (
+CREATE TABLE `tc_attendance` (
   `indiv` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
   KEY `indiv` (`indiv`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_calling`
+-- Table structure for table `tc_calling`
 --
-CREATE TABLE `3rd_calling` (
+CREATE TABLE `tc_calling` (
   `indiv_id` int(16) unsigned default NULL,
   `name` varchar(30) default NULL,
   `organization` varchar(30) default NULL,
@@ -93,9 +93,9 @@ CREATE TABLE `3rd_calling` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_child`
+-- Table structure for table `tc_child`
 --
-CREATE TABLE `3rd_child` (
+CREATE TABLE `tc_child` (
   `child` int(16) unsigned NOT NULL auto_increment,
   `family` int(16) unsigned default NULL,
   `name` varchar(30) default NULL,
@@ -106,10 +106,10 @@ CREATE TABLE `3rd_child` (
 ) ENGINE=MyISAM AUTO_INCREMENT=260 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_companionship`
+-- Table structure for table `tc_companionship`
 --
 
-CREATE TABLE `3rd_companionship` (
+CREATE TABLE `tc_companionship` (
   `companionship` int(16) unsigned NOT NULL default '0',
   `indiv` int(16) unsigned NOT NULL default '0',
   `aaronic` int(16) unsigned NOT NULL default '0',
@@ -119,9 +119,9 @@ CREATE TABLE `3rd_companionship` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_district`
+-- Table structure for table `tc_district`
 --
-CREATE TABLE `3rd_district` (
+CREATE TABLE `tc_district` (
   `district` int(16) unsigned NOT NULL default '0',
   `name` varchar(30) default NULL,
   `supervisor` int(16) unsigned default NULL,
@@ -130,9 +130,9 @@ CREATE TABLE `3rd_district` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_indiv`
+-- Table structure for table `tc_indiv`
 --
-CREATE TABLE `3rd_indiv` (
+CREATE TABLE `tc_indiv` (
   `indiv` int(16) unsigned NOT NULL auto_increment,
   `indiv_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
@@ -150,9 +150,9 @@ CREATE TABLE `3rd_indiv` (
 ) ENGINE=MyISAM AUTO_INCREMENT=105 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_family`
+-- Table structure for table `tc_family`
 --
-CREATE TABLE `3rd_family` (
+CREATE TABLE `tc_family` (
   `family` int(16) unsigned NOT NULL auto_increment,
   `hofh_id` int(16) unsigned NOT NULL default '0',
   `name` varchar(30) NOT NULL default '',
@@ -166,9 +166,9 @@ CREATE TABLE `3rd_family` (
 ) ENGINE=MyISAM AUTO_INCREMENT=277 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_parent`
+-- Table structure for table `tc_parent`
 --
-CREATE TABLE `3rd_parent` (
+CREATE TABLE `tc_parent` (
   `parent` int(16) unsigned NOT NULL auto_increment,
   `family` int(16) unsigned default NULL,
   `name` varchar(30) default NULL,
@@ -181,18 +181,18 @@ CREATE TABLE `3rd_parent` (
 ) ENGINE=MyISAM AUTO_INCREMENT=396 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_participation`
+-- Table structure for table `tc_participation`
 --
-CREATE TABLE `3rd_participation` (
+CREATE TABLE `tc_participation` (
   `indiv` int(16) unsigned NOT NULL default '0',
   `activity` int(16) unsigned default NULL,
   UNIQUE KEY `activity_ndx` (`indiv`,`activity`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_interview`
+-- Table structure for table `tc_interview`
 --
-CREATE TABLE `3rd_interview` (
+CREATE TABLE `tc_interview` (
   `interview` int(16) unsigned NOT NULL auto_increment,
   `interviewer` int(16) unsigned default NULL,
   `indiv` int(16) unsigned default NULL,
@@ -205,9 +205,9 @@ CREATE TABLE `3rd_interview` (
 
 
 --
--- Table structure for table `3rd_presidency`
+-- Table structure for table `tc_presidency`
 --
-CREATE TABLE `3rd_presidency` (
+CREATE TABLE `tc_presidency` (
   `presidency` int(16) unsigned NOT NULL auto_increment,
   `indiv` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
@@ -223,9 +223,9 @@ CREATE TABLE `3rd_presidency` (
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_visit`
+-- Table structure for table `tc_visit`
 --
-CREATE TABLE `3rd_visit` (
+CREATE TABLE `tc_visit` (
   `visit` int(16) unsigned NOT NULL auto_increment,
   `family` int(16) unsigned default NULL,
   `companionship` int(16) unsigned default NULL,
@@ -239,9 +239,9 @@ CREATE TABLE `3rd_visit` (
 ) ENGINE=MyISAM AUTO_INCREMENT=9513 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `3rd_willingness`
+-- Table structure for table `tc_willingness`
 --
-CREATE TABLE `3rd_willingness` (
+CREATE TABLE `tc_willingness` (
   `indiv` int(16) unsigned NOT NULL,
   `assignment` int(16) unsigned NOT NULL,
   `willing` enum('y','n','') NOT NULL,
