@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customReport name="Organization class per member" description="" isPortrait="false" groupOption="NONE" splitGroups="false">
+  <column typeID="31" width="33" />
+  <column typeID="27" width="33" />
+  <column typeID="21" width="33" />
+</customReport>
+

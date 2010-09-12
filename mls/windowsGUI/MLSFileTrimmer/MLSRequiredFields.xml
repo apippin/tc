@@ -47,8 +47,8 @@
       <MLSField>*</MLSField>
     </MLSFile>
 
-    <MLSFile Name="EQ Prospective Elders.csv">
-      <Description>A list of prospective elders in the EQ stewardship</Description>
+    <MLSFile Name="Organization class per member.csv">
+      <Description>A list of members and which organization classes they belong to</Description>
       <Extension>csv</Extension>
       <MLSField>*</MLSField>
     </MLSFile>

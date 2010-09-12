@@ -102,10 +102,10 @@ Requirements
      Org Seq
      Sustained
    
-   EQ Prospective Elders.csv  
-      Optional file that lists the prospective elders for which  the EQ has stewardship.
-      Use this file if you want them listed in the PPI/attendence/etc lists
-      import mls/EQ\ Prospective\ Elders.mls as a new report into MLS to create the csv file.
+   Organization class per member.csv
+      File that contains information about which organization classes each member belongs to.
+      We use this to determine the prospective elders assigned to HP or EQ.
+      import mls/Organization\ class\ per\ member.mls as a new report into MLS to create the csv file.
 
    Home Teacher per Companionship.csv  (optional file that lists home teaching stats - use all fields)
      import mls/Home\ Teacher\ per\ Companionship.mls as a new report into MLS to create the csv file.

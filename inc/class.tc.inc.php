@@ -1004,7 +1004,8 @@ class tc
       $this->t->set_block('par_view_t','header_list','list1');
       $this->t->set_block('par_view_t','indiv_list','list2');
 
-      $sql = "SELECT * FROM tc_indiv where valid=1";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1114,7 +1115,8 @@ class tc
       }
       $this->t->set_var('filter_input',$filter_input);
       
-      $sql = "SELECT * FROM tc_indiv where valid=1";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -1457,7 +1459,8 @@ class tc
 	}
       
       // create the individual id -> individual name mapping
-      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY name ASC";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where valid=1 and steward='Elder' ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $indiv_id = NULL;
@@ -1536,7 +1539,8 @@ class tc
       $this->t->set_var('appt_table_width',$appt_table_width);
 
       // PPI SCHEDULING TABLE
-      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY ppi_pri ASC";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where valid=1 and steward='Elder' ORDER BY ppi_pri ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       $i=0; 
@@ -1698,6 +1702,7 @@ class tc
       //print "year: $year month: $month quarter_start: $quarter_start quarter_end: $quarter_end<br>";
 
       // create the individual id -> individual name mapping
+      // TODO:  changed this so it picks the quorum dynamically
       $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
@@ -2384,7 +2389,8 @@ class tc
       $this->t->set_var('district_number','*');
       $this->t->set_var('district_name',$president_name);
 
-      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3149,7 +3155,8 @@ class tc
       else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
       else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-      $sql = "SELECT * FROM tc_indiv where valid=1";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3341,7 +3348,8 @@ class tc
 	 return false;    
 	}
 
-      $sql = "SELECT * FROM tc_indiv where valid=1";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3725,7 +3733,8 @@ class tc
 	  //Header('Location: ' . $take_me_to_url);
 	}
       
-      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
@@ -3943,7 +3952,8 @@ class tc
 
       $this->t->pfp('out','admin_t');
 
-      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY indiv ASC";
+      // TODO:  changed this so it picks the quorum dynamically
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1 ORDER BY indiv ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())

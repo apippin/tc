@@ -116,6 +116,7 @@ CREATE TABLE `tc_indiv` (
   `family` int(16) unsigned default NULL,
   `hh_position` enum('Head of Household','Spouse','Other') DEFAULT 'Other',
   `priesthood` enum('High Priest','Elder','Priest','Teacher','Deacon','Unordained') DEFAULT NULL,
+  `steward` enum('High Priest','Elder') DEFAULT NULL,
   `ppi_pri` int(10) unsigned NOT NULL default '1',
   `ppi_notes` varchar(128) default NULL,
   `int_pri` int(10) unsigned default '1',

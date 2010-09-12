@@ -87,8 +87,12 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `family` INT(16) UNSIGNED NULL DEFAULT NULL AFTER `email`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Add a new 'family' column to the tc_indiv table
+# Add a new 'hh_position' column to the tc_indiv table
 $sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `hh_position` ENUM( 'Head of Household', 'Spouse', 'Other' ) NOT NULL DEFAULT 'Other' AFTER `family`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'steward' column to the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `steward` ENUM( 'High Priest', 'Elder', '' ) NULL DEFAULT NULL AFTER `priesthood`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_family table to tc_family
