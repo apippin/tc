@@ -1540,7 +1540,7 @@ class tc
 
       // PPI SCHEDULING TABLE
       // TODO:  changed this so it picks the quorum dynamically
-      $sql = "SELECT * FROM tc_indiv where valid=1 and steward='Elder' ORDER BY ppi_pri ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 and steward='Elder' ORDER BY ppi_pri ASC, name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       
       $i=0; 
@@ -2085,7 +2085,7 @@ class tc
       $year = date('Y');
 
       // create the family id -> family name mapping
-      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0 and companionship != 0 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $family_id = NULL;
@@ -2229,7 +2229,7 @@ class tc
 
       
       // VISIT SCHEDULING TABLE
-      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0 ORDER BY visit_pri ASC";
+      $sql = "SELECT * FROM tc_family where valid=1 and indiv_id != 0  and companionship != 0 ORDER BY visit_pri ASC, name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
 
       $total_families=0; $families_with_yearly_visit=0;
