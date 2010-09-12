@@ -1900,8 +1900,7 @@ class tc
       $i=0;
       for ($j=0; $j < count($unique_companionships); $j++) {
 	// Select all the companions from each companionship
-	$sql = "SELECT * FROM tc_companionship where valid=1 and ".
-	   "companionship=". $unique_companionships[$j]['companionship'];
+	$sql = "SELECT * FROM tc_companionship where valid=1 and companionship=". $unique_companionships[$j]['companionship'];
 	$this->db->query($sql,__LINE__,__FILE__);
 	$k=0; $int_completed=0;
 	$comp = $unique_companionships[$j]['companionship'];
@@ -1913,14 +1912,16 @@ class tc
 	      // Get this companions information
 	      $indiv_id = $this->db->f('indiv');
 	     
-	      $sql = "SELECT * FROM tc_indiv where indiv=$indiv_id";
+	      $sql = "SELECT * FROM tc_indiv where indiv='$indiv_id'";
 	      $this->db2->query($sql,__LINE__,__FILE__);	
-	      $indiv_id = $this->db2->f('indiv');
-	      $indiv_name = $this->db2->f('name');
-	      $indiv_phone[$indiv_id] = $this->db2->f('phone');
-	      $indiv_int_pri[$indiv_id] = $this->db2->f('int_pri');
-	      $indiv_int_notes[$indiv_id] = $this->db2->f('int_notes');
-
+	      if($this->db2->next_record())
+	      {
+		      $indiv_id = $this->db2->f('indiv');
+		      $indiv_name = $this->db2->f('name');
+		      $indiv_phone[$indiv_id] = $this->db2->f('phone');
+		      $indiv_int_pri[$indiv_id] = $this->db2->f('int_pri');
+		      $indiv_int_notes[$indiv_id] = $this->db2->f('int_notes');
+	      }
 	      $id = $indiv_id;
 	      $name = $indiv_name;
 	      $phone = $indiv_phone[$id];
@@ -1943,12 +1944,11 @@ class tc
 	      }
 	      
 	      // If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-	      $sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' ".
-		 "AND indiv=" . $id;
+	      $sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND indiv='$id'";
 	      $this->db2->query($sql,__LINE__,__FILE__);
 	      
 	      if(!$this->db2->next_record()) {
-		$sql = "SELECT * FROM tc_interview WHERE indiv=" . $id . " ORDER BY date DESC";
+		$sql = "SELECT * FROM tc_interview WHERE indiv='$id' ORDER BY date DESC";
 		$this->db3->query($sql,__LINE__,__FILE__);
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
 		$link_data['menuaction'] = 'tc.tc.int_update';
