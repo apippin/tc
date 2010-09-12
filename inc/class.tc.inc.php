@@ -220,15 +220,6 @@ class tc
           $indivs[$id] = $indiv_name[$i];
       }      
 
-      $sql = "SELECT * FROM tc_aaronic where valid=1 ORDER BY aaronic ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      while ($this->db->next_record())
-	{
-	  $aaronic_id = $this->db->f('aaronic');
-	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
-	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
-	}
-
       $this->nextmatchs->template_alternate_row_color(&$this->t);
       for($m=$num_months; $m >= 0; $m--) { $total_families[$m]=0; }
       for ($i=0; $i < count($districts); $i++) {
@@ -262,15 +253,8 @@ class tc
 	      if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 	      $companionship = $this->db->f('companionship');
 	      $indiv_id = $this->db->f('indiv');
-	      $aaronic_id = $this->db->f('aaronic');
-	      if($indiv_id) {
-		$name = $indivs[$indiv_id];
-		$phone = $indiv_phone[$indiv_id];
-	      }
-	      else if($aaronic_id) {
-		$name = $aaronic[$aaronic_id]['name'];
-		$phone = $aaronic[$aaronic_id]['phone'];		
-	      }
+	      $name = $indivs[$indiv_id];
+	      $phone = $indiv_phone[$indiv_id];
 	      $companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
 	    }
 	  $table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
@@ -472,15 +456,6 @@ class tc
           $indivs[$id] = $indiv_name[$i];
       }      
 
-      $sql = "SELECT * FROM tc_aaronic where valid=1 ORDER BY aaronic ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      while ($this->db->next_record())
-	{
-	  $aaronic_id = $this->db->f('aaronic');
-	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
-	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
-	}
-      
       // Select all the unique companionship numbers for this district
       $sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $district;
       $this->db->query($sql,__LINE__,__FILE__);
@@ -506,15 +481,8 @@ class tc
 	    if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 	    $companionship = $this->db->f('companionship');
 	    $indiv_id = $this->db->f('indiv');
-	    $aaronic_id = $this->db->f('aaronic');
-	    if($indiv_id) {
-	      $name = $indivs[$indiv_id];
-	      $phone = $indiv_phone[$indiv_id];
-	    }
-	    else if($aaronic_id) {
-	      $name = $aaronic[$aaronic_id]['name'];
-	      $phone = $aaronic[$aaronic_id]['phone'];
-	    }
+	    $name = $indivs[$indiv_id];
+	    $phone = $indiv_phone[$indiv_id];
 	    $companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
 	  }
 	$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
@@ -1429,7 +1397,7 @@ class tc
 	if($this->db2->next_record()) {
 	  $indiv_id = $this->db2->f('indiv_id');
 	}
-	$sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
+	$sql = "SELECT * FROM tc_indiv where indiv_id='$indiv_id'";
 	$this->db2->query($sql,__LINE__,__FILE__);
 	if($this->db2->next_record()) {
 	  $president_address = $this->db2->f('address');
@@ -1763,7 +1731,7 @@ class tc
 		  if($this->db2->next_record()) {
 		    $indiv_id = $this->db2->f('indiv_id');
 		  }
-		  $sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
+		  $sql = "SELECT * FROM tc_indiv where indiv_id='$indiv_id'";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 		  if($this->db2->next_record()) {
 		    $supervisor_address = $this->db2->f('address');
@@ -1797,15 +1765,12 @@ class tc
 	     $indiv_id = $entry['indiv_id'];
 	     $indiv_name = $entry['indiv_name'];
 	     $int_pri = $entry['pri'];
-	     $aaronic = $entry['aaronic'];
-	     //print "int_notes: $int_notes indiv_name: $indiv_name aaronic: $aaronic <Br>";
-	     if($aaronic == 0) { 
-	       // Perform database save actions here
-	       $this->db->query("UPDATE tc_indiv set " .
-				" int_notes='" . $int_notes . "'" .
-				",int_pri='" . $int_pri . "'" .
-				" WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
-	     } 
+	     //print "int_notes: $int_notes indiv_name: $indiv_name <Br>";
+	     // Perform database save actions here
+	     $this->db->query("UPDATE tc_indiv set " .
+	                      " int_notes='" . $int_notes . "'" .
+	                      ",int_pri='" . $int_pri . "'" .
+	                      " WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
 	     
 	   }
 
@@ -1856,7 +1821,7 @@ class tc
       if($this->db2->next_record()) {
 	$indiv_id = $this->db2->f('indiv_id');
       }
-      $sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
+      $sql = "SELECT * FROM tc_indiv where indiv_id='$indiv_id'";
       $this->db2->query($sql,__LINE__,__FILE__);
       if($this->db2->next_record()) {
 	$supervisor_address = $this->db2->f('address');
@@ -1942,37 +1907,20 @@ class tc
 	    {	      
 	      // Get this companions information
 	      $indiv_id = $this->db->f('indiv');
-	      $aaronic_id = $this->db->f('aaronic');
 	     
 	      $sql = "SELECT * FROM tc_indiv where indiv=$indiv_id";
 	      $this->db2->query($sql,__LINE__,__FILE__);	
-	      if($this->db2->next_record())
-		{
-		  $indiv_id = $this->db2->f('indiv');
-		  $indiv_name = $this->db2->f('name');
-		  $indiv_phone[$indiv_id] = $this->db2->f('phone');
-		  $indiv_int_pri[$indiv_id] = $this->db2->f('int_pri');
-		  $indiv_int_notes[$indiv_id] = $this->db2->f('int_notes');
-		  $indiv_aaronic = 0;
-		}
-	      else {
-		$sql = "SELECT * FROM tc_aaronic where aaronic=$aaronic_id";
-		$this->db2->query($sql,__LINE__,__FILE__);
-		if($this->db2->next_record())
-		  {
-		    $indiv_id = $this->db2->f('aaronic');
-		    $indiv_name = $this->db2->f('name');
-		    $indiv_phone[$indiv_id] = $this->db2->f('phone');
-		    $indiv_aaronic = 1;
-		  }
-	      }
+	      $indiv_id = $this->db2->f('indiv');
+	      $indiv_name = $this->db2->f('name');
+	      $indiv_phone[$indiv_id] = $this->db2->f('phone');
+	      $indiv_int_pri[$indiv_id] = $this->db2->f('int_pri');
+	      $indiv_int_notes[$indiv_id] = $this->db2->f('int_notes');
 
 	      $id = $indiv_id;
 	      $name = $indiv_name;
 	      $phone = $indiv_phone[$id];
 	      $int_pri = $indiv_int_pri[$id];
 	      $int_notes = $indiv_int_notes[$id];
-	      $aaronic = $indiv_aaronic;
 	      
 	      // If the companionship has already had its quarterly interview,
 	      // Skip the other companion in the companionship.
@@ -2000,7 +1948,6 @@ class tc
 		if($this->db3->next_record()) { $date = $this->db3->f('date'); } else { $date = ""; }
 		$link_data['menuaction'] = 'tc.tc.int_update';
 		$link_data['indiv'] = $id;
-		$link_data['aaronic'] = 0;
 		$link_data['name'] = $name;
 		$link_data['interview'] = '';
 		$link_data['action'] = 'add';
@@ -2009,22 +1956,17 @@ class tc
 		$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 		$table_data.= "<td align=center>$phone</td>";
 		$table_data.= "<td align=center>";
-		if($aaronic == 0) { 
-		  $table_data.= '<select name=int_notes['.$i.'][pri]>';
-		  foreach(range(0,6) as $num) {
-		    if($num == 0) { $num = 1; } else {$num = $num*5; }
-		    if($int_pri == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
-		    $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
-		  }
+		$table_data.= '<select name=int_notes['.$i.'][pri]>';
+		foreach(range(0,6) as $num) {
+		  if($num == 0) { $num = 1; } else {$num = $num*5; }
+		  if($int_pri == $num) { $selected[$num] = 'selected="selected"'; } else { $selected[$num] = ''; }
+		  $table_data.= '<option value='.$num.' '.$selected[$num].'>'.$num.'</option>';
+		}
 		  $table_data.= '</select></td>';
-		}
 		$table_data.= "<td align=center>$date</td>";
-		if($aaronic == 0) { 
-		  $table_data.= '<td><input type=text size="50" maxlength="128" name="int_notes['.$i.'][notes]" value="'.$int_notes.'">';
-		}
+		$table_data.= '<td><input type=text size="50" maxlength="128" name="int_notes['.$i.'][notes]" value="'.$int_notes.'">';
 		$table_data.= '<input type=hidden name="int_notes['.$i.'][indiv_id]" value="'.$id.'">';
 		$table_data.= '<input type=hidden name="int_notes['.$i.'][indiv_name]" value="'.$name.'">';
-		$table_data.= '<input type=hidden name="int_notes['.$i.'][aaronic]" value="'.$aaronic.'">';
 		$table_data.= '</td>';
 		$table_data.= '</tr>'."\n";
 		$i++;
@@ -2032,7 +1974,6 @@ class tc
 		$link_data['menuaction'] = 'tc.tc.int_update';
 		$link_data['interviewer'] = $this->db2->f('interviewer');
 		$link_data['indiv'] = $this->db2->f('indiv');
-		$link_data['aaronic'] = $this->db2->f('aaronic');
 		$link_data['name'] = $name;
 		$link_data['interview'] = $this->db2->f('interview');
 		$link_data['action'] = 'view';
@@ -2133,7 +2074,7 @@ class tc
 	  $family_id[$i] = $this->db->f('family');
 	  $family_name[$i] = $this->db->f('name');
 	  $familyid2name[$family_id[$i]] = $family_name[$i];
-	  $sql = "SELECT * FROM tc_parent where family='$family_id[$i]'";
+	  $sql = "SELECT * FROM tc_indiv where family='$family_id[$i]'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
@@ -2290,7 +2231,7 @@ class tc
 	  $total_families++;
 	}
 
-      $sql = "SELECT * FROM tc_parent where valid=1";
+      $sql = "SELECT * FROM tc_indiv where valid=1";
       $this->db->query($sql,__LINE__,__FILE__);
       while ($this->db->next_record())
 	{
@@ -2549,7 +2490,6 @@ class tc
       $name = get_var('name',array('GET','POST'));
       $interview = get_var('interview',array('GET','POST'));
       $indiv = get_var('indiv',array('GET','POST'));
-      $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
       $interview_type = get_var('interview_type',array('GET','POST'));
@@ -2577,7 +2517,6 @@ class tc
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 		          ", indiv='" . $indiv . "'" .
-			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 	         ", interview_type='" . $interview_type . "'" .
@@ -2589,8 +2528,8 @@ class tc
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO tc_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
-			   . "VALUES ('" . $interviewer . "','" . $indiv . "','" . $aaronic . "','"
+	  $this->db->query("INSERT INTO tc_interview (interviewer,indiv,date,notes,interview_type) "
+			   . "VALUES ('" . $interviewer . "','" . $indiv . "','"
 			   . $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
 	  $this->ppi_view();
 	  return false;
@@ -2719,15 +2658,6 @@ class tc
           $indivs[$id] = $indiv_name[$i];
       }      
 
-      $sql = "SELECT * FROM tc_aaronic where valid=1 ORDER BY aaronic ASC";
-      $this->db->query($sql,__LINE__,__FILE__);
-      while ($this->db->next_record())
-	{
-	  $aaronic_id = $this->db->f('aaronic');
-	  $aaronic[$aaronic_id]['name'] = $this->db->f('name');
-	  $aaronic[$aaronic_id]['phone'] = $this->db->f('phone');
-	}
-      
       $total_companionships = 0;
       $this->nextmatchs->template_alternate_row_color(&$this->t);
       for ($i=0; $i < count($districts); $i++) {
@@ -2762,20 +2692,12 @@ class tc
 	      $num_indivs++;
 	      $companionship = $this->db->f('companionship');
 	      $indiv_id = $this->db->f('indiv');
-	      $aaronic_id = $this->db->f('aaronic');
-	      if($indiv_id) {
-		$name = $indivs[$indiv_id];
-		$phone = $indiv_phone[$indiv_id];
-	      }
-	      else if($aaronic_id) {
-		$name = $aaronic[$aaronic_id]['name'];
-		$phone = $aaronic[$aaronic_id]['phone'];
-	      }
+	      $name = $indivs[$indiv_id];
+	      $phone = $indiv_phone[$indiv_id];
 	      $link_data['menuaction'] = 'tc.tc.int_update';
 	      $link_data['companionship'] = $companionship;
 	      $link_data['interviewer'] = $supervisor;
 	      $link_data['indiv'] = $indiv_id;
-	      $link_data['aaronic'] = $aaronic_id;
 	      $link_data['name'] = $name;
 	      $link_data['interview'] = '';
 	      $link_data['action'] = 'add';
@@ -2793,7 +2715,7 @@ class tc
 		$month_end = "$year"."-"."$month"."-"."31";
 		$month = "$month"."/"."$year";
 		$sql = "SELECT * FROM tc_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
-		   "AND indiv=" . $indiv_id . " AND aaronic=" . $aaronic_id;
+		   "AND indiv=" . $indiv_id;
 		$this->db2->query($sql,__LINE__,__FILE__);
 		$header_row .= "<th width=$int_width><font size=-2>$month</th>";
 	      
@@ -2806,7 +2728,6 @@ class tc
 		  $link_data['companionship'] = $companionship;
 		  $link_data['interviewer'] = $this->db2->f('interviewer');
 		  $link_data['indiv'] = $indiv_id;
-		  $link_data['aaronic'] = $aaronic_id;
 		  $link_data['name'] = $name;
 		  $link_data['interview'] = $this->db2->f('interview');
 		  $link_data['action'] = 'view';
@@ -2886,7 +2807,6 @@ class tc
       $name = get_var('name',array('GET','POST'));
       $interview = get_var('interview',array('GET','POST'));
       $indiv = get_var('indiv',array('GET','POST'));
-      $aaronic = get_var('aaronic',array('GET','POST'));
       $date = get_var('date',array('GET','POST'));
       $notes = get_var('notes',array('GET','POST'));
       $interview_type = get_var('interview_type',array('GET','POST'));
@@ -2913,7 +2833,6 @@ class tc
 		     "   interview='" . $interview . "'" .
 		    ", interviewer='" . $interviewer . "'" .
 		          ", indiv='" . $indiv . "'" .
-			", aaronic='" . $aaronic . "'" .
 			   ", date='" . $date . "'" .
 			  ", notes='" . $notes . "'" .
 		 ", interview_type='" . $interview_type . "'" .
@@ -2925,8 +2844,8 @@ class tc
       if($action == 'insert')
 	{
 	  $notes = get_var('notes',array('POST'));
-	  $this->db->query("INSERT INTO tc_interview (interviewer,indiv,aaronic,date,notes,interview_type) "
-			   . "VALUES ('" . $interviewer . "','" . $indiv . "','" . $aaronic . "','"
+	  $this->db->query("INSERT INTO tc_interview (interviewer,indiv,date,notes,interview_type) "
+			   . "VALUES ('" . $interviewer . "','" . $indiv . "','"
 			   . $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
 	  $this->int_view();
 	  return false;
@@ -2939,7 +2858,6 @@ class tc
 	  $this->t->set_var('interviewer', $interviewer);
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('indiv',$indiv);
-	  $this->t->set_var('aaronic',$aaronic);
 	  $this->t->set_var('date','');
 	  $this->t->set_var('notes','');
 	  $this->t->set_var('lang_done','Cancel');
@@ -2957,7 +2875,6 @@ class tc
 	  $this->t->set_var('name',$name);
 	  $this->t->set_var('interviewer', $this->db->f('interviewer'));
 	  $this->t->set_var('indiv',$this->db->f('indiv'));
-	  $this->t->set_var('aaronic',$this->db->f('aaronic'));
 	  $this->t->set_var('date',$this->db->f('date'));
 	  $this->t->set_var('notes',$this->db->f('notes'));
 	  if($this->db->f('interview_type') == 1) { $this->t->set_var('interview_type_checked','checked'); }
@@ -3534,12 +3451,12 @@ class tc
       $this->t->set_file(array('dir_view_t' => 'dir_view.tpl'));
       $this->t->set_block('dir_view_t','dir_list','list');
       
-      $sql = "SELECT * FROM tc_parent where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_indiv where valid=1 and hh_position='Head of Household' ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       while ($this->db->next_record())
       	{
-	  $parent[$i]['id'] = $this->db->f('parent');
+	  $parent[$i]['id'] = $this->db->f('indiv');
 	  $parent[$i]['name'] = $this->db->f('name');
 	  $parent[$i]['phone'] = $this->db->f('phone');
 	  $parent[$i]['address'] = $this->db->f('address');
@@ -3681,7 +3598,7 @@ class tc
 	  $family_id[$i] = $this->db->f('family');
 	  $family_name[$i] = $this->db->f('name');
 	  $familyid2name[$family_id[$i]] = $family_name[$i];
-	  $sql = "SELECT * FROM tc_parent where family='$family_id[$i]'";
+	  $sql = "SELECT * FROM tc_indiv where family='$family_id[$i]' and hh_position='Head of Household'";
 	  $this->db2->query($sql,__LINE__,__FILE__);
 	  if($this->db2->next_record()) {
 	    $familyid2address[$family_id[$i]] = $this->db2->f('address');
@@ -3727,7 +3644,7 @@ class tc
 		     if($this->db2->next_record()) {
 		       $indiv_id = $this->db2->f('indiv_id');
 		     }
-		     $sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
+		     $sql = "SELECT * FROM tc_indiv where indiv_id='$indiv_id'";
 		     $this->db2->query($sql,__LINE__,__FILE__);
 		     if($this->db2->next_record()) {
 		       $supervisor_address = $this->db2->f('address');
@@ -3854,7 +3771,7 @@ class tc
 		if($this->db2->next_record()) {
 		  $indiv_id = $this->db2->f('indiv_id');
 		}
-		$sql = "SELECT * FROM tc_parent where indiv_id='$indiv_id'";
+		$sql = "SELECT * FROM tc_indiv where indiv_id='$indiv_id'";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 		  $supervisor_address = $this->db2->f('address');

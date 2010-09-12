@@ -102,67 +102,6 @@ sub print_hash
 
 ######################################################################
 
-# 3RD_AARONIC
-#+-------+--------------------+------+-----+---------+-------+
-#| Field | Type               | Null | Key | Default | Extra |
-#+-------+--------------------+------+-----+---------+-------+
-#| aaronic | int(16) unsigned |      | PRI | 0       |   A   |
-#| name    | varchar(60)      | YES  |     | NULL    |       |
-#| phone   | varchar(12)      | YES  |     | NULL    |       |
-#| email   | varchar(120)     | YES  |     | NULL    |       |
-#| valid   | tinyint(1)       | YES  |     | NULL    |       |
-#+-------+--------------------+------+-----+---------+-------+
-sub update_tc_aaronic_table
-{
-    print "\n-> Updating tc_aaronic table\n";
-
-    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
-    $sth = $dbh->prepare("update tc_aaronic set valid=0");
-    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-    
-    foreach $index (keys %membership_data)
-    {
-	$hashref = $membership_data{$index};
-	foreach $key (keys %$hashref) {
-	    if($key =~ /Priesthood/i &&
-	       ($membership_data{$index}{$key} =~ /^Deacon\s*$/i ||
-	        $membership_data{$index}{$key} =~ /^Teacher\s*$/i ||
-		$membership_data{$index}{$key} =~ /^Priest\s*$/i)) {
-		$aaronic_name = $membership_data{$index}{'Preferred Name'};
-		$phone = $membership_data{$index}{'Household Phone'};
-		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
-		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
-		$email = $membership_data{$index}{'Individual E-mail'};
-		if ($email eq "") { $email = $membership_data{$index}{'Household E-mail'}; }
-		$sth = $dbh->prepare("select * from tc_aaronic where name='$aaronic_name'");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
-		my $rows = scalar @data;
-		if($rows == 0) {
-		    # No existing records found for this aaronic, make a new entry
-		    print "   Adding new Aaronic: $aaronic_name\n";
-		    $sth = $dbh->prepare("insert into tc_aaronic values (NULL,'$aaronic_name','$phone','$email',1)");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows == 1) {
-		    # An existing record was found for this aaronic, update it, mark it valid!
-		    print "   Updating existing aaronic: $aaronic_name\n";
-		    $sth = $dbh->prepare("update tc_aaronic set phone='$phone' where name='$aaronic_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_aaronic set email='$email' where name='$aaronic_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_aaronic set valid=1 where name='$aaronic_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} else {
-		    # More than one record was found. Error! This shouldn't happen.
-		    print "   -E- More than one record found ($rows) for aaronic name: $aaronic_name\n";
-		}
-	    }
-	}
-    }
-    $sth->finish();
-}
-
 # 3RD_INDIV
 #+-------------+------------------+------+-----+---------+----------------+
 #| Field       | Type             | Null | Key | Default | Extra          |
@@ -191,77 +130,74 @@ sub update_tc_indiv_table
     foreach $index (keys %membership_data)
     {
 	$hashref = $membership_data{$index};
-	foreach $key (keys %$hashref) {
-	    if($key =~ /Priesthood/i && 
-	       ($membership_data{$index}{$key} =~ /Deacon/i ||
-	        $membership_data{$index}{$key} =~ /Teacher/i ||
-		$membership_data{$index}{$key} =~ /Priest/i ||
-		$membership_data{$index}{$key} =~ /Elder/i ||
-		$membership_data{$index}{$key} =~ /Unordained/i)) {
-		
-		# check if this is a prospective elder under the stewardship of the EQ
-		if($membership_data{$index}{$key} !~ /Elder/i) {
-			$found = 0;
-			foreach $i (keys %prospective_elder_data) {
-				#print "$membership_data{$index}{'Full Name'}\n";
-				#print "$prospective_elder_data{$i}{'Full Name'}\n";
-				if($membership_data{$index}{'Full Name'} eq $prospective_elder_data{$i}{'Full Name'}) {
-					$found = 1;
-					last;
-				}
-			}
-			if($found == 0) { next;}
-		}
-		
-		$id = $membership_data{$index}{'Indiv ID'};
-		$indiv_name = $membership_data{$index}{'Preferred Name'};
-		$phone = $membership_data{$index}{'Household Phone'};
-		$priesthood = $membership_data{$index}{'Priesthood'};
-		$organization = $organization_by_id{$id};
-		$attending = 0;
-		if(($organization =~ /Elders/) ||
-		   ($organization =~ /Young Men/) ||
-		   ($organization =~ /Sunday School/) ||
-		   ($organization =~ /Primary/)
-		   ) { $attending = 1; }
-		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
-		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
-		$email = $membership_data{$index}{'indiv E-mail'};
-		if ($email eq "") { $email = $membership_data{$index}{'Household E-mail'}; }
-		$sth = $dbh->prepare("select * from tc_indiv where name='$indiv_name'");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
-		my $rows = scalar @data;
-		if($rows == 0) {
-		    # No existing records found for this indiv, make a new entry
-		    print "   Adding new indiv: $indiv_name\n";
-		    $sth = $dbh->prepare("insert into tc_indiv values (NULL,'$id','$indiv_name','$phone','$email','$priesthood','n','1','','1','',$attending,1)");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows == 1) {
-		    # An existing record was found for this indiv, update it
-		    print "   Updating existing indiv: $indiv_name\n";
-		    $sth = $dbh->prepare("update tc_indiv set valid=1 where name='$indiv_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    if($phone ne "") { 
-			$sth = $dbh->prepare("update tc_indiv set phone='$phone' where name='$indiv_name'");
-		    } else {
-			$sth = $dbh->prepare("update tc_indiv set phone=NULL where name='$indiv_name'");
-		    }
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_indiv set attending='$attending' where name='$indiv_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_indiv set indiv_id='$id' where name='$indiv_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_indiv set priesthood='$priesthood' where name='$indiv_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_indiv set email='$email' where name='$indiv_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} else {
-		    # More than one record was found. Error! This shouldn't happen.
-		    print "   -E- More than one record found ($rows) for indiv: $indiv_name\n";
-		}
+	$id = $membership_data{$index}{'Indiv ID'};
+	$indiv_name = $membership_data{$index}{'Preferred Name'};
+	$birthday = $membership_data{$index}{'Birth'};
+	$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
+	$address = $membership_data{$index}{'Street 1'};
+	if($membership_data{$index}{'Street 2'} ne "") { 
+	    $address .= " " . $membership_data{$index}{'Street 2'};
+	}
+	$phone = $membership_data{$index}{'Household Phone'};
+	$priesthood = $membership_data{$index}{'Priesthood'};
+	$hhposition = $membership_data{$index}{'HH Position'};
+	$organization = $organization_by_id{$id};
+	$attending = 0;
+	if(($organization =~ /Elders/) ||
+	   ($organization =~ /Young Men/) ||
+	   ($organization =~ /Sunday School/) ||
+	   ($organization =~ /Primary/)
+	   ) { $attending = 1; }
+	if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
+	if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
+	$email = $membership_data{$index}{'indiv E-mail'};
+	if ($email eq "") { $email = $membership_data{$index}{'Household E-mail'}; }
+	$sth = $dbh->prepare("select * from tc_indiv where name=\"$indiv_name\"");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	my @data = ();
+	while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
+	my $rows = scalar @data;
+	if($rows == 0) {
+	    # No existing records found for this indiv, make a new entry
+	    print "   Adding new indiv: $indiv_name\n";
+	    $sth = $dbh->prepare("insert into tc_indiv values (NULL,'$id',\"$indiv_name\",'$year-$month-$day','$address','$phone','$email','','$hhposition','$priesthood','1','','1','',$attending,1)");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	} elsif($rows == 1) {
+	    # An existing record was found for this indiv, update it
+	    print "   Updating existing indiv: $indiv_name\n";
+	    $sth = $dbh->prepare("update tc_indiv set valid=1 where name=\"$indiv_name\"");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    if($phone ne "") { 
+		$sth = $dbh->prepare("update tc_indiv set phone='$phone' where name=\"$indiv_name\"");
+	    } else {
+		$sth = $dbh->prepare("update tc_indiv set phone=NULL where name=\"$indiv_name\"");
 	    }
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    if($birthday ne "") { 
+		$sth = $dbh->prepare("update tc_indiv set birthday='$year-$month-$day' where name=\"$indiv_name\"");
+	    } else {
+		$sth = $dbh->prepare("update tc_indiv set birthday=NULL where name=\"$indiv_name\"");
+	    }
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    if($address ne "") { 
+		$sth = $dbh->prepare("update tc_indiv set address='$address' where name=\"$indiv_name\"");
+	    } else {
+		$sth = $dbh->prepare("update tc_indiv set address=NULL where name=\"$indiv_name\"");
+	    }
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    $sth = $dbh->prepare("update tc_indiv set attending='$attending' where name=\"$indiv_name\"");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    $sth = $dbh->prepare("update tc_indiv set indiv_id='$id' where name=\"$indiv_name\"");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    $sth = $dbh->prepare("update tc_indiv set priesthood='$priesthood' where name=\"$indiv_name\"");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    $sth = $dbh->prepare("update tc_indiv set email='$email' where name=\"$indiv_name\"");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	    $sth = $dbh->prepare("update tc_indiv set hh_position='$hhposition' where name=\"$indiv_name\"");
+	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
+	} else {
+	    # More than one record was found. Error! This shouldn't happen.
+	    print "   -E- More than one record found ($rows) for indiv: $indiv_name\n";
 	}
     }
     $sth->finish();
@@ -346,7 +282,6 @@ sub update_tc_district_table
 #+---------------+------------------+------+-----+---------+-------+
 #| companionship | int(16) unsigned |      |     | 0       |       |
 #| indiv         | int(16) unsigned | YES  |     | NULL    |       |
-#| aaronic       | int(16) unsigned | YES  |     | NULL    |       |
 #| district      | int(16) unsigned | YES  |     | NULL    |       |
 #| valid         | tinyint(1)       | YES  |     | NULL    |       |
 #+---------------+------------------+------+-----+---------+-------+
@@ -356,9 +291,6 @@ sub update_tc_companionship_table
 
     # First, mark all existing companionships as invalid in case they have been dissolved
     $sth = $dbh->prepare("update tc_companionship set valid=0");
-    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-    # Second, mark all the aaronic invalid. We'll only mark the ones as valid that are assigned to hometeach
-    $sth = $dbh->prepare("update tc_aaronic set valid=0");
     $sth->execute or die "-E- DB error: $DBI::errstr\n";
     
     foreach $index (keys %hometeaching_data)
@@ -373,18 +305,9 @@ sub update_tc_companionship_table
 		    $sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		    $sqlhashref2 = $sth2->fetchrow_hashref;
 		    $indiv = $sqlhashref2->{indiv};
-		    $aaronic = "NULL";
-		    if($indiv eq "") {
-			$sth2 = $dbh->prepare("select * from tc_aaronic where name='$indiv_name'");
-			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
-			$sqlhashref2 = $sth2->fetchrow_hashref;
-			$aaronic = $sqlhashref2->{aaronic};
-			$indiv = "NULL";
-			if($aaronic eq "") { print "-W- Unable to find $indiv_name in tc_indiv or tc_aaronic tables\n"; next; }
-		    } 
 		    $id = $hometeaching_data{$index}{'Comp ID'};
 		    $district = $hometeaching_data{$index}{'HT District'};
-		    $sth = $dbh->prepare("select * from tc_companionship where indiv='$indiv' and aaronic='$aaronic' and companionship='$id'");
+		    $sth = $dbh->prepare("select * from tc_companionship where indiv='$indiv' and companionship='$id'");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    my @data = ();
 		    while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
@@ -392,31 +315,19 @@ sub update_tc_companionship_table
 		    if($rows == 0) {
 			# No existing records found for this companionship, make a new entry
 			print "   Adding Companion to companionship: $indiv_name -> $id\n";
-			$sth = $dbh->prepare("insert into tc_companionship values ($id,'$indiv','$aaronic','$district',1)");
+			$sth = $dbh->prepare("insert into tc_companionship values ($id,'$indiv','$district',1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		    } else {
 			# An existing companionship was found for this companionship, update it
 			$sth2 = $dbh->prepare("select * from tc_companionship where district='$district' and companionship='$id'");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
-			if($indiv ne "NULL") {
-			    print "   Updating Companionship with indiv: $indiv_name ($indiv) -> $id\n";
-			    $sth = $dbh->prepare("update tc_companionship set district='$district' where indiv='$indiv' and companionship='$id'");
-			    $sth->execute or die "-E- DB error 'district': $DBI::errstr\n";
-			    $sth = $dbh->prepare("update tc_companionship set indiv='$indiv' where indiv='$indiv' and companionship='$id'");
-			    $sth->execute or die "-E- DB error 'indiv': $DBI::errstr\n";
-			    $sth = $dbh->prepare("update tc_companionship set valid=1 where indiv='$indiv' and companionship='$id'");
-			    $sth->execute or die "-E- DB error 'valid': $DBI::errstr\n";
-			} else {
-			    print "   Updating Companionship with Aaronic: $indiv_name ($aaronic) -> $id\n";
-			    $sth = $dbh->prepare("update tc_companionship set district='$district' where aaronic='$aaronic' and companionship='$id'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			    $sth = $dbh->prepare("update tc_companionship set aaronic='$aaronic' where aaronic='$aaronic' and companionship='$id'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			    $sth = $dbh->prepare("update tc_companionship set valid=1 where aaronic='$aaronic' and companionship='$id'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";			    
-			    $sth = $dbh->prepare("update tc_aaronic set valid=1 where aaronic='$aaronic'");
-			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-			}
+			print "   Updating Companionship with indiv: $indiv_name ($indiv) -> $id\n";
+			$sth = $dbh->prepare("update tc_companionship set district='$district' where indiv='$indiv' and companionship='$id'");
+			$sth->execute or die "-E- DB error 'district': $DBI::errstr\n";
+			$sth = $dbh->prepare("update tc_companionship set indiv='$indiv' where indiv='$indiv' and companionship='$id'");
+			$sth->execute or die "-E- DB error 'indiv': $DBI::errstr\n";
+			$sth = $dbh->prepare("update tc_companionship set valid=1 where indiv='$indiv' and companionship='$id'");
+			$sth->execute or die "-E- DB error 'valid': $DBI::errstr\n";
 		    }
 		    $sth->finish();
 		    $sth2->finish();		    
@@ -518,171 +429,6 @@ sub update_tc_family_table
 			    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 			}
 		    }
-		}
-		$sth->finish();
-	    }
-	}
-    }
-}
-
-# 3RD_PARENT
-#+----------+------------------+------+-----+---------+-------+
-#| Field    | Type             | Null | Key | Default | Extra |
-#+----------+------------------+------+-----+---------+-------+
-#| parent   | int(16) unsigned |      | PRI | 0       |   A   |
-#| family   | int(16) unsigned | YES  |     | NULL    |       |
-#| name     | varchar(30)      | YES  |     | NULL    |       |
-#| birthday | date             | YES  |     | NULL    |       |
-#| phone    | varchar(12)      | YES  |     | NULL    |       |
-#| address  | varchar(255)     | YES  |     | NULL    |       |
-#| indiv_id | int(16) unsigned | YES  | UNI | NULL    |       |
-#| valid    | tinyint(1)       | YES  |     | NULL    |       |
-#+----------+------------------+------+-----+---------+-------+
-sub update_tc_parent_table
-{
-    print "\n-> Updating tc_parent table\n";
-
-    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
-    $sth = $dbh->prepare("update tc_parent set valid=0");
-    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-    
-    foreach $index (keys %membership_data)
-    {
-	$hashref = $membership_data{$index};
-	foreach $key (keys %$hashref) {
-	    if($key =~ /HH Position/i &&
-	       $membership_data{$index}{$key} =~ /Head of Household/i ||
-	       $membership_data{$index}{$key} =~ /Spouse/i
-	       ) {
-		# Get some information from the hash about this parent
-		$parent_name = $membership_data{$index}{'Preferred Name'};
-		$parent_name =~ s/\'/\\'/g; #'
-		$birthday = $membership_data{$index}{'Birth'};
-		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
-		$hofh_id = $membership_data{$index}{'HofH ID'};
-		$id = $membership_data{$index}{'Indiv ID'};
-		$phone = $membership_data{$index}{'Household Phone'};
-		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
-		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
-		$address = $membership_data{$index}{'Street 1'};
-		if($membership_data{$index}{'Street 2'} ne "") { 
-		    $address .= " " . $membership_data{$index}{'Street 2'};
-		}
-
-		# Find the family id for this parent's HofH_ID.
-		$sth = $dbh->prepare("select * from tc_family where hofh_id='$hofh_id' and valid=1");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @family_data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
-		my $family_rows = scalar @family_data;
-		if($family_rows > 0) { $family_id = $family_data[0]->{'family'}; }
-		else { $family_id = 0; }
-		
-		# Find out how many parents match this parent's name
-		$sth = $dbh->prepare("select * from tc_parent where name='$parent_name'");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
-		my $rows = scalar @data;
-		
-		if($rows == 0 && $family_rows > 0) {
-		    # No existing records found for this parent, make a new entry
-		    print "   Adding new Parent: $parent_name\n";
-		    $sth = $dbh->prepare("insert into tc_parent values (NULL,$family_id,'$parent_name','$year-$month-$day','$phone','$address','$id',1)");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows == 1 && $family_rows > 0) {
-		    # An existing record was found for this parent, update it
-		    print "   Updating existing parent: $parent_name\n";
-		    $sth = $dbh->prepare("update tc_parent set family='$family_id' where name='$parent_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_parent set birthday='$year-$month-$day' where name='$parent_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_parent set phone='$phone' where name='$parent_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_parent set address='$address' where name='$parent_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_parent set valid=1 where name='$parent_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_parent set indiv_id='$id' where name='$parent_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows > 1) {
-		    # More than one record was found. Error! This shouldn't happen.
-		    print "   -E- More than one record found with same parent name: $parent_name with hofh_id: $hofh_id\n";
-		} else {
-		    print "   -E- Unable to find a family to attach this parent to: $parent_name with hofh_id: $hofh_id\n";
-		}
-		$sth->finish();
-	    }
-	}
-    }
-}
-
-# 3RD_CHILD
-#+----------+------------------+------+-----+---------+-------+
-#| Field    | Type             | Null | Key | Default | Extra |
-#+----------+------------------+------+-----+---------+-------+
-#| child    | int(16) unsigned |      | PRI | 0       |   A   |
-#| family   | int(16) unsigned | YES  |     | NULL    |       |
-#| name     | varchar(30)      | YES  |     | NULL    |       |
-#| birthday | date             | YES  |     | NULL    |       |
-#| indiv_id | int(16) unsigned | YES  | UNI | NULL    |       |
-#| valid    | tinyint(1)       | YES  |     | NULL    |       |
-#+----------+------------------+------+-----+---------+-------+
-sub update_tc_child_table
-{
-    print "\n-> Updating tc_child table\n";
-
-    # Set all records to be invalid. Only mark them as valid if they appear on the new list.
-    $sth = $dbh->prepare("update tc_child set valid=0");
-    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-    
-    foreach $index (keys %membership_data)
-    {
-	$hashref = $membership_data{$index};
-	foreach $key (keys %$hashref) {
-	    if($key =~ /HH Position/i && $membership_data{$index}{$key} =~ /Other/i ) {
-		$child_name = $membership_data{$index}{'Full Name'};
-		$child_name =~ s/\'/\\'/g; #'
-		$birthday = $membership_data{$index}{'Birth'};
-		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
-		$id = $membership_data{$index}{'Indiv ID'};
-		$hofh_id = $membership_data{$index}{'HofH ID'};
-
-		# Find the family id for this child's HofH_ID.
-		$sth = $dbh->prepare("select * from tc_family where hofh_id='$hofh_id' and valid=1");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @family_data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
-		my $family_rows = scalar @family_data;
-		if($family_rows > 0) { $family_id = $family_data[0]->{'family'}; }
-		else { $family_id = 0; }
-		
-		# Find out how many children have the same name for the same family
-		$sth = $dbh->prepare("select * from tc_child where name='$child_name'");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
-		my $rows = scalar @data;
-		
-		if($rows == 0 && $family_rows > 0) {
-		    # No existing records found for this child, make a new entry
-		    print "   Adding new Child: $child_name\n";
-		    $sth = $dbh->prepare("insert into tc_child values (NULL,$family_id,'$child_name','$year-$month-$day','$id',1)");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} elsif($rows == 1 && $family_rows > 0) {
-		    # An existing record was found for this child, update it
-		    print "   Updating existing child: $child_name\n";
-		    $sth = $dbh->prepare("update tc_child set family='$family_id' where name='$child_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_child set birthday='$year-$month-$day' where name='$child_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_child set valid=1 where name='$child_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		    $sth = $dbh->prepare("update tc_child set indiv_id='$id' where name='$child_name'");
-		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} else {
-		    # More than one record was found. Error! This shouldn't happen.
-		    print "   -E- More than one record found ($rows) with same child name: $child_name\n";
 		}
 		$sth->finish();
 	    }
@@ -833,6 +579,36 @@ sub check_for_changed_ids
     return $found_problem;
 }
 
+sub update_family_in_tc_indiv_table
+{
+    print "\n-> Updating family info in tc_indiv table\n";
+
+    foreach $index (keys %membership_data)
+    {
+	$hashref = $membership_data{$index};
+	
+	# get some information from hash about this individual
+	$name = $membership_data{$index}{'Preferred Name'};
+	$hofh_id = $membership_data{$index}{'HofH ID'};
+	
+	# Find the family id for this individual's HofH_id
+	$sth = $dbh->prepare("select * from tc_family where hofh_id=$hofh_id and valid=1");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	my @family_data = ();
+	while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
+	my $family_rows = scalar @family_data;
+	if($family_rows > 0) { 
+		$family_id = $family_data[0]->{'family'};
+		
+		print "   Updating family data for: $name\n";
+		
+		# write the family id to the individual's data in tc_indiv
+		$sth = $dbh->prepare("update tc_indiv set family='$family_id' where name=\"$name\""); 
+		$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	} else { $family_id = 0; }
+    }
+}
+
 ######################################################################
 # MAIN
 ######################################################################
@@ -898,13 +674,11 @@ if($opt_s) { $dbh->disconnect(); exit; }
 # Now update the various eq DB tables
 &update_tc_calling_table();
 &update_tc_indiv_table();
-&update_tc_aaronic_table();
 &update_tc_district_table();
 &update_tc_companionship_table();
 &update_tc_family_table();
-&update_tc_parent_table();
-&update_tc_child_table();
 &update_tc_visit_table();
+&update_family_in_tc_indiv_table();
 
 print "\n-> Import Successful! DONE...\n";
 

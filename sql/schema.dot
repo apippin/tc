@@ -7,11 +7,11 @@ digraph schema {
     shape = "record"
   ];
   indiv   [
-    label = "<i> indiv||<id> indiv_id|<n> name|<p> phone|<em> email|<po> priesthood|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
+    label = "<i> indiv||<id> indiv_id|<n> name|<b> birthday|<a> address|<p> phone|<em> email|<f> family|<hh> hh position|<po> priesthood|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
     shape = "record"
   ];
   companionship   [
-    label = "<c> companionship||<i> indiv|<a> aaronic|<d> district|<v> valid"
+    label = "<c> companionship||<i> indiv|<d> district|<v> valid"
     shape = "record"
   ];
   visit   [
@@ -19,7 +19,7 @@ digraph schema {
     shape = "record"
   ];
   interview   [
-    label = "<in> interview||<i> interviewer|<il> indiv|<a> aaronic|<t> date|<n> notes|<it> interview_type"
+    label = "<in> interview||<i> interviewer|<il> indiv|<t> date|<n> notes|<it> interview_type"
     shape = "record"
   ];
   activity   [
@@ -32,18 +32,6 @@ digraph schema {
   ];
   attendance   [
     label = "attendance||<i> indiv|<d> date"
-    shape = "record"
-  ];
-  child	[
-    label = "<c> child||<f> family|<n> name|<b> birthday|<i> indiv_id|<v> valid"
-    shape = "record"
-  ]; 
-  parent	[
-    label = "<p> parent||<f> family|<n> name|<b> birthday|<p> phone|<a> address|<i>indiv_id|<v> valid"
-    shape = "record"
-  ]; 
-  aaronic       [
-    label = "<a> aaronic||<n> name|<p> phone|<em> email|<v> valid"
     shape = "record"
   ];
   appointment   [
@@ -73,14 +61,12 @@ digraph schema {
 
   family:c        -> companionship:c
   companionship:i -> indiv:i
-  companionship:a -> aaronic:a
 
   appointment:i   -> indiv:i
   appointment:f   -> family:f
 
   interview:il    -> indiv:i
   interview:i     -> indiv:i
-  interview:a     -> aaronic:a
 
   presidency:i    -> indiv:i
   presidency:d    -> district:d
@@ -100,6 +86,5 @@ digraph schema {
 
   attendance:i    -> indiv:i
 
-  child:f         -> family:f
-  parent:f        -> family:f
+  indiv:f        -> family:f
 }

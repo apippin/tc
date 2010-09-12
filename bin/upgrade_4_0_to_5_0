@@ -15,8 +15,8 @@ $dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$
     PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
 ###################################################
 
-# Rename eq_aaronic table to tc_aaronic
-$sth = $dbh->prepare("RENAME TABLE `eq_aaronic` TO `tc_aaronic`");
+# Remove eq_aaronic table
+$sth = $dbh->prepare("DROP TABLE `eq_aaronic` IF EXISTS");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_activity table to tc_activity
@@ -47,12 +47,16 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("RENAME TABLE `eq_calling` TO `tc_calling`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Rename eq_child table to tc_child
-$sth = $dbh->prepare("RENAME TABLE `eq_child` TO `tc_child`");
+# Remove eq_child table
+$sth = $dbh->prepare("DROP TABLE `eq_child` IF EXISTS");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_companionship table to tc_companionship
 $sth = $dbh->prepare("RENAME TABLE `eq_companionship` TO `tc_companionship`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Remove aaronic field from tc_companionship
+$sth = $dbh->prepare("ALTER TABLE 'tc_companionship' DROP 'aaronic'");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change elder field in tc_companionship table to indiv
@@ -67,12 +71,24 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("RENAME TABLE `eq_elder` TO `tc_indiv`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Add a new 'propective' field to the tc_indiv table
-$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `prospective` enum('y','n') NULL AFTER `priesthood`");
-$sth->execute or die "-E- DB error: $DBI::errstr\n";
-
 # Change elder field in tc_indiv table to indiv
 $sth = $dbh->prepare("ALTER TABLE `tc_indiv` CHANGE `elder` `indiv` INT(16)");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'birthday' column to the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `birthday` DATE NULL DEFAULT NULL AFTER `name` ");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'address' column to the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `address` VARCHAR( 255 ) NULL DEFAULT NULL AFTER `birthday`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'family' column to the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `family` INT(16) UNSIGNED NULL DEFAULT NULL AFTER `email`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Add a new 'family' column to the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `hh_position` ENUM( 'Head of Household', 'Spouse', 'Other' ) NOT NULL DEFAULT 'Other' AFTER `family`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_family table to tc_family
@@ -83,8 +99,8 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_family` CHANGE `elder_id` `indiv_id` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Rename eq_parent table to tc_parent
-$sth = $dbh->prepare("RENAME TABLE `eq_parent` TO `tc_parent`");
+# Remove eq_parent table
+$sth = $dbh->prepare("DROP TABLE `eq_parent` IF EXISTS");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_participation table to tc_participation
@@ -101,6 +117,10 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change elder field in tc_interview table to indiv
 $sth = $dbh->prepare("ALTER TABLE `tc_interview` CHANGE `elder` `indiv` INT(16)");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Remove aaronic field from tc_interview
+$sth = $dbh->prepare("ALTER TABLE 'tc_interview' DROP 'aaronic'");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change ppi field in tc_interview table to interview

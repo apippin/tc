@@ -12,19 +12,6 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/ `phpgroupware` /*!40100 DEFAULT CHARACT
 USE `phpgroupware`;
 
 --
--- Table structure for table `tc_aaronic`
---
-CREATE TABLE `tc_aaronic` (
-  `aaronic` int(16) unsigned NOT NULL auto_increment,
-  `name` varchar(60) default NULL,
-  `phone` varchar(12) default NULL,
-  `email` varchar(120) default NULL,
-  `valid` tinyint(1) default NULL,
-  PRIMARY KEY  (`aaronic`)
-) ENGINE=MyISAM AUTO_INCREMENT=92 DEFAULT CHARSET=latin1;
-
-
---
 -- Table structure for table `tc_activity`
 --
 CREATE TABLE `tc_activity` (
@@ -93,26 +80,12 @@ CREATE TABLE `tc_calling` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `tc_child`
---
-CREATE TABLE `tc_child` (
-  `child` int(16) unsigned NOT NULL auto_increment,
-  `family` int(16) unsigned default NULL,
-  `name` varchar(30) default NULL,
-  `birthday` date default NULL,
-  `indiv_id` int(16) unsigned default NULL,
-  `valid` tinyint(1) default NULL,
-  PRIMARY KEY  (`child`)
-) ENGINE=MyISAM AUTO_INCREMENT=260 DEFAULT CHARSET=latin1;
-
---
 -- Table structure for table `tc_companionship`
 --
 
 CREATE TABLE `tc_companionship` (
   `companionship` int(16) unsigned NOT NULL default '0',
   `indiv` int(16) unsigned NOT NULL default '0',
-  `aaronic` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
   KEY `companionship` (`companionship`)
@@ -136,10 +109,13 @@ CREATE TABLE `tc_indiv` (
   `indiv` int(16) unsigned NOT NULL auto_increment,
   `indiv_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
+  `birthday` date default NULL,
+  `address` varchar(255) default NULL,
   `phone` varchar(12) default NULL,
   `email` varchar(120) default NULL,
+  `family` int(16) unsigned default NULL,
+  `hh_position` enum('Head of Household','Spouse','Other') DEFAULT 'Other',
   `priesthood` enum('High Priest','Elder','Priest','Teacher','Deacon','Unordained') DEFAULT NULL,
-  `prospective` enum('y','n') DEFAULT 'n',
   `ppi_pri` int(10) unsigned NOT NULL default '1',
   `ppi_notes` varchar(128) default NULL,
   `int_pri` int(10) unsigned default '1',
@@ -166,21 +142,6 @@ CREATE TABLE `tc_family` (
 ) ENGINE=MyISAM AUTO_INCREMENT=277 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `tc_parent`
---
-CREATE TABLE `tc_parent` (
-  `parent` int(16) unsigned NOT NULL auto_increment,
-  `family` int(16) unsigned default NULL,
-  `name` varchar(30) default NULL,
-  `birthday` date default NULL,
-  `phone` varchar(12) default NULL,
-  `address` varchar(255) default NULL,
-  `indiv_id` int(16) unsigned default NULL,
-  `valid` tinyint(1) default NULL,
-  PRIMARY KEY  (`parent`)
-) ENGINE=MyISAM AUTO_INCREMENT=396 DEFAULT CHARSET=latin1;
-
---
 -- Table structure for table `tc_participation`
 --
 CREATE TABLE `tc_participation` (
@@ -196,7 +157,6 @@ CREATE TABLE `tc_interview` (
   `interview` int(16) unsigned NOT NULL auto_increment,
   `interviewer` int(16) unsigned default NULL,
   `indiv` int(16) unsigned default NULL,
-  `aaronic` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
   `notes` text,
   `interview_type` enum('hti','ppi') NOT NULL DEFAULT 'hti',
