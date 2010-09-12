@@ -1703,7 +1703,7 @@ class tc
 
       // create the individual id -> individual name mapping
       // TODO:  changed this so it picks the quorum dynamically
-      $sql = "SELECT * FROM tc_indiv where valid=1 ORDER BY name ASC";
+      $sql = "SELECT * FROM tc_indiv where steward='Elder' and valid=1 ORDER BY name ASC";
       $this->db->query($sql,__LINE__,__FILE__);
       $i=0;
       $indiv_id_data = NULL;
@@ -1715,6 +1715,21 @@ class tc
 	  $individ2name[$indiv_id_data[$i]] = $indiv_name_data[$i];
 	  $i++;
 	}
+      // add any YM that are home teachers
+      $sql = "SELECT * FROM tc_companionship where valid=1";
+      $this->db->query($sql,__LINE__,__FILE__);
+      while ($this->db->next_record())
+      {
+	  $tmp_indiv_id = $this->db->f('indiv');
+          $sql = "Select * FROM tc_indiv where indiv='$tmp_indiv_id' and steward='' and valid=1";
+          $this->db2->query($sql,__LINE__,__FILE__);
+          while ($this->db2->next_record()) {
+	      $indiv_name_data[$i] = $this->db2->f('name');
+	      $indiv_id_data[$i] = $this->db2->f('indiv');
+	      $individ2name[$indiv_id_data[$i]] = $indiv_name_data[$i];
+	      $i++;
+	  }
+      }
       array_multisort($indiv_name_data, $indiv_id_data);
 
       if($action == 'save')
