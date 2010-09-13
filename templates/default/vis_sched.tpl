@@ -14,7 +14,7 @@
 	<form action="{actionurl}" method="POST">
 
 <!-- BEGIN appt_list -->
-        <table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 				<font face="{font}"><b>Yearly Visits Appointment Slots</b></font>
@@ -23,17 +23,17 @@
 		<tr bgcolor="#c9c9c9"><font face="{font}">{appt_header_row}</tr>
 		{appt_table_data}
 		<tr>
-		<td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td>
 		</tr>
-        </table>
+	</table>
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
-                <td height="50" align="right">
-			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
-			&nbsp; &nbsp;
-			<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
-			</form>
-		</td>
+			<td height="50" align="right">
+				<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
+				&nbsp; &nbsp;
+				<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
+				</form>
+			</td>
 		</tr>
 	</table>
 <!-- END appt_list -->

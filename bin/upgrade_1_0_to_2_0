@@ -23,16 +23,16 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("select * from eq_interview");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 while($row = $sth->fetchrow_hashref) {
-    $interviewer = $row->{interviewer};
-    $elder = $row->{elder};
-    $aaronic = $row->{aaronic};
-    $date = $row->{date};
-    $notes = $row->{notes};
-    $notes =~ s/\'/\\\'/g;
-    $eqpresppi = 0;
-    #print "$interviewer $elder $aaronic $date $eqpresppi $notes\n";
-    $sth2 = $dbh->prepare("insert into eq_ppi values (NULL,'$interviewer','$elder','$aaronic','$date','$notes','$eqpresppi')");
-    $sth2->execute or die "-E- DB error: $DBI::errstr\n";
+	$interviewer = $row->{interviewer};
+	$elder = $row->{elder};
+	$aaronic = $row->{aaronic};
+	$date = $row->{date};
+	$notes = $row->{notes};
+	$notes =~ s/\'/\\\'/g;
+	$eqpresppi = 0;
+	#print "$interviewer $elder $aaronic $date $eqpresppi $notes\n";
+	$sth2 = $dbh->prepare("insert into eq_ppi values (NULL,'$interviewer','$elder','$aaronic','$date','$notes','$eqpresppi')");
+	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 }
 
 print "\n-> Succesfully imported all eq_interview table entries into eq_ppi table...\n";

@@ -30,58 +30,58 @@ $monthname2num{'Dec'} = '12';
 ######################################################################
 sub csv_to_hash
 {
-    my ($filename, $hashref) = @_;
+	my ($filename, $hashref) = @_;
 
-    open(FILE,$filename) || die "-E- Could not open $filename for reading\n";
+	open(FILE,$filename) || die "-E- Could not open $filename for reading\n";
 
-    my $found_header = 0; my $index = 0;
-    while(<FILE>)
-    {
-	$line = $_;
-	@data = split /\",/, $line;
-	if(!$found_header) { @header = @data; $found_header = 1; }
-	else {
-	    foreach $i (0..$#data-1) {
-		$data[$i] =~ s/\"//g;
-		$header[$i] =~ s/\"//g;
-	        $hashref->{$index}{$header[$i]} = $data[$i];
-		#print "$index: $i: $header[$i]: $data[$i]\n";
-	    }
-	    $index++;
+	my $found_header = 0; my $index = 0;
+	while(<FILE>)
+	{
+		$line = $_;
+		@data = split /\",/, $line;
+		if(!$found_header) { @header = @data; $found_header = 1; }
+		else {
+			foreach $i (0..$#data-1) {
+				$data[$i] =~ s/\"//g;
+				$header[$i] =~ s/\"//g;
+				$hashref->{$index}{$header[$i]} = $data[$i];
+				#print "$index: $i: $header[$i]: $data[$i]\n";
+			}
+			$index++;
+		}
 	}
-    }
-    
-    close(FILE);
+
+	close(FILE);
 }
 
 ######################################################################
 sub print_hash
 {
-    my ($hashref) = @_;
+	my ($hashref) = @_;
 
-    foreach $key (sort {$a <=> $b} keys %$hashref) {
-	print "Index: $key\n";
-	foreach $field (keys %{$hashref->{$key}}) {
-	    print "$field: $hashref->{$key}{$field}\n";
+	foreach $key (sort {$a <=> $b} keys %$hashref) {
+		print "Index: $key\n";
+		foreach $field (keys %{$hashref->{$key}}) {
+			print "$field: $hashref->{$key}{$field}\n";
+		}
+		print "\n";
 	}
-	print "\n";
-    }
 }
 
 ######################################################################
 sub print_birthdays
 {
-    my ($hashref) = @_;
+	my ($hashref) = @_;
 
-    foreach $key (sort {$a <=> $b} keys %$hashref) {
-	$name = "";
-	$birthday = "";
-	foreach $field (keys %{$hashref->{$key}}) {
-	    if($field =~ /Full Name/) { $name = $hashref->{$key}{$field}; }
-	    if($field =~ /Birth/) { $birthday = $hashref->{$key}{$field}; }
+	foreach $key (sort {$a <=> $b} keys %$hashref) {
+		$name = "";
+		$birthday = "";
+		foreach $field (keys %{$hashref->{$key}}) {
+			if($field =~ /Full Name/) { $name = $hashref->{$key}{$field}; }
+			if($field =~ /Birth/) { $birthday = $hashref->{$key}{$field}; }
+		}
+		if($name ne "" && $birthday ne "") { printf "%-30s %-10s\n",$name,$birthday; }
 	}
-	if($name ne "" && $birthday ne "") { printf "%-30s %-10s\n",$name,$birthday; }
-    }
 }
 
 ######################################################################
@@ -106,10 +106,10 @@ print "-> Processing all ward data files in $datadir\n";
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
 
 if($opt_v) {
-    print "-> Membership Data Dump\n\n";
-    &print_hash(\%membership_data);
-    print "-> HomeTeaching Data Dump\n\n";
-    &print_hash(\%hometeaching_data);
+	print "-> Membership Data Dump\n\n";
+	&print_hash(\%membership_data);
+	print "-> HomeTeaching Data Dump\n\n";
+	&print_hash(\%hometeaching_data);
 }
 
 if($opt_b) { &print_birthdays(\%membership_data); }
