@@ -72,7 +72,7 @@ $sth = $dbh->prepare("RENAME TABLE `eq_elder` TO `tc_indiv`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change elder field in tc_indiv table to indiv
-$sth = $dbh->prepare("ALTER TABLE `tc_indiv` CHANGE `elder` `indiv` INT(16)");
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` CHANGE `elder` `indiv` INT(16) NOT NULL AUTO_INCREMENT");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Add a new 'birthday' column to the tc_indiv table
@@ -128,7 +128,7 @@ $sth = $dbh->prepare("ALTER TABLE `tc_interview` DROP `aaronic`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change ppi field in tc_interview table to interview
-$sth = $dbh->prepare("ALTER TABLE `tc_interview` CHANGE `ppi` `interview` INT(16)");
+$sth = $dbh->prepare("ALTER TABLE `tc_interview` CHANGE `ppi` `interview` INT(16) NOT NULL AUTO_INCREMENT");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Add a new 'interview_type' column to the tc_interview table
