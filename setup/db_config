@@ -10,5 +10,7 @@ $dbhost = "192.168.0.4"; # This can be an IP address or name
 $dbport = 3306;
 $dbuser = "phpgroupware"; # This may require an additional '\@localhost'
 $dbpass = "phpgroupware";
-$areacode = "970";
 
+$areacode = "970";
+$default_visit_pri = 30;
+$default_interview_pri = 30;

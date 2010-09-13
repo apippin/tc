@@ -160,7 +160,7 @@ sub update_tc_indiv_table
 	if($rows == 0) {
 	    # No existing records found for this indiv, make a new entry
 	    print "   Adding new indiv: $indiv_name\n";
-	    $sth = $dbh->prepare("insert into tc_indiv values (NULL,'$id',\"$indiv_name\",'$year-$month-$day','$address','$phone','$email','','$hhposition','$priesthood','','1','','1','',$attending,1)");
+	    $sth = $dbh->prepare("insert into tc_indiv values (NULL,'$id',\"$indiv_name\",'$year-$month-$day','$address','$phone','$email','','$hhposition','$priesthood','','$default_interview_pri','','$default_interview_pri','',$attending,1)");
 	    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 	} elsif($rows == 1) {
 	    # An existing record was found for this indiv, update it
@@ -381,7 +381,7 @@ sub update_tc_family_table
 		if($rows == 0) {
 		    # No existing records found for this family, make a new entry
 		    print "   Adding new Family: $family_name\n";
-		    $sth = $dbh->prepare("insert into tc_family values (NULL,$id,'$family_name','$name_id','0','0','1','',1)");
+		    $sth = $dbh->prepare("insert into tc_family values (NULL,$id,'$family_name','$name_id','0','0','$default_visit_pri','',1)");
 		    $sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 		    # An existing record was found for this family, update it
