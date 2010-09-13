@@ -16,7 +16,7 @@ $dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$
 ###################################################
 
 # Remove eq_aaronic table
-$sth = $dbh->prepare("DROP TABLE `eq_aaronic` IF EXISTS");
+$sth = $dbh->prepare("DROP TABLE IF EXISTS `eq_aaronic`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_activity table to tc_activity
@@ -48,7 +48,7 @@ $sth = $dbh->prepare("RENAME TABLE `eq_calling` TO `tc_calling`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Remove eq_child table
-$sth = $dbh->prepare("DROP TABLE `eq_child` IF EXISTS");
+$sth = $dbh->prepare("DROP TABLE IF EXISTS `eq_child`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_companionship table to tc_companionship
@@ -56,7 +56,7 @@ $sth = $dbh->prepare("RENAME TABLE `eq_companionship` TO `tc_companionship`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Remove aaronic field from tc_companionship
-$sth = $dbh->prepare("ALTER TABLE 'tc_companionship' DROP 'aaronic'");
+$sth = $dbh->prepare("ALTER TABLE `tc_companionship` DROP `aaronic`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change elder field in tc_companionship table to indiv
@@ -104,7 +104,7 @@ $sth = $dbh->prepare("ALTER TABLE `tc_family` CHANGE `elder_id` `indiv_id` INT(1
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Remove eq_parent table
-$sth = $dbh->prepare("DROP TABLE `eq_parent` IF EXISTS");
+$sth = $dbh->prepare("DROP TABLE IF EXISTS `eq_parent`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Rename eq_participation table to tc_participation
@@ -124,7 +124,7 @@ $sth = $dbh->prepare("ALTER TABLE `tc_interview` CHANGE `elder` `indiv` INT(16)"
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Remove aaronic field from tc_interview
-$sth = $dbh->prepare("ALTER TABLE 'tc_interview' DROP 'aaronic'");
+$sth = $dbh->prepare("ALTER TABLE `tc_interview` DROP `aaronic`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Change ppi field in tc_interview table to interview
