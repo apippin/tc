@@ -109,7 +109,6 @@ CREATE TABLE `tc_indiv` (
   `indiv` int(16) unsigned NOT NULL auto_increment,
   `indiv_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
-  `birthday` date default NULL,
   `address` varchar(255) default NULL,
   `phone` varchar(12) default NULL,
   `email` varchar(120) default NULL,

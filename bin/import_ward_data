@@ -134,8 +134,6 @@ sub update_tc_indiv_table
 		$hashref = $membership_data{$index};
 		$id = $membership_data{$index}{'Indiv ID'};
 		$indiv_name = $membership_data{$index}{'Preferred Name'};
-		$birthday = $membership_data{$index}{'Birth'};
-		$birthday =~ /(\d+) (\S+) (\d+)/; $day=$1; $month=$monthname2num{$2}; $year=$3;
 		$address = $membership_data{$index}{'Street 1'};
 		if($membership_data{$index}{'Street 2'} ne "") { 
 			$address .= " " . $membership_data{$index}{'Street 2'};
@@ -162,7 +160,7 @@ sub update_tc_indiv_table
 		if($rows == 0) {
 			# No existing records found for this indiv, make a new entry
 			print "   Adding new indiv: $indiv_name\n";
-			$sth = $dbh->prepare("insert into tc_indiv values (NULL,'$id',\"$indiv_name\",'$year-$month-$day','$address','$phone','$email','','$hhposition','$priesthood','','$default_interview_pri','','$default_interview_pri','',$attending,1)");
+			$sth = $dbh->prepare("insert into tc_indiv values (NULL,'$id',\"$indiv_name\",'$address','$phone','$email','','$hhposition','$priesthood','','$default_interview_pri','','$default_interview_pri','',$attending,1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 			# An existing record was found for this indiv, update it
@@ -173,12 +171,6 @@ sub update_tc_indiv_table
 				$sth = $dbh->prepare("update tc_indiv set phone='$phone' where name=\"$indiv_name\"");
 			} else {
 				$sth = $dbh->prepare("update tc_indiv set phone=NULL where name=\"$indiv_name\"");
-			}
-			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			if($birthday ne "") { 
-				$sth = $dbh->prepare("update tc_indiv set birthday='$year-$month-$day' where name=\"$indiv_name\"");
-			} else {
-				$sth = $dbh->prepare("update tc_indiv set birthday=NULL where name=\"$indiv_name\"");
 			}
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			if($address ne "") { 

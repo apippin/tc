@@ -10,20 +10,7 @@ else { require "db_config"; }
 
 %hometeaching_data = ();
 %membership_data = ();
-getopts('vsn:o:b');
-
-$monthname2num{'Jan'} = '01';
-$monthname2num{'Feb'} = '02';
-$monthname2num{'Mar'} = '03';
-$monthname2num{'Apr'} = '04';
-$monthname2num{'May'} = '05';
-$monthname2num{'Jun'} = '06';
-$monthname2num{'Jul'} = '07';
-$monthname2num{'Aug'} = '08';
-$monthname2num{'Sep'} = '09';
-$monthname2num{'Oct'} = '10';
-$monthname2num{'Nov'} = '11';
-$monthname2num{'Dec'} = '12';
+getopts('vsn:o');
 
 ######################################################################
 # SUBROUTINES
@@ -69,22 +56,6 @@ sub print_hash
 }
 
 ######################################################################
-sub print_birthdays
-{
-	my ($hashref) = @_;
-
-	foreach $key (sort {$a <=> $b} keys %$hashref) {
-		$name = "";
-		$birthday = "";
-		foreach $field (keys %{$hashref->{$key}}) {
-			if($field =~ /Full Name/) { $name = $hashref->{$key}{$field}; }
-			if($field =~ /Birth/) { $birthday = $hashref->{$key}{$field}; }
-		}
-		if($name ne "" && $birthday ne "") { printf "%-30s %-10s\n",$name,$birthday; }
-	}
-}
-
-######################################################################
 # MAIN
 ######################################################################
 
@@ -111,8 +82,6 @@ if($opt_v) {
 	print "-> HomeTeaching Data Dump\n\n";
 	&print_hash(\%hometeaching_data);
 }
-
-if($opt_b) { &print_birthdays(\%membership_data); }
 
 if($opt_s) { $dbh->disconnect(); exit; }
 

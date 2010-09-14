@@ -75,12 +75,8 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_indiv` CHANGE `elder` `indiv` INT(16) NOT NULL AUTO_INCREMENT");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# Add a new 'birthday' column to the tc_indiv table
-$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `birthday` DATE NULL DEFAULT NULL AFTER `name` ");
-$sth->execute or die "-E- DB error: $DBI::errstr\n";
-
 # Add a new 'address' column to the tc_indiv table
-$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `address` VARCHAR( 255 ) NULL DEFAULT NULL AFTER `birthday`");
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `address` VARCHAR( 255 ) NULL DEFAULT NULL AFTER `name`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 # Add a new 'family' column to the tc_indiv table
