@@ -2993,7 +2993,7 @@ class tc
 		}
 
 		// List the families that are available to record a visit against
-		$sql = "SELECT * FROM tc_family WHERE valid=1";
+		$sql = "SELECT * FROM tc_family WHERE companionship != 0 and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$total_records = $this->db->num_rows();
 
