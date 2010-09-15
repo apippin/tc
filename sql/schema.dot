@@ -7,7 +7,7 @@ digraph schema {
     shape = "record"
   ];
   indiv   [
-    label = "<i> indiv||<id> indiv_id|<n> name|<a> address|<p> phone|<em> email|<f> family|<hh> hh position|<po> priesthood|<st> steward|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<ip> int_pri|<in> int_notes|<a> attending|<v> valid"
+    label = "<i> indiv||<id> indiv_id|<n> name|<a> address|<p> phone|<em> email|<f> family|<hh> hh position|<po> priesthood|<st> steward|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<hp> hti_pri|<hn> hti_notes|<a> attending|<v> valid"
     shape = "record"
   ];
   companionship   [

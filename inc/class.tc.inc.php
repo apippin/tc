@@ -1748,17 +1748,17 @@ class tc
 			}
 
 			// Save any changes made to the int notes table
-			$new_data = get_var('int_notes',array('POST'));
+			$new_data = get_var('hti_notes',array('POST'));
 			foreach ($new_data as $entry) {
-				$int_notes = $entry['notes'];
+				$hti_notes = $entry['notes'];
 				$indiv_id = $entry['indiv_id'];
 				$indiv_name = $entry['indiv_name'];
-				$int_pri = $entry['pri'];
-				//print "int_notes: $int_notes indiv_name: $indiv_name <Br>";
+				$hti_pri = $entry['pri'];
+				//print "hti_notes: $hti_notes indiv_name: $indiv_name <Br>";
 				// Perform database save actions here
 				$this->db->query("UPDATE tc_indiv set " .
-				                 " int_notes='" . $int_notes . "'" .
-				                 ",int_pri='" . $int_pri . "'" .
+				                 " hti_notes='" . $hti_notes . "'" .
+				                 ",hti_pri='" . $hti_pri . "'" .
 				                 " WHERE indiv=" . $indiv_id,__LINE__,__FILE__);
 			}
 
@@ -1902,14 +1902,14 @@ class tc
 						$indiv_id = $this->db2->f('indiv');
 						$indiv_name = $this->db2->f('name');
 						$indiv_phone[$indiv_id] = $this->db2->f('phone');
-						$indiv_int_pri[$indiv_id] = $this->db2->f('int_pri');
-						$indiv_int_notes[$indiv_id] = $this->db2->f('int_notes');
+						$indiv_hti_pri[$indiv_id] = $this->db2->f('hti_pri');
+						$indiv_hti_notes[$indiv_id] = $this->db2->f('hti_notes');
 					}
 					$id = $indiv_id;
 					$name = $indiv_name;
 					$phone = $indiv_phone[$id];
-					$int_pri = $indiv_int_pri[$id];
-					$int_notes = $indiv_int_notes[$id];
+					$hti_pri = $indiv_hti_pri[$id];
+					$hti_notes = $indiv_hti_notes[$id];
 
 					// If the companionship has already had its quarterly interview,
 					// Skip the other companion in the companionship.
@@ -1917,7 +1917,7 @@ class tc
 						$completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 						$completed_data.= "<td align=center>$phone</td>";
 						$completed_data.= "<td align=center><a href=".$link.">$date</a></td>";
-						$completed_data.= "<td align=left>$int_notes</td>";
+						$completed_data.= "<td align=left>$hti_notes</td>";
 						$completed_data.= '</tr>';
 						$tr_color2 = $this->nextmatchs->alternate_row_color($tr_color2);
 						$this->t->set_var('tr_color2',$tr_color2);
@@ -1948,10 +1948,10 @@ class tc
 						$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 						$table_data.= "<td align=center>$phone</td>";
 						$table_data.= "<td align=center>";
-						$table_data.= '<select name=int_notes['.$i.'][pri]>';
+						$table_data.= '<select name=hti_notes['.$i.'][pri]>';
 						foreach(range(0,6) as $num) {
 							if($num == 0) { $num = 1; } else {$num = $num*5; }
-							if($int_pri == $num) { 
+							if($hti_pri == $num) { 
 								$selected[$num] = 'selected="selected"'; 
 							} else { 
 								$selected[$num] = ''; 
@@ -1960,9 +1960,9 @@ class tc
 						}
 						$table_data.= '</select></td>';
 						$table_data.= "<td align=center>$date</td>";
-						$table_data.= '<td><input type=text size="50" maxlength="128" name="int_notes['.$i.'][notes]" value="'.$int_notes.'">';
-						$table_data.= '<input type=hidden name="int_notes['.$i.'][indiv_id]" value="'.$id.'">';
-						$table_data.= '<input type=hidden name="int_notes['.$i.'][indiv_name]" value="'.$name.'">';
+						$table_data.= '<td><input type=text size="50" maxlength="128" name="hti_notes['.$i.'][notes]" value="'.$hti_notes.'">';
+						$table_data.= '<input type=hidden name="hti_notes['.$i.'][indiv_id]" value="'.$id.'">';
+						$table_data.= '<input type=hidden name="hti_notes['.$i.'][indiv_name]" value="'.$name.'">';
 						$table_data.= '</td>';
 						$table_data.= '</tr>'."\n";
 						$i++;
@@ -1977,12 +1977,12 @@ class tc
 						$comps_with_quarterly_int++;
 						$int_completed=1;
 						$date = $this->db2->f('date');
-						$int_notes = $this->db2->f('notes');
-						if(strlen($int_notes) > 40) { $int_notes = substr($int_notes,0,40) . "..."; }
+						$hti_notes = $this->db2->f('notes');
+						if(strlen($hti_notes) > 40) { $hti_notes = substr($hti_notes,0,40) . "..."; }
 						$completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 						$completed_data.= "<td align=center>$phone</td>";
 						$completed_data.= "<td align=center><a href=".$link.">$date</a></td>";
-						$completed_data.= "<td align=left>$int_notes</td>";
+						$completed_data.= "<td align=left>$hti_notes</td>";
 						$completed_data.= '</tr>';
 					}
 				}

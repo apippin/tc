@@ -118,8 +118,8 @@ CREATE TABLE `tc_indiv` (
   `steward` enum('High Priest','Elder') DEFAULT NULL,
   `ppi_pri` int(10) unsigned NOT NULL default '1',
   `ppi_notes` varchar(128) default NULL,
-  `int_pri` int(10) unsigned default '1',
-  `int_notes` varchar(128) default NULL,
+  `hti_pri` int(10) unsigned default '1',
+  `hti_notes` varchar(128) default NULL,
   `attending` tinyint(1) default '0',
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`indiv`)

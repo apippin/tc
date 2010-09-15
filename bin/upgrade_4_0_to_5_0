@@ -91,6 +91,14 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_indiv` ADD `steward` ENUM( 'High Priest', 'Elder', '' ) NULL DEFAULT NULL AFTER `priesthood`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Rename int_pri column to hti_pri in the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` CHANGE `int_pri` `hti_pri` INT( 10 ) UNSIGNED NULL DEFAULT '1'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# Rename int_notes column to hti_notes in the tc_indiv table
+$sth = $dbh->prepare("ALTER TABLE `tc_indiv` CHANGE `int_notes` `hti_notes` VARCHAR( 128 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 # Rename eq_family table to tc_family
 $sth = $dbh->prepare("RENAME TABLE `eq_family` TO `tc_family`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
