@@ -474,7 +474,7 @@ sub update_tc_visit_table
 		#print "family_id = $family_id\n";
 		#print "comp_id = $comp_id\n";
 		
-		# ignore visits that weren't done by the EQ
+		# ignore visits that weren't done by the quorum
 		if ($comp_id == 0) { next; }
 		
 		# retrieve the month header if not already done

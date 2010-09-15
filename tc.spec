@@ -51,6 +51,6 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/%{phpgwdirname}
 
 %changelog
-- EQ App Update
+- TC App Update
 
 # end of file

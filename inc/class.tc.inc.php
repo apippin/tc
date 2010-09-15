@@ -290,7 +290,7 @@ class tc
 						$query_id = $this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->num_rows($query_id) == 0) {
 							// We did not find any visits made by the currently assigned companionship,
-							// look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
+							// look for visits made by any other companionship other than 0. (0 == Presidency Visit)
 							$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 								   " AND companionship!=0".
 								   " AND family=". $family_id;
@@ -492,7 +492,7 @@ class tc
 				$query_id = $this->db2->query($sql,__LINE__,__FILE__);
 				if($this->db2->num_rows($query_id) == 0) {
 					// We did not find any visits made by the currently assigned companionship,
-					// look for visits made by any other companionship other than 0. (0 == EQ Presidency Visit)
+					// look for visits made by any other companionship other than 0. (0 == Presidency Visit)
 					$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' ".
 					       " AND companionship!=0".
 					       " AND family=". $family_id;
@@ -1352,7 +1352,7 @@ class tc
 
 		$year = date('Y');
 
-		// Get the EQ President
+		// Get the President
 		$sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
@@ -1449,7 +1449,7 @@ class tc
 
 		$total_indivs=0; $indivs_with_yearly_ppi=0;
 
-		// Display a scheduling table for the EQ President
+		// Display a scheduling table for the President
 		$table_data=""; $appt_table_data="";
 		$table_title = "District ".$district_number.": ".$district_name.": All indivs with Yearly PPI Not Completed";
 		$appt_table_title = "District ".$district_number.": ".$district_name.": Yearly PPI Appointment Slots";
@@ -2137,7 +2137,7 @@ class tc
 		$appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
 		$appt_table_data = ""; 
 
-		// Find out what the EQ Presidency ID is
+		// Find out what the President ID is
 		$sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
@@ -4147,7 +4147,7 @@ class tc
 			$this->t->pfp('adminhandle','admin'); 
 		}
 
-		// Now save off the data needed for an EQ Presidency Table Update
+		// Now save off the data needed for a Presidency Table Update
 
 		$sql = "SELECT * FROM tc_presidency where valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);

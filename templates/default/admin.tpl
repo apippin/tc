@@ -47,7 +47,7 @@
 	<tr>
           <td align="left">
 	    <hr>
-  	    <b>Update the EQ Presidency Table</b>
+  	    <b>Update the Presidency Table</b>
 	    <br><br>
 	    <form enctype="multipart/form-data" action="{presidency_action}" method="POST">
             <table border="0" width="80%" cellspacing="2" cellpadding="2">
@@ -56,14 +56,12 @@
             </table>
             <b>Notes:</b>
             <br>- The District is a drop-down list. Please assign a unique district number per district supervisor.
-	    <br>- The President, Counselor, Secretary, and EQ Presidency fields are boolean value (true|false) flags.
+	    <br>- The President, Counselor, Secretary, and Presidency fields are boolean value (true|false) flags.
             <br>- If a member of the presidency is not a District Leader, make sure to set their "District=0".
             <br>- If a district leader is not a member of the presidency, add them without setting any other flags except the district.
             <br>- You can only add 1 new presidency member at a time (1 per each update request to the table).
-	    <br>- Make sure you have 1 EQ Presidency member that is marked as EQ Presidency=1 with no Elder selected.
-            <br>This entry is used to email the entire presidency, and its email address should cause that to happen.
 	    <br><br>
-	    <input type="submit" value="Update EQ Presidency Table">
+	    <input type="submit" value="Update Presidency Table">
 	    </form>
           </td>
         </tr>

@@ -10,7 +10,7 @@
 		</tr>
 	</table>
 	<br>
-	<b>Note:</b> All individuals serving in the EQ Presidency, Young Men, Sunday School, or Primary
+	<b>Note:</b> All individuals serving in the Presidency, Young Men, Sunday School, or Primary
 	<br>have been automarked as attending. Feel free to adjust this accordingly.
 	<br>
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">

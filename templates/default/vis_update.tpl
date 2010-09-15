@@ -15,7 +15,7 @@
 		</tr>
 		<tr>
 			<td align="left"><font face="{font}"><b>Companionship: </b>&nbsp;
-			<input type=text size="30" name="companionship" value="EQ Presidency" READONLY></td>
+			<input type=text size="30" name="companionship" value="Presidency" READONLY></td>
 	
 		</tr>
 		<tr>
