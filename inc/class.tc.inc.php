@@ -2138,7 +2138,7 @@ class tc
 		$appt_table_data = ""; 
 
 		// Find out what the EQ Presidency ID is
-		$sql = "SELECT * FROM tc_presidency where eqpres=1 and valid=1";
+		$sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$presidency_name = $this->db->f('name');
@@ -4070,13 +4070,10 @@ class tc
 				$president = $entry['president'];
 				$counselor = $entry['counselor'];
 				$secretary = $entry['secretary'];
-				$eqpresidency = $entry['eqpresidency'];
-				// Set the individual id to 0 for EQ Presidency tagged entry
-				if($eqpresidency == 1) { $indiv="0"; }
-				// Re-look up the individual name for the ID if we aren't an EQ Presidency tagged entry
-				else { $name = $indiv2name[$indiv]; }
+				// look up the individual name for the ID
+				$name = $indiv2name[$indiv]; 
 				//print "id=$id indiv=$indiv name=$name email=$email district=$district president=$president ";
-				//print "counselor=$counselor secretary=$secretary eqpres=$eqpresidency<br>";
+				//print "counselor=$counselor secretary=$secretary<br>";
 
 				if(($indiv > 0) || ($name != "")) {
 					if($id < $this->max_presidency_members) {
@@ -4089,15 +4086,14 @@ class tc
 						                  " ,president='" . $president . "'" .
 						                  " ,counselor='" . $counselor . "'" .
 						                  " ,secretary='" . $secretary . "'" .
-						                  " ,eqpres='" . $eqpresidency . "'" .
 						                  " WHERE presidency=" . $id,__LINE__,__FILE__);
 					} else {
 						//print "Adding New Entry<br>";
 						$this->db2->query("INSERT INTO tc_presidency (presidency,indiv,district,name," .
-						                  "email,president,counselor,secretary,eqpres,valid) " .
+						                  "email,president,counselor,secretary,valid) " .
 						                  "VALUES (NULL,'" . $indiv . "','" . $district . "','" .
 						                  $name . "','" . $email . "','" . $president  . "','" .
-						                  $counselor . "','" . $secretary . "','" . $eqpres  . "','1'" .
+						                  $counselor . "','" . $secretary . "','1'" .
 						                  ")",__LINE__,__FILE__);
 					}
 				} else {
@@ -4156,7 +4152,7 @@ class tc
 		$sql = "SELECT * FROM tc_presidency where valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$table_data = "";
-		$header_row = "<th>Individual</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th><th>Presidency</th>";
+		$header_row = "<th>Individual</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th>";
 		while ($this->db->next_record()) {
 			// Extract the data for each presidency record
 			$id = $this->db->f('presidency');
@@ -4167,7 +4163,6 @@ class tc
 			$president = $this->db->f('president');
 			$counselor = $this->db->f('counselor');
 			$secretary = $this->db->f('secretary');
-			$eqpresidency = $this->db->f('eqpres');
 
 			// Create the forms needed in the table
 			$table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
@@ -4231,12 +4226,6 @@ class tc
 			else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
 			$table_data.='</select></td>';
 
-			// Presidency
-			$table_data.= '<td align=center><select name="eqpres['.$id.'][eqpresidency]">';
-			if($eqpresidency == 1) { $table_data .= '<option value=0>0</option><option value=1 selected="selected">1</option>'; }
-			else { $table_data .= '<option value=0 selected="selected">0</option><option value=1>1</option>'; }
-			$table_data.='</select></td>';
-
 			// End of ROW
 			$table_data .= "</tr>\n";
 			$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
@@ -4282,10 +4271,6 @@ class tc
 		$table_data.='</select></td>';
 		// Secretary
 		$table_data.= '<td align=center><select name="eqpres['.$id.'][secretary]">';
-		$table_data.= '<option value=0>0</option><option value=1>1</option>';
-		$table_data.='</select></td>';
-		// Presidency
-		$table_data.= '<td align=center><select name="eqpres['.$id.'][eqpresidency]">';
 		$table_data.= '<option value=0>0</option><option value=1>1</option>';
 		$table_data.='</select></td>';
 		// End of ROW

@@ -147,6 +147,10 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_presidency` CHANGE `elder` `indiv` INT(16)");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Remove eqpres field from tc_presidency
+$sth = $dbh->prepare("ALTER TABLE `tc_presidency` DROP `eqpres`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 # Rename eq_visit table to tc_visit
 $sth = $dbh->prepare("RENAME TABLE `eq_visit` TO `tc_visit`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
