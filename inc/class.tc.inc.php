@@ -3570,7 +3570,7 @@ class tc
 		$header_row.= "<th width=$location_width><font size=-2>Location</th>";
 		$table_data = "";
 
-		$sql = "SELECT * FROM tc_presidency where valid=1 GROUP BY indiv";
+		$sql = "SELECT * FROM tc_presidency where valid=1 GROUP BY indiv ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
