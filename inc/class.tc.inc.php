@@ -584,7 +584,7 @@ class tc
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$activity_list[$i]['name'] = $this->db2->f('name');
-				$activity_list[$i]['code'] = $this->db2->f('code');
+				$activity_list[$i]['abbreviation'] = $this->db2->f('abbreviation');
 			}
 			$i++;
 		}
@@ -638,7 +638,7 @@ class tc
 		$this->db2->query($sql,__LINE__,__FILE__);
 		if($this->db2->next_record()) {
 			$this->t->set_var('name', $this->db2->f('name'));
-			$this->t->set_var('code', $this->db2->f('code'));
+			$this->t->set_var('abbreviation', $this->db2->f('abbreviation'));
 		}
 		$this->t->set_var('lang_name','Assignment');
 		$this->t->set_var('lang_date','Date');
@@ -792,7 +792,7 @@ class tc
 		while ($this->db->next_record()) {
 			$assignments[$i]['assignment']  = $this->db->f('assignment');
 			$assignments[$i]['name'] = $this->db->f('name');
-			$assignments[$i]['code'] = $this->db->f('code');
+			$assignments[$i]['abbreviation'] = $this->db->f('abbreviation');
 			$i++;
 		}
 
@@ -870,7 +870,7 @@ class tc
 		$this->t->set_block('assign_view_t','assign_view','list');
 
 		$this->t->set_var('lang_name','Assignment Name');
-		$this->t->set_var('lang_code','Code');
+		$this->t->set_var('lang_code','Abbreviation');
 
 		$sql = "SELECT * FROM tc_assignment ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
@@ -880,14 +880,14 @@ class tc
 		while ($this->db->next_record()) {
 			$assignment_list[$i]['assignment']  = $this->db->f('assignment');
 			$assignment_list[$i]['name'] = $this->db->f('name');
-			$assignment_list[$i]['code'] = $this->db->f('code');
+			$assignment_list[$i]['abbreviation'] = $this->db->f('abbreviation');
 			$i++;
 		}
 
 		for ($i=0; $i < count($assignment_list); $i++) {
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
 			$this->t->set_var('name',$assignment_list[$i]['name']);
-			$this->t->set_var('code',$assignment_list[$i]['code']);
+			$this->t->set_var('abbreviation',$assignment_list[$i]['abbreviation']);
 
 			$link_data['menuaction'] = 'tc.tc.assign_update';
 			$link_data['assignment'] = $assignment_list[$i]['assignment'];
@@ -921,10 +921,10 @@ class tc
 
 		if($action == 'save') {
 			$assignment['name'] = get_var('name',array('POST'));
-			$assignment['code'] = get_var('code',array('POST'));
+			$assignment['abbreviation'] = get_var('abbreviation',array('POST'));
 			$this->db->query("UPDATE tc_assignment set " .
 			                 "  name='" . $assignment['name'] . "'" .
-			                 ", code='" . $assignment['code'] . "'" .
+			                 ", abbreviation='" . $assignment['abbreviation'] . "'" .
 			                 " WHERE assignment=" . $assignment['assignment'],__LINE__,__FILE__);
 
 			$this->assign_view();
@@ -933,10 +933,10 @@ class tc
 
 		if($action == 'insert') {
 			$assignment['name'] = get_var('name',array('POST'));
-			$assignment['code'] = get_var('code',array('POST'));
-			$this->db->query("INSERT INTO tc_assignment (name,code) " .
+			$assignment['abbreviation'] = get_var('abbreviation',array('POST'));
+			$this->db->query("INSERT INTO tc_assignment (name,abbreviation) " .
 			                 "VALUES ('" . $assignment['name'] . "','" .
-			                 $assignment['code'] . "')",__LINE__,__FILE__);
+			                 $assignment['abbreviation'] . "')",__LINE__,__FILE__);
 			$this->assign_view();
 			return false;
 		}
@@ -944,7 +944,7 @@ class tc
 		if($action == 'add') {
 			$assignment['assignment'] = 0;
 			$this->t->set_var('name','');
-			$this->t->set_var('code','');
+			$this->t->set_var('abbreviation','');
 			$this->t->set_var('lang_done','Cancel');
 			$this->t->set_var('lang_action','Adding New Assignment');
 			$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.assign_update&assignment=' .
@@ -957,7 +957,7 @@ class tc
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('name', $this->db->f('name'));
-			$this->t->set_var('code', $this->db->f('code'));
+			$this->t->set_var('abbreviation', $this->db->f('abbreviation'));
 			$this->t->set_var('lang_done','Cancel');
 			$this->t->set_var('lang_action','Editing Assignment');
 			$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.assign_update&assignment=' .
@@ -1012,7 +1012,7 @@ class tc
 		while($this->db->next_record()) {
 			$assignment_list[$i]['assignment'] = $this->db->f('assignment');
 			$assignment_list[$i]['name'] = $this->db->f('name');
-			$assignment_list[$i]['code'] = $this->db->f('code');
+			$assignment_list[$i]['abbreviation'] = $this->db->f('abbreviation');
 			$i++;
 		}
 
@@ -1020,7 +1020,7 @@ class tc
 		$total_width=$individual_width+$part_width;
 		for ($i=0; $i < count($assignment_list); $i++) {
 			$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
-			$this->t->set_var('assignment_code',$assignment_list[$i]['code']);
+			$this->t->set_var('assignment_abbreviation',$assignment_list[$i]['abbreviation']);
 			$this->t->fp('list1','header_list',True);
 			$total_width += $assignment_width;
 		}
@@ -1112,7 +1112,7 @@ class tc
 		while($this->db->next_record()) {
 			$assignment_list[$i]['assignment'] = $this->db->f('assignment');
 			$assignment_list[$i]['name'] = $this->db->f('name');
-			$assignment_list[$i]['code'] = $this->db->f('code');
+			$assignment_list[$i]['abbreviation'] = $this->db->f('abbreviation');
 			$i++;
 		}
 
@@ -1133,7 +1133,7 @@ class tc
 
 		for ($i=0; $i < count($assignment_list); $i++) {
 			$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
-			$this->t->set_var('assignment_code',$assignment_list[$i]['code']);
+			$this->t->set_var('assignment_abbreviation',$assignment_list[$i]['abbreviation']);
 			$this->t->fp('list1','header_list',True);
 			$total_width += $assignment_width;
 			$total_willing[$i] = 0;
@@ -1261,7 +1261,7 @@ class tc
 		while ($this->db->next_record()) {
 			$assignment = $this->db->f('assignment');
 			$assignment_name = $this->db->f('name');
-			$assignment_code = $this->db->f('code');
+			$assignment_abbreviation = $this->db->f('abbreviation');
 
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
 			$table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$assignment_name</td>";

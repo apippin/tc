@@ -44,7 +44,7 @@ CREATE TABLE `tc_appointment` (
 CREATE TABLE `tc_assignment` (
   `assignment` int(12) unsigned NOT NULL auto_increment,
   `name` varchar(60) NOT NULL,
-  `code` varchar(12) default NULL,
+  `abbreviation` varchar(12) default NULL,
   PRIMARY KEY  (`assignment`)
 ) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
@@ -53,7 +53,7 @@ CREATE TABLE `tc_assignment` (
 --
 LOCK TABLES `tc_assignment` WRITE;
 /*!40000 ALTER TABLE `tc_assignment` DISABLE KEYS */;
-INSERT INTO `tc_assignment` (`assignment`, `name`, `code`) VALUES (1,'Enrichment Night Babysitting','RS'),(2,'Building Lockup','LU'),(3,'Building Cleaning Coordinator','CC'),(4,'Missionary Splits','MS'),(5,'Stake Farm','SF'),(6,'Loveland Kitchen','LK'),(7,'Moves','MV'),(8,'Temple Kitchen & Laundary','TKL'),(9,'Temple Sealings','TS'),(10,'Temple Initatories','TI');
+INSERT INTO `tc_assignment` (`assignment`, `name`, `abbreviation`) VALUES (1,'Enrichment Night Babysitting','RS'),(2,'Building Lockup','LU'),(3,'Building Cleaning Coordinator','CC'),(4,'Missionary Splits','MS'),(5,'Stake Farm','SF'),(6,'Loveland Kitchen','LK'),(7,'Moves','MV'),(8,'Temple Kitchen & Laundary','TKL'),(9,'Temple Sealings','TS'),(10,'Temple Initatories','TI');
 /*!40000 ALTER TABLE `tc_assignment` ENABLE KEYS */;
 UNLOCK TABLES;
 

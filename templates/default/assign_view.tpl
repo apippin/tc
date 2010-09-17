@@ -10,7 +10,7 @@
 <!-- BEGIN assign_view -->
 
 		<tr bgcolor="{tr_color}">
-			<td><font face="{font}">{code}</font></td>
+			<td><font face="{font}">{abbreviation}</font></td>
 			<td width=60%><font face="{font}" size="{font_size}">{name}</font></td>
 			<td align="center"><font face="{font}"><a href="{view}">{lang_view}</a></font></td>
 			<td align="center"><font face="{font}"><a href="{edit}">{lang_edit}</a></font></td>
