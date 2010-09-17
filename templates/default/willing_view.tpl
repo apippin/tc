@@ -22,15 +22,15 @@
 	<form action="{actionurl}" method="POST">
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
 	<tr bgcolor="#c9c9c9">
-		<td width={indiv_width}><b><center>Individual</center></b></td>
+		<td width={individual_width}><b><center>Individual</center></b></td>
 <!-- BEGIN header_list -->
 		<td width={willing_width}><b><center><font size=-2>{assignment_name}</font></center></b></td>
 <!-- END header_list -->
 	</tr>
 
-<!-- BEGIN indiv_list -->
-	<tr bgcolor="{tr_color}"><td title="{indiv_phone}"><b><font size=-2><a href={editurl}>{indiv_name}</a></b></font></td>{willing_table}</tr>
-<!-- END indiv_list -->
+<!-- BEGIN individual_list -->
+	<tr bgcolor="{tr_color}"><td title="{individual_phone}"><b><font size=-2><a href={editurl}>{individual_name}</a></b></font></td>{willing_table}</tr>
+<!-- END individual_list -->
 	<tr bgcolor="#c9c9c9">
 	{stat_table}
 	</tr>

@@ -30,21 +30,21 @@
 <!-- END month_list -->
 	</tr>
 	<tr bgcolor="#c9c9c9">
-		<th width={indiv_width}>Individual</th>
+		<th width={individual_width}>Individual</th>
 <!-- BEGIN header_list -->
 		<th width={act_width}><font size=-3><a href="{update_day}">{day}</a></font></th>
 <!-- END header_list -->
 	</tr>
 
-<!-- BEGIN indiv_list -->
-	<tr bgcolor="{tr_color}"><td>{indiv_name}</td>{att_table}</tr>
-<!-- END indiv_list -->
+<!-- BEGIN individual_list -->
+	<tr bgcolor="{tr_color}"><td>{individual_name}</td>{att_table}</tr>
+<!-- END individual_list -->
 
 	</table>
 	<br>
 
 	<table border="0" width="{total_width}" cellspacing="2" cellpadding="2">
-	<tr bgcolor="#c9c9c9"><th width={indiv_width}><font size=-2>{total_indivs} Total Individuals</font></th>{header_row}</tr>
+	<tr bgcolor="#c9c9c9"><th width={individual_width}><font size=-2>{total_individuals} Total Individuals</font></th>{header_row}</tr>
 	<tr>
 		<td><b><font size=-2>Individuals Attending:</b></font></td>
 		{attendance}

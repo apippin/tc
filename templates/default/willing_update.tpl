@@ -13,7 +13,7 @@
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
  		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>Individual: {indiv_name}</b></font>
+			<font face="{font}"><b>Individual: {individual_name}</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>

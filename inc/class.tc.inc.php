@@ -200,11 +200,11 @@ class tc
 			$i++;
 		}
 
-		$sql = "SELECT * FROM tc_individual where valid=1 ORDER BY indiv ASC";
+		$sql = "SELECT * FROM tc_individual where valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$i++;
@@ -250,7 +250,7 @@ class tc
 					// Get this companions information
 					if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 					$companionship = $this->db->f('companionship');
-					$individual = $this->db->f('indiv');
+					$individual = $this->db->f('individual');
 					$name = $indivs[$individual];
 					$phone = $indiv_phone[$individual];
 					$companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
@@ -427,11 +427,11 @@ class tc
 			return false;
 		}
 
-		$sql = "SELECT * FROM tc_individual where valid=1 ORDER BY indiv ASC";
+		$sql = "SELECT * FROM tc_individual where valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$i++;
@@ -466,7 +466,7 @@ class tc
 				// Get this companions information
 				if($companion_table_entry != "") { $companion_table_entry .= "<td>&nbsp;/&nbsp;</td>"; }
 				$companionship = $this->db->f('companionship');
-				$individual = $this->db->f('indiv');
+				$individual = $this->db->f('individual');
 				$name = $indivs[$individual];
 				$phone = $indiv_phone[$individual];
 				$companion_table_entry .= "<td title=\"$phone\"><b>$name</b></td>";
@@ -665,12 +665,12 @@ class tc
 
 		$i = 0;
 		while ($this->db->next_record()) {
-			$part_list[$i]['indiv']  = $this->db->f('indiv');
+			$part_list[$i]['individual']  = $this->db->f('individual');
 			$i++;
 		}
 
 		for ($i=0; $i < count($part_list); $i++) {
-			$sql = "SELECT * FROM tc_individual WHERE indiv=" . $part_list[$i]['indiv'];
+			$sql = "SELECT * FROM tc_individual WHERE individual=" . $part_list[$i]['individual'];
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$names[$i] = $this->db->f('name');
@@ -696,7 +696,7 @@ class tc
 	function act_update()
 	{
 		$this->t->set_file(array('form' => 'act_update.tpl'));
-		$this->t->set_block('form','indiv_list','list');
+		$this->t->set_block('form','individual_list','list');
 		$this->t->set_block('form','add','addhandle');
 		$this->t->set_block('form','edit','edithandle');
 		$this->t->set_var('lang_done','Done');
@@ -719,11 +719,11 @@ class tc
 			$this->db->query("DELETE from tc_participation where activity=".$activity['activity'],__LINE__,__FILE__);
 
 			// Re-add the individuals who are checked as having participated in this activity
-			$indivs = get_var('indiv_name',array('POST'));
+			$indivs = get_var('individual_name',array('POST'));
 			if(is_array($indivs)) { // Only do the foreach loop if we have a valid array of indivs to work with
 				foreach ($indivs as $indiv) {
-					$this->db->query("INSERT INTO tc_participation (indiv,activity) " .
-					                 "VALUES (" . $indiv . ",". $activity['activity'] . ")",__LINE__,__FILE__);
+					$this->db->query("INSERT INTO tc_participation (individual,activity) " .
+					                 "VALUES (" . $individual . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 				}
 			}
 
@@ -747,11 +747,11 @@ class tc
 				$activity['activity'] = $this->db->f('activity');
 			}
 
-			$indivs = get_var('indiv_name',array('POST'));
+			$indivs = get_var('individual_name',array('POST'));
 			foreach ($indivs as $indiv)
 			{
-				$this->db->query("INSERT INTO tc_participation (indiv,activity) " .
-				                 "VALUES (" . $indiv . ",". $activity['activity'] . ")",__LINE__,__FILE__);
+				$this->db->query("INSERT INTO tc_participation (individual,activity) " .
+				                 "VALUES (" . $individual . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 			}
 
 			$this->act_list();
@@ -818,7 +818,7 @@ class tc
 		while ($this->db->next_record()) {
 			if($this->db->f('valid') == 1 || $action != 'add') {
 				$indiv_name[$i] = $this->db->f('name');
-				$individual[$i] = $this->db->f('indiv');
+				$individual[$i] = $this->db->f('individual');
 				$indiv_valid[$i] = $this->db->f('valid');
 				$i++;
 			}
@@ -828,7 +828,7 @@ class tc
 		$j=0;
 		for ($i=0; $i < count($individual); $i++) {
 			//$this->nextmatchs->template_alternate_row_color(&$this->t);
-			$sql = "SELECT * FROM tc_participation where activity=". $activity['activity'] . " AND indiv=" . $individual[$i];
+			$sql = "SELECT * FROM tc_participation where activity=". $activity['activity'] . " AND individual=" . $individual[$i];
 			$this->db->query($sql,__LINE__,__FILE__);
 			if($this->db->next_record()) { 
 				$this->t->set_var('checked','checked'); 
@@ -838,15 +838,15 @@ class tc
 				$checked=0; 
 			}
 			if($checked || $indiv_valid[$i] == 1) {
-				$this->t->set_var('indiv_name',$indiv_name[$i]);
-				$this->t->set_var('indiv',$individual[$i]);
+				$this->t->set_var('individual_name',$indiv_name[$i]);
+				$this->t->set_var('individual',$individual[$i]);
 				if(($j+1) % 3 == 0) {
 					$this->t->set_var('table_sep',"</td></tr><tr>"); 
 				} else { 
 					$this->t->set_var('table_sep',"</td>"); 
 				}
 				if(($j) % 3 == 0) { $this->nextmatchs->template_alternate_row_color(&$this->t); }
-				$this->t->fp('list','indiv_list',True);
+				$this->t->fp('list','individual_list',True);
 				$j++;
 			}
 		}
@@ -981,18 +981,18 @@ class tc
 	{
 		$this->t->set_file(array('par_view_t' => 'par_view.tpl'));
 		$this->t->set_block('par_view_t','header_list','list1');
-		$this->t->set_block('par_view_t','indiv_list','list2');
+		$this->t->set_block('par_view_t','individual_list','list2');
 
 		// TODO:  changed this so it picks the quorum dynamically
 		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$indiv_name[$i] = $this->db->f('name');
-			$individual[$i] = $this->db->f('indiv');
+			$individual_name[$i] = $this->db->f('name');
+			$individual[$i] = $this->db->f('individual');
 			$i++;
 		}
-		array_multisort($indiv_name, $individual);
+		array_multisort($individual_name, $individual);
 
 		$sql = "SELECT * FROM tc_activity ORDER BY date DESC";
 		$this->db->query($sql,__LINE__,__FILE__);
@@ -1016,8 +1016,8 @@ class tc
 			$i++;
 		}
 
-		$indiv_width=300; $part_width=25; $assignment_width=50;
-		$total_width=$indiv_width+$part_width;
+		$individual_width=300; $part_width=25; $assignment_width=50;
+		$total_width=$individual_width+$part_width;
 		for ($i=0; $i < count($assignment_list); $i++) {
 			$this->t->set_var('assignment_name',$assignment_list[$i]['name']);
 			$this->t->set_var('assignment_code',$assignment_list[$i]['code']);
@@ -1028,14 +1028,14 @@ class tc
 		for ($i=0; $i < count($individual); $i++) {
 			$participated=0; $part_table = ''; 
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
-			$this->t->set_var('indiv_name',$indiv_name[$i]);
+			$this->t->set_var('individual_name',$individual_name[$i]);
 			for ($j=0; $j < count($assignment_list); $j++) {
 				$date = "0000-00-00"; $checkmark=0; $num_matches=0;
 				for ($k=0; $k < count($activity_list); $k++) {
 					if($assignment_list[$j]['assignment'] == $activity_list[$k]['assignment']) {
 						$sql = "SELECT * FROM tc_participation where " .
 						       " activity=" . $activity_list[$k]['activity'] .
-						       " AND indiv=" . $individual[$i];
+						       " AND individual=" . $individual[$i];
 						$this->db->query($sql,__LINE__,__FILE__);
 						while($this->db->next_record()) {
 							if($activity_list[$k]['date'] > $date) { 
@@ -1061,10 +1061,10 @@ class tc
 				$part_table .= '<td>&nbsp;</td>'; 
 			}
 			$this->t->set_var('part_table',$part_table);
-			$this->t->fp('list2','indiv_list',True);
+			$this->t->fp('list2','individual_list',True);
 		}
 		$this->t->set_var('total_width',$total_width);
-		$this->t->set_var('indiv_width',$indiv_width);
+		$this->t->set_var('individual_width',$individual_width);
 		$this->t->set_var('part_width',$part_width);
 		$this->t->set_var('act_width',$act_width);
 		$this->t->pfp('out','par_view_t');
@@ -1075,7 +1075,7 @@ class tc
 	{
 		$this->t->set_file(array('willing_view_t' => 'willing_view.tpl'));
 		$this->t->set_block('willing_view_t','header_list','list1');
-		$this->t->set_block('willing_view_t','indiv_list','list2');
+		$this->t->set_block('willing_view_t','individual_list','list2');
 
 		$this->t->set_var('lang_filter','Filter');
 		$this->t->set_var('lang_filter_unwilling','Filter out unwilling individuals:');
@@ -1100,7 +1100,7 @@ class tc
 		$i=0;
 		while ($this->db->next_record()) {
 			$indiv_name[$i] = $this->db->f('name');
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$i++;
 		}
@@ -1141,15 +1141,15 @@ class tc
 
 		for ($i=0; $i < count($individual); $i++) {
 			$willing_table = ''; $indiv_willing=0;
-			$this->t->set_var('indiv_name',$indiv_name[$i]);
-			$this->t->set_var('indiv_phone',$indiv_phone[$individual[$i]]);
+			$this->t->set_var('individual_name',$indiv_name[$i]);
+			$this->t->set_var('individual_phone',$indiv_phone[$individual[$i]]);
 			$this->t->set_var('editurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.willing_update&individual=' .
 			                  $individual[$i] . '&action=' . 'edit'));
 			for ($j=0; $j < count($assignment_list); $j++) {
 				$found_willingness=0; 
 				$sql = "SELECT * FROM tc_willingness where " .
 				       " assignment=" . $assignment_list[$j]['assignment'] .
-				       " AND indiv=" . $individual[$i];
+				       " AND individual=" . $individual[$i];
 				$this->db->query($sql,__LINE__,__FILE__);
 				while($this->db->next_record()) {
 					$found_willingness=1;
@@ -1163,7 +1163,7 @@ class tc
 						$date = $this->db2->f('date');
 						$sql = "SELECT * FROM tc_participation where " .
 						       " activity=" . $activity .
-						       " AND indiv=". $individual[$i];
+						       " AND individual=". $individual[$i];
 						$this->db3->query($sql,__LINE__,__FILE__);
 						if($this->db3->next_record()) {
 							$date_part = $date;
@@ -1188,7 +1188,7 @@ class tc
 			}
 			if(($indiv_willing == 1) || ($filter_unwilling == 'n')) { 
 				$this->t->set_var('willing_table',$willing_table);
-				$this->t->fp('list2','indiv_list',True);
+				$this->t->fp('list2','individual_list',True);
 				$this->nextmatchs->template_alternate_row_color(&$this->t);
 			} 
 		}
@@ -1200,7 +1200,7 @@ class tc
 		$this->t->set_var('stat_table',$stat_table);
 
 		$this->t->set_var('total_width',$total_width);
-		$this->t->set_var('indiv_width',$indiv_width);
+		$this->t->set_var('individual_width',$indiv_width);
 		$this->t->set_var('willing_width',$willing_width);
 		$this->t->pfp('out','willing_view_t');
 		$this->save_sessiondata(); 
@@ -1227,7 +1227,7 @@ class tc
 
 		if($action == 'save') {
 			// Delete all the previous willingness entries for this individual
-			$this->db->query("DELETE from tc_willingness where indiv=" . $individual ,__LINE__,__FILE__);
+			$this->db->query("DELETE from tc_willingness where individual=" . $individual ,__LINE__,__FILE__);
 
 			// Now, add the assignment willingness that is checked for this individual
 			$new_data = get_var('willingness',array('POST'));
@@ -1236,7 +1236,7 @@ class tc
 				$assignment = $data_array[0];
 				$willing = $data_array[1];
 				//print "individual: $individual assignment: $assignment willing: $willing<br>";
-				$this->db->query("INSERT INTO tc_willingness (indiv,assignment,willing) " .
+				$this->db->query("INSERT INTO tc_willingness (individual,assignment,willing) " .
 				                 "VALUES (" . $individual .",". $assignment .",'". $willing . "')",__LINE__,__FILE__);
 			}      
 			$this->willing_view();
@@ -1247,11 +1247,11 @@ class tc
 		$table_data=""; 
 
 		// Find out the individual's name
-		$sql = "SELECT * FROM tc_individual WHERE indiv=".$individual." AND valid=1";
+		$sql = "SELECT * FROM tc_individual WHERE individual=".$individual." AND valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$indiv_name = $this->db->f('name');
-			$this->t->set_var('indiv_name',$indiv_name);
+			$this->t->set_var('individual_name',$indiv_name);
 		}
 
 		// Select all the assignments
@@ -1267,7 +1267,7 @@ class tc
 			$table_data.="<tr bgcolor=". $this->t->get_var('tr_color') ."><td>$assignment_name</td>";
 
 			$header_row="<th width=$comp_width><font size=-2>Assignments</th><th>Willingness</th>";
-			$sql = "SELECT * FROM tc_willingness WHERE indiv=".$individual." AND assignment=".$assignment;
+			$sql = "SELECT * FROM tc_willingness WHERE individual=".$individual." AND assignment=".$assignment;
 			$this->db2->query($sql,__LINE__,__FILE__);
 			$value = $assignment;
 
@@ -1325,7 +1325,7 @@ class tc
 	function ppi_sched()
 	{
 		$this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
-		$this->t->set_block('ppi_sched_t','indiv_list','indivlist');
+		$this->t->set_block('ppi_sched_t','individual_list','indivlist');
 		$this->t->set_block('ppi_sched_t','appt_list','apptlist');
 		$action = get_var('action',array('GET','POST'));
 
@@ -1359,12 +1359,12 @@ class tc
 			$president_name = $this->db->f('name');
 			$president_name_array = explode(",",$president_name);
 			$president_last_name = $president_name_array[0];
-			$president_id = $this->db->f('indiv');
+			$president_id = $this->db->f('individual');
 			$presidency_id = $this->db->f('presidency');
-			$interviewer = $this->db->f('indiv');
+			$interviewer = $this->db->f('individual');
 			$district_number = '*';
 			$district_name = $president_name;
-			$sql = "SELECT * FROM tc_individual where indiv='$president_id'";
+			$sql = "SELECT * FROM tc_individual where individual='$president_id'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$mls_indiv_id = $this->db2->f('mls_indiv_id');
@@ -1384,19 +1384,19 @@ class tc
 			$new_data = get_var('appt_notes',array('POST'));
 			if($new_data != "") {
 				foreach ($new_data as $entry) {
-					$indiv = $entry['indiv'];
+					$indiv = $entry['individual'];
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
 					if($location == "") { $location = "$president_last_name"." home ($president_address)"; }
 					if($indiv == 0) { $location = ""; }
 
 					//Only perform a database update if we have made a change to this appointment
-					$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
+					$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and individual='$indiv' and location='$location'";
 					$this->db->query($sql,__LINE__,__FILE__);
 					if(!$this->db->next_record()) {
 						// Perform database save actions here
 						$this->db->query("UPDATE tc_appointment set " .
-						                 " indiv='" . $indiv . "'" .
+						                 " individual='" . $indiv . "'" .
 						                 ",location='" . $location . "'" .
 						                 " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 						// Email the appointment
@@ -1416,7 +1416,7 @@ class tc
 				$this->db->query("UPDATE tc_individual set " .
 				                 " ppi_notes='" . $ppi_notes . "'" .
 				                 ",ppi_pri='" . $ppi_pri . "'" .
-				                 " WHERE indiv=" . $individual,__LINE__,__FILE__);
+				                 " WHERE individual=" . $individual,__LINE__,__FILE__);
 
 			}
 
@@ -1433,7 +1433,7 @@ class tc
 		$indiv_name = NULL;
 		while ($this->db->next_record()) {
 			$indiv_name[$i] = $this->db->f('name');
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$i++;
 		}
 		array_multisort($indiv_name, $individual);
@@ -1462,7 +1462,7 @@ class tc
 
 		while ($this->db->next_record()) {
 			$appointment = $this->db->f('appointment');
-			$indiv = $this->db->f('indiv');
+			$indiv = $this->db->f('individual');
 			$location = $this->db->f('location');
 			if(($location == "") && ($indiv > 0)) { $location = "$president_last_name"." home ($president_address)"; }
 
@@ -1479,7 +1479,7 @@ class tc
 			$appt_table_data.= "<td align=center>$day_string</td>";
 			$appt_table_data.= "<td align=center>$time_string</td>";
 
-			$appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][indiv]>';
+			$appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][individual]>';
 			$appt_table_data.= '<option value=0></option>';
 			for ($i=0; $i < count($individual); $i++) {
 				$id = $individual[$i];
@@ -1514,7 +1514,7 @@ class tc
 		$i=0; 
 		$individual = NULL;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$indiv_ppi_pri[$individual[$i]] = $this->db->f('ppi_pri');
@@ -1535,11 +1535,11 @@ class tc
 			// If this individual has had a yearly PPI this year, don't show him on the schedule list
 			$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 			$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-			       "AND indiv=" . $id . " AND interview_type='ppi'";
+			       "AND individual=" . $id . " AND interview_type='ppi'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 
 			if(!$this->db2->next_record()) {
-				$sql = "SELECT * FROM tc_interview WHERE indiv=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
+				$sql = "SELECT * FROM tc_interview WHERE individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 				$this->db->query($sql,__LINE__,__FILE__);
 				if($this->db->next_record()) { 
 					$date = $this->db->f('date'); 
@@ -1547,7 +1547,7 @@ class tc
 					$date = ""; 
 				}
 				$link_data['menuaction'] = 'tc.tc.ppi_update';
-				$link_data['indiv'] = $id;
+				$link_data['individual'] = $id;
 				$link_data['name'] = $name;
 				$link_data['interview'] = '';
 				$link_data['interview_type'] = 1;
@@ -1580,7 +1580,7 @@ class tc
 			} else {
 				$link_data['menuaction'] = 'tc.tc.ppi_update';
 				$link_data['interviewer'] = $this->db2->f('interviewer');
-				$link_data['indiv'] = $this->db2->f('indiv');
+				$link_data['individual'] = $this->db2->f('individual');
 				$link_data['name'] = $name;
 				$link_data['interview'] = $this->db2->f('interview');
 				$link_data['interview_type'] = $this->db2->f('interview_type');
@@ -1613,7 +1613,7 @@ class tc
 		$this->t->set_var('completed_header_row',$completed_header_row);
 		$this->t->set_var('completed_table_width',$completed_table_width);
 		$this->t->set_var('completed',$completed_data);
-		$this->t->fp('indivlist','indiv_list',True); 
+		$this->t->fp('indivlist','individual_list',True); 
 
 		$indivs_width=300; $totals_width=100;
 		$totals_table_width=$indivs_width + $totals_width;
@@ -1642,7 +1642,7 @@ class tc
 	function int_sched()
 	{
 		$this->t->set_file(array('int_sched_t' => 'int_sched.tpl'));
-		$this->t->set_block('int_sched_t','indiv_list','indivlist');
+		$this->t->set_block('int_sched_t','individual_list','indivlist');
 		$this->t->set_block('int_sched_t','appt_list','apptlist');
 		$action = get_var('action',array('GET','POST'));
 
@@ -1685,7 +1685,7 @@ class tc
 		$indiv_name_data = NULL;
 		while ($this->db->next_record()) {
 			$indiv_name_data[$i] = $this->db->f('name');
-			$individual_data[$i] = $this->db->f('indiv');
+			$individual_data[$i] = $this->db->f('individual');
 			$individ2name[$individual_data[$i]] = $indiv_name_data[$i];
 			$i++;
 		}
@@ -1693,12 +1693,12 @@ class tc
 		$sql = "SELECT * FROM tc_companionship where valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
-			$tmp_individual = $this->db->f('indiv');
-			$sql = "Select * FROM tc_individual where indiv='$tmp_individual' and steward='' and valid=1";
+			$tmp_individual = $this->db->f('individual');
+			$sql = "Select * FROM tc_individual where individual='$tmp_individual' and steward='' and valid=1";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			while ($this->db2->next_record()) {
 				$indiv_name_data[$i] = $this->db2->f('name');
-				$individual_data[$i] = $this->db2->f('indiv');
+				$individual_data[$i] = $this->db2->f('individual');
 				$individ2name[$individual_data[$i]] = $indiv_name_data[$i];
 				$i++;
 			}
@@ -1710,14 +1710,14 @@ class tc
 			$new_data = get_var('appt_notes',array('POST'));
 			if($new_data != "") {
 				foreach ($new_data as $entry) {
-					$indiv = $entry['indiv'];
+					$indiv = $entry['individual'];
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
 					if($location == "") {
 						$supervisor = $entry['supervisor'];
 						$supervisor_array = explode(",", $individ2name[$supervisor]);
 						$supervisor_last_name = $supervisor_array[0];
-						$sql = "SELECT * FROM tc_individual where indiv='$supervisor'";
+						$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
 							$mls_indiv_id = $this->db2->f('mls_indiv_id');
@@ -1733,12 +1733,12 @@ class tc
 
 					//print "indiv: $indiv appointment: $appointment <br>";
 					//Only perform a database update if we have made a change to this appointment
-					$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and indiv='$indiv' and location='$location'";
+					$sql = "SELECT * FROM tc_appointment where appointment='$appointment' and individual='$indiv' and location='$location'";
 					$this->db->query($sql,__LINE__,__FILE__);
 					if(!$this->db->next_record()) {
 						// Perform database save actions here
 						$this->db->query("UPDATE tc_appointment set " .
-						                 " indiv='" . $indiv . "'" .
+						                 " individual='" . $indiv . "'" .
 						                 ",location='" . $location . "'" .
 						                 " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 						// Email the appointment
@@ -1759,7 +1759,7 @@ class tc
 				$this->db->query("UPDATE tc_individual set " .
 				                 " hti_notes='" . $hti_notes . "'" .
 				                 ",hti_pri='" . $hti_pri . "'" .
-				                 " WHERE indiv=" . $individual,__LINE__,__FILE__);
+				                 " WHERE individual=" . $individual,__LINE__,__FILE__);
 			}
 
 			$take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched');
@@ -1803,7 +1803,7 @@ class tc
 			$supervisor = $districts[$d]['supervisor'];
 			$supervisor_array = explode(",", $supervisor);
 			$supervisor_last_name = $supervisor_array[0];
-			$sql = "SELECT * FROM tc_individual where indiv='$supervisor'";
+			$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$mls_indiv_id = $this->db2->f('mls_indiv_id');
@@ -1825,7 +1825,7 @@ class tc
 
 			while ($this->db->next_record()) {
 				$appointment = $this->db->f('appointment');
-				$indiv = $this->db->f('indiv');
+				$indiv = $this->db->f('individual');
 				$location = $this->db->f('location');
 				if(($location == "") && ($indiv > 0)) { $location = "$supervisor_last_name"." home ($supervisor_address)"; }
 
@@ -1842,7 +1842,7 @@ class tc
 				$appt_table_data.= "<td align=center>$day_string</td>";
 				$appt_table_data.= "<td align=center>$time_string</td>";
 
-				$appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][indiv]>';
+				$appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][individual]>';
 				$appt_table_data.= '<option value=0></option>';
 				for ($i=0; $i < count($individual_data); $i++) {
 					$id = $individual_data[$i];
@@ -1894,12 +1894,12 @@ class tc
 				$total_comps++;
 				while ($this->db->next_record()) {
 					// Get this companions information
-					$individual = $this->db->f('indiv');
+					$individual = $this->db->f('individual');
 
-					$sql = "SELECT * FROM tc_individual where indiv='$individual'";
+					$sql = "SELECT * FROM tc_individual where individual='$individual'";
 					$this->db2->query($sql,__LINE__,__FILE__);	
 					if($this->db2->next_record()) {
-						$individual = $this->db2->f('indiv');
+						$individual = $this->db2->f('individual');
 						$indiv_name = $this->db2->f('name');
 						$indiv_phone[$individual] = $this->db2->f('phone');
 						$indiv_hti_pri[$individual] = $this->db2->f('hti_pri');
@@ -1927,11 +1927,11 @@ class tc
 					}
 
 					// If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND indiv='$id'";
+					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id'";
 					$this->db2->query($sql,__LINE__,__FILE__);
 
 					if(!$this->db2->next_record()) {
-						$sql = "SELECT * FROM tc_interview WHERE indiv='$id' ORDER BY date DESC";
+						$sql = "SELECT * FROM tc_interview WHERE individual='$id' ORDER BY date DESC";
 						$this->db3->query($sql,__LINE__,__FILE__);
 						if($this->db3->next_record()) { 
 							$date = $this->db3->f('date'); 
@@ -1939,7 +1939,7 @@ class tc
 							$date = ""; 
 						}
 						$link_data['menuaction'] = 'tc.tc.int_update';
-						$link_data['indiv'] = $id;
+						$link_data['individual'] = $id;
 						$link_data['name'] = $name;
 						$link_data['interview'] = '';
 						$link_data['action'] = 'add';
@@ -1969,7 +1969,7 @@ class tc
 					} else {
 						$link_data['menuaction'] = 'tc.tc.int_update';
 						$link_data['interviewer'] = $this->db2->f('interviewer');
-						$link_data['indiv'] = $this->db2->f('indiv');
+						$link_data['individual'] = $this->db2->f('individual');
 						$link_data['name'] = $name;
 						$link_data['interview'] = $this->db2->f('interview');
 						$link_data['action'] = 'view';
@@ -2001,7 +2001,7 @@ class tc
 			$this->t->set_var('completed_header_row',$completed_header_row);
 			$this->t->set_var('completed_table_width',$completed_table_width);
 			$this->t->set_var('completed',$completed_data);
-			$this->t->fp('indivlist','indiv_list',True);
+			$this->t->fp('indivlist','individual_list',True);
 
 		} // End for each district loop
 
@@ -2380,7 +2380,7 @@ class tc
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$president_name = $this->db->f('name');
-			$interviewer = $this->db->f('indiv');
+			$interviewer = $this->db->f('individual');
 			$interview_type = 'ppi';
 		} else {
 			print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
@@ -2390,11 +2390,11 @@ class tc
 		$this->t->set_var('district_name',$president_name);
 
 		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY indiv ASC";
+		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$indiv_ppi_pri[$individual[$i]] = $this->db->f('ppi_pri');
@@ -2436,7 +2436,7 @@ class tc
 				$year = date('Y') - $m;
 				$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 				$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-				       "AND indiv=" . $id . " AND interview_type='ppi'";
+				       "AND individual=" . $id . " AND interview_type='ppi'";
 				$this->db2->query($sql,__LINE__,__FILE__);
 
 				if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2503,7 +2503,7 @@ class tc
 		$sql = "SELECT * FROM tc_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
-			$indiv = $this->db2->f('indiv');
+			$indiv = $this->db2->f('individual');
 			$interviewer_name = $this->db2->f('name');
 			if($indiv == $interviewer) {
 				$this->t->set_var('interviewer',$interviewer . ' selected');
@@ -2520,7 +2520,7 @@ class tc
 			$this->db->query("UPDATE tc_interview set " .
 			                 "   interview='" . $interview . "'" .
 			                 ", interviewer='" . $interviewer . "'" .
-			                 ", indiv='" . $indiv . "'" .
+			                 ", individual='" . $indiv . "'" .
 			                 ", date='" . $date . "'" .
 			                 ", notes='" . $notes . "'" .
 			                 ", interview_type='" . $interview_type . "'" .
@@ -2531,7 +2531,7 @@ class tc
 
 		if($action == 'insert') {
 			$notes = get_var('notes',array('POST'));
-			$this->db->query("INSERT INTO tc_interview (interviewer,indiv,date,notes,interview_type) " .
+			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
 			                 "VALUES ('" . $interviewer . "','" . $indiv . "','" .
 			                 $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
 			$this->ppi_view();
@@ -2643,11 +2643,11 @@ class tc
 			$i++;
 		}
 
-		$sql = "SELECT * FROM tc_individual where valid=1 ORDER BY indiv ASC";
+		$sql = "SELECT * FROM tc_individual where valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$i++;
@@ -2689,7 +2689,7 @@ class tc
 					// Get this companions information
 					$num_indivs++;
 					$companionship = $this->db->f('companionship');
-					$individual = $this->db->f('indiv');
+					$individual = $this->db->f('individual');
 					$name = $indivs[$individual];
 					$phone = $indiv_phone[$individual];
 					$link_data['menuaction'] = 'tc.tc.int_update';
@@ -2717,7 +2717,7 @@ class tc
 						$month_end = "$year"."-"."$month"."-"."31";
 						$month = "$month"."/"."$year";
 						$sql = "SELECT * FROM tc_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
-						       "AND indiv=" . $individual;
+						       "AND individual=" . $individual;
 						$this->db2->query($sql,__LINE__,__FILE__);
 						$header_row .= "<th width=$int_width><font size=-2>$month</th>";
 
@@ -2826,7 +2826,7 @@ class tc
 		$sql = "SELECT * FROM tc_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
-			$indiv = $this->db2->f('indiv');
+			$indiv = $this->db2->f('individual');
 			$interviewer_name = $this->db2->f('name');
 			if($indiv == $interviewer) {
 				$this->t->set_var('interviewer',$interviewer . ' selected');
@@ -2842,7 +2842,7 @@ class tc
 			$this->db->query("UPDATE tc_interview set " .
 			                 "   interview='" . $interview . "'" .
 			                 ", interviewer='" . $interviewer . "'" .
-			                 ", indiv='" . $indiv . "'" .
+			                 ", individual='" . $indiv . "'" .
 			                 ", date='" . $date . "'" .
 			                 ", notes='" . $notes . "'" .
 			                 ", interview_type='" . $interview_type . "'" .
@@ -2853,7 +2853,7 @@ class tc
 
 		if($action == 'insert') {
 			$notes = get_var('notes',array('POST'));
-			$this->db->query("INSERT INTO tc_interview (interviewer,indiv,date,notes,interview_type) " .
+			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
 			                 "VALUES ('" . $interviewer . "','" . $indiv . "','" .
 			                 $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
 			$this->int_view();
@@ -2881,7 +2881,7 @@ class tc
 			$this->t->set_var('interview',$interview);
 			$this->t->set_var('name',$name);
 			$this->t->set_var('interviewer', $this->db->f('interviewer'));
-			$this->t->set_var('indiv',$this->db->f('indiv'));
+			$this->t->set_var('indiv',$this->db->f('individual'));
 			$this->t->set_var('date',$this->db->f('date'));
 			$this->t->set_var('notes',$this->db->f('notes'));
 			if($this->db->f('interview_type') == 1) { $this->t->set_var('interview_type_checked','checked'); }
@@ -3133,7 +3133,7 @@ class tc
 
 		$this->t->set_block('att_view_t','month_list','list1');
 		$this->t->set_block('att_view_t','header_list','list2');
-		$this->t->set_block('att_view_t','indiv_list','list3');
+		$this->t->set_block('att_view_t','individual_list','list3');
 
 		$this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.att_view'));
 		$num_quarters = get_var('num_quarters',array('GET','POST'));
@@ -3158,11 +3158,11 @@ class tc
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$indiv_name[$i] = $this->db->f('name');
-			$individual[$i] = $this->db->f('indiv');
+			$individual_name[$i] = $this->db->f('name');
+			$individual[$i] = $this->db->f('individual');
 			$i++;
 		}
-		array_multisort($indiv_name, $individual);
+		array_multisort($individual_name, $individual);
 
 		// Create a list of sunday dates for a window of 3 months back and current month
 		$i=0; 
@@ -3188,7 +3188,7 @@ class tc
 			if($found_sunday) { $i++; $found_sunday=0; }
 		}
 
-		$total_indivs = count($individual);
+		$total_individuals = count($individual);
 		$old_month=$sunday_list[0]['month']; $span=0;
 		for ($i=0; $i < count($sunday_list); $i++) {
 			$date = $sunday_list[$i]['date'];
@@ -3213,10 +3213,10 @@ class tc
 			}
 			$span++;
 		}
-		$this->t->set_var('total_indivs',$total_indivs);
+		$this->t->set_var('total_individuals',$total_individuals);
 		$this->t->set_var('header_row',$header_row);
 
-		$indiv_width=200; $att_width=25; $total_width=$indiv_width; 
+		$individual_width=200; $att_width=25; $total_width=$individual_width; 
 		for ($i=0; $i < count($sunday_list); $i++) {
 			$link_data['menuaction'] = 'tc.tc.att_update';
 			$link_data['month'] = $sunday_list[$i]['month'];
@@ -3237,14 +3237,14 @@ class tc
 		for ($i=0; $i < count($individual); $i++) {
 			$att_table = "";
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
-			$this->t->set_var('indiv_name',$indiv_name[$i]);
-			#print "checking for indiv: " . $individual[$i] . "<br>";
+			$this->t->set_var('individual_name',$individual_name[$i]);
+			#print "checking for individual: " . $individual[$i] . "<br>";
 			for ($j=0; $j < count($sunday_list); $j++) {
 				#print "checking for date: " .  $sunday_list[$j]['date'] . "<br>";
 				#print "SELECT * FROM tc_attendance WHERE date='"
-				#  . $sunday_list[$j]['date'] . "' AND indiv=" . $individual[$i] . "<br>";
+				#  . $sunday_list[$j]['date'] . "' AND individual=" . $individual[$i] . "<br>";
 				$sql = "SELECT * FROM tc_attendance WHERE date='" .
-				       $sunday_list[$j]['date'] . "' AND indiv=" . $individual[$i];
+				       $sunday_list[$j]['date'] . "' AND individual=" . $individual[$i];
 				$this->db->query($sql,__LINE__,__FILE__);
 				if($this->db->next_record()) {
 					$cur_month = $sunday_list[$j]['month'];
@@ -3258,10 +3258,10 @@ class tc
 				}
 			}
 			$this->t->set_var('att_table',$att_table);
-			$this->t->fp('list3','indiv_list',True);
+			$this->t->fp('list3','individual_list',True);
 		}
 		$this->t->set_var('total_width',$total_width);
-		$this->t->set_var('indiv_width',$indiv_width);
+		$this->t->set_var('individual_width',$individual_width);
 		$this->t->set_var('att_width',$att_width);
 
 		# Now calculate attendance for these months
@@ -3275,17 +3275,17 @@ class tc
 		foreach($attendance as $att => $value) {
 			$total_attended = $attendance[$att];
 			$ave_total_attended += $attendance[$att]; $num_months++;
-			$percent = ceil(($total_attended / $total_indivs)*100);
+			$percent = ceil(($total_attended / $total_individuals)*100);
 			$attendance_str.="<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
-			$total_nonattended = $total_indivs - $total_attended;
-			$percent = ceil(($total_nonattended / $total_indivs)*100);
+			$total_nonattended = $total_individuals - $total_attended;
+			$percent = ceil(($total_nonattended / $total_individuals)*100);
 			$nonattendance_str.="<td align=center><font size=-2><b>$total_nonattended ($percent%)</b></font></td>";
 
 			$total_attended = ceil(($ave_total_attended / $num_months));
-			$percent = ceil(($total_attended / $total_indivs)*100);
+			$percent = ceil(($total_attended / $total_individuals)*100);
 			$aveattendance_str .= "<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
-			$total_attended = $total_indivs - ceil(($ave_total_attended / $num_months));
-			$percent = ceil(($total_attended / $total_indivs)*100);
+			$total_attended = $total_individuals - ceil(($ave_total_attended / $num_months));
+			$percent = ceil(($total_attended / $total_individuals)*100);
 			$avenonattendance_str .= "<td align=center><font size=-2><b>$total_attended ($percent%)</b></font></td>";
 		}
 
@@ -3309,7 +3309,7 @@ class tc
 
 		$this->t->set_block('form','month_list','list1');
 		$this->t->set_block('form','header_list','list2');
-		$this->t->set_block('form','indiv_list','list3');
+		$this->t->set_block('form','individual_list','list3');
 
 		$this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.att_view'));
 
@@ -3320,7 +3320,7 @@ class tc
 		$date = get_var('date',array('GET','POST'));
 
 		if($action == 'save_month' || $action == 'save_day') {
-			$new_data = get_var('indivs_attended',array('POST'));
+			$new_data = get_var('individuals_attended',array('POST'));
 			$month = $monthnum[$month]; if($month < 10) { $month = "0" . $month; }
 
 			if($action == 'save_month') {
@@ -3335,7 +3335,7 @@ class tc
 				$data_array = explode("-",$data);
 				$indiv = $data_array[0];
 				$date  = "$data_array[1]-$data_array[2]-$data_array[3]";	      
-				$this->db->query("INSERT INTO tc_attendance (indiv,date) " .
+				$this->db->query("INSERT INTO tc_attendance (individual,date) " .
 				                 "VALUES (" . $indiv . ",'". $date . "')",__LINE__,__FILE__);
 			}
 
@@ -3349,7 +3349,7 @@ class tc
 		$i=0;
 		while ($this->db->next_record()) {
 			$indiv_name[$i] = $this->db->f('name');
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_attending[$individual[$i]] = $this->db->f('attending');
 			$i++;
 		}
@@ -3417,22 +3417,22 @@ class tc
 		for ($i=0; $i < count($individual); $i++) {
 			$att_table = "";
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
-			$this->t->set_var('indiv_name',$indiv_name[$i]);
+			$this->t->set_var('individual_name',$indiv_name[$i]);
 			for ($j=0; $j < count($sunday_list); $j++) {
 				$sql = "SELECT * FROM tc_attendance WHERE date='" .
-				       $sunday_list[$j]['date'] . "' AND indiv=" . $individual[$i];
+				       $sunday_list[$j]['date'] . "' AND individual=" . $individual[$i];
 				$this->db->query($sql,__LINE__,__FILE__);
 				$value = $individual[$i] . "-" . $sunday_list[$j]['date'];
 				if($this->db->next_record()) {
-					$att_table .= '<td align=center><input type="checkbox" name="indivs_attended[]" value="'.$value.'" checked></td>';
+					$att_table .= '<td align=center><input type="checkbox" name="individuals_attended[]" value="'.$value.'" checked></td>';
 				} else if($indiv_attending[$individual[$i]] == 1) {
-					$att_table .= '<td align=center><input type="checkbox" name="indivs_attended[]" value="'.$value.'" checked></td>';
+					$att_table .= '<td align=center><input type="checkbox" name="individuals_attended[]" value="'.$value.'" checked></td>';
 				} else {
-					$att_table .= '<td align=center><input type="checkbox" name="indivs_attended[]" value="'.$value.'"></td>';
+					$att_table .= '<td align=center><input type="checkbox" name="individuals_attended[]" value="'.$value.'"></td>';
 				}
 			}
 			$this->t->set_var('att_table',$att_table);
-			$this->t->fp('list3','indiv_list',True);
+			$this->t->fp('list3','individual_list',True);
 		} 
 
 		$this->t->set_var('lang_done', 'Cancel');
@@ -3454,7 +3454,7 @@ class tc
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$parent[$i]['id'] = $this->db->f('indiv');
+			$parent[$i]['id'] = $this->db->f('individual');
 			$parent[$i]['name'] = $this->db->f('name');
 			$parent[$i]['phone'] = $this->db->f('phone');
 			$parent[$i]['address'] = $this->db->f('address');
@@ -3570,15 +3570,15 @@ class tc
 		$header_row.= "<th width=$location_width><font size=-2>Location</th>";
 		$table_data = "";
 
-		$sql = "SELECT * FROM tc_presidency where valid=1 GROUP BY indiv ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_presidency where valid=1 GROUP BY individual ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$presidency_data[$i]['id'] = $this->db->f('presidency');
 			$presidency_data[$i]['name'] = $this->db->f('name');
-			$presidency_data[$i]['indiv'] = $this->db->f('indiv');
+			$presidency_data[$i]['indiv'] = $this->db->f('individual');
 			$presidency2name[$presidency_data[$i]['id']] = $presidency_data[$i]['name'];
-			$presidency2indiv[$presidency_data[$i]['id']] = $presidency_data[$i]['indiv'];
+			$presidency2indiv[$presidency_data[$i]['id']] = $presidency_data[$i]['individual'];
 			$i++;
 		}
 
@@ -3609,7 +3609,7 @@ class tc
 					$hour = $entry['hour'];
 					$minute = $entry['minute'];
 					$pm = $entry['pm'];
-					$indiv = $entry['indiv'];
+					$indiv = $entry['individual'];
 					$family = $entry['family'];
 					$location = $entry['location'];
 					if($pm) { $hour = $hour + 12; }
@@ -3626,7 +3626,7 @@ class tc
 						} else if($indiv > 0) {
 							$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 							$supervisor_last_name = $supervisor_name_array[0];
-							$sql = "SELECT * FROM tc_individual where indiv='$presidency2indiv[$presidency]'";
+							$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
 								$mls_indiv_id = $this->db2->f('mls_indiv_id');
@@ -3656,7 +3656,7 @@ class tc
 						$sql = "SELECT * FROM tc_appointment where " .
 						       "appointment='$appointment'" .
 						       " and presidency='$presidency'" .
-						       " and indiv='$indiv'" .
+						       " and individual='$indiv'" .
 						       " and family='$family'" .
 						       " and date='$date'" .
 						       " and time='$time'" .
@@ -3667,7 +3667,7 @@ class tc
 							$old_time = $this->db->f('time');
 							$this->db2->query("UPDATE tc_appointment set" .
 							                  " family=" . $family . 
-							                  " ,indiv=" . $indiv . 
+							                  " ,individual=" . $indiv . 
 							                  " ,date='" . $date . "'" .
 							                  " ,time='" . $time . "'" .
 							                  " ,location='" . $location . "'" .
@@ -3682,15 +3682,15 @@ class tc
 					// Add a new appointment
 					else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 					{
-						//print "adding entry: appt=$appointment date: $date time: $time indiv: $indiv family: $family<br>";
-						$this->db2->query("INSERT INTO tc_appointment (appointment,presidency,family,indiv,date,time,location,uid) " .
+						//print "adding entry: appt=$appointment date: $date time: $time individual: $indiv family: $family<br>";
+						$this->db2->query("INSERT INTO tc_appointment (appointment,presidency,family,individual,date,time,location,uid) " .
 						                  "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $indiv . "','" .
 						                  $date . "','" . $time  . "','" . $location . "','" . $uid ."')",__LINE__,__FILE__);
 
 						// Now reselect this entry from the database to see if we need
 						// to send an appointment out for it.
 						$sql = "SELECT * FROM tc_appointment where " .
-						       "indiv='$indiv'" .
+						       "individual='$indiv'" .
 						       " and family='$family'" .
 						       " and presidency='$presidency'" .
 						       " and date='$date'" .
@@ -3713,11 +3713,11 @@ class tc
 		}
 
 		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY indiv ASC";
+		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
 			$i++;
@@ -3726,7 +3726,7 @@ class tc
 
 		for ($i=0; $i < count($presidency_data); $i++) {
 			$presidency = $presidency_data[$i]['id'];
-			$interviewer = $presidency_data[$i]['indiv'];
+			$interviewer = $presidency_data[$i]['individual'];
 			$name = $presidency_data[$i]['name'];
 			$this->t->set_var('presidency_name',$name);
 			$table_data="";
@@ -3738,7 +3738,7 @@ class tc
 			// Prefill any existing appointment slots
 			while ($this->db->next_record()) {
 				$appointment = $this->db->f('appointment');
-				$indiv = $this->db->f('indiv');
+				$indiv = $this->db->f('individual');
 				$family = $this->db->f('family');
 				$location = $this->db->f('location');
 
@@ -3751,7 +3751,7 @@ class tc
 					} else if($indiv > 0) {
 						$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 						$supervisor_last_name = $supervisor_name_array[0];
-						$sql = "SELECT * FROM tc_individual where indiv='$presidency2indiv[$presidency]'";
+						$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
 							$mls_indiv_id = $this->db2->f('mls_indiv_id');
@@ -3890,7 +3890,7 @@ class tc
 	function email()
 	{
 		$this->t->set_file(array('email_t' => 'email.tpl'));
-		$this->t->set_block('email_t','indiv_list','list');
+		$this->t->set_block('email_t','individual_list','list');
 
 		$action = get_var('action',array('GET','POST'));
 
@@ -3935,11 +3935,11 @@ class tc
 		$this->t->pfp('out','admin_t');
 
 		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY indiv ASC";
+		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$individual[$i] = $this->db->f('indiv');
+			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv2name[$individual[$i]] = $indiv_name[$i];
 			$i++;
@@ -4079,7 +4079,7 @@ class tc
 					if($id < $this->max_presidency_members) {
 						//print "Updating Existing Entry<br>";
 						$this->db2->query("UPDATE tc_presidency set" .
-						                  " indiv=" . $indiv . 
+						                  " individual=" . $indiv . 
 						                  " ,district=" . $district . 
 						                  " ,name='" . $name . "'" .
 						                  " ,email='" . $email . "'" .
@@ -4089,7 +4089,7 @@ class tc
 						                  " WHERE presidency=" . $id,__LINE__,__FILE__);
 					} else {
 						//print "Adding New Entry<br>";
-						$this->db2->query("INSERT INTO tc_presidency (presidency,indiv,district,name," .
+						$this->db2->query("INSERT INTO tc_presidency (presidency,individual,district,name," .
 						                  "email,president,counselor,secretary,valid) " .
 						                  "VALUES (NULL,'" . $indiv . "','" . $district . "','" .
 						                  $name . "','" . $email . "','" . $president  . "','" .
@@ -4123,7 +4123,7 @@ class tc
 			while ($this->db->next_record()) {
 				// Extract the data for each presidency record
 				$id = $this->db->f('presidency');
-				$indiv = $this->db->f('indiv');
+				$indiv = $this->db->f('individual');
 				$name = $this->db->f('name');
 				$district = $this->db->f('district');
 				$name = $this->db->f('name');
@@ -4156,7 +4156,7 @@ class tc
 		while ($this->db->next_record()) {
 			// Extract the data for each presidency record
 			$id = $this->db->f('presidency');
-			$indiv = $this->db->f('indiv');
+			$indiv = $this->db->f('individual');
 			$district = $this->db->f('district');
 			$name = $this->db->f('name');
 			$email = $this->db->f('email');
@@ -4298,7 +4298,7 @@ class tc
 			$location = $this->db->f('location');
 			$interviewer = "";
 			$email = "";
-			$indiv = $this->db->f('indiv');
+			$indiv = $this->db->f('individual');
 			$indiv_name = "";
 			$family = $this->db->f('family');
 			$family_name = "";
@@ -4330,7 +4330,7 @@ class tc
 			$from = $email;
 
 			if($indiv > 0) {
-				$sql = "SELECT * FROM tc_individual where indiv='$indiv'";
+				$sql = "SELECT * FROM tc_individual where individual='$indiv'";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				if($this->db2->next_record()) {
 					$indiv_name = $this->db2->f('name');
@@ -4348,7 +4348,7 @@ class tc
 					$phone = $this->db2->f('phone');
 					$individual = $this->db2->f('individual');
 					$appt_name = $family_name . " Family Visit";
-					$sql = "SELECT * FROM tc_individual where indiv='$individual'";
+					$sql = "SELECT * FROM tc_individual where individual='$individual'";
 					$this->db3->query($sql,__LINE__,__FILE__);
 					if($this->db3->next_record()) {
 						$phone = $this->db3->f('phone');

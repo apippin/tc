@@ -12,7 +12,7 @@
 	<br><br>
 
 
-<!-- BEGIN indiv_list -->
+<!-- BEGIN individual_list -->
 	<form action="{actionurl}" method="POST">
         <hr>
         <table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
@@ -57,7 +57,7 @@
 		</td>
 		</tr>
 	</table>
-<!-- END indiv_list -->
+<!-- END individual_list -->
 	<hr>
 	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
 		<tr>

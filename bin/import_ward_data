@@ -108,7 +108,7 @@ sub print_hash
 #+-------------+------------------+------+-----+---------+----------------+
 #| Field       | Type             | Null | Key | Default | Extra          |
 #+-------------+------------------+------+-----+---------+----------------+
-#| indiv       | int(16) unsigned |      | PRI | NULL    | auto_increment |
+#| individual  | int(16) unsigned |      | PRI | NULL    | auto_increment |
 #| mls_indiv_id| int(16) unsigned |      |     | NULL    |                |
 #| name        | varchar(60)      | YES  |     | NULL    |                |
 #| phone       | varchar(12)      | YES  |     | NULL    |                |
@@ -133,7 +133,7 @@ sub update_tc_individual_table
 	{
 		$hashref = $membership_data{$index};
 		$id = $membership_data{$index}{'Indiv ID'};
-		$indiv_name = $membership_data{$index}{'Preferred Name'};
+		$individual_name = $membership_data{$index}{'Preferred Name'};
 		$address = $membership_data{$index}{'Street 1'};
 		if($membership_data{$index}{'Street 2'} ne "") { 
 			$address .= " " . $membership_data{$index}{'Street 2'};
@@ -152,46 +152,46 @@ sub update_tc_individual_table
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$email = $membership_data{$index}{'indiv E-mail'};
 		if ($email eq "") { $email = $membership_data{$index}{'Household E-mail'}; }
-		$sth = $dbh->prepare("select * from tc_individual where name=\"$indiv_name\"");
+		$sth = $dbh->prepare("select * from tc_individual where name=\"$individual_name\"");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @data = ();
 		while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
 		my $rows = scalar @data;
 		if($rows == 0) {
-			# No existing records found for this indiv, make a new entry
-			print "   Adding new indiv: $indiv_name\n";
-			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$indiv_name\",'$address','$phone','$email','','$hhposition','$priesthood','','$default_interview_pri','','$default_interview_pri','',$attending,1)");
+			# No existing records found for this individual, make a new entry
+			print "   Adding new individual: $individual_name\n";
+			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','','$hhposition','$priesthood','','$default_interview_pri','','$default_interview_pri','',$attending,1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
-			# An existing record was found for this indiv, update it
-			print "   Updating existing indiv: $indiv_name\n";
-			$sth = $dbh->prepare("update tc_individual set valid=1 where name=\"$indiv_name\"");
+			# An existing record was found for this individual, update it
+			print "   Updating existing individual: $individual_name\n";
+			$sth = $dbh->prepare("update tc_individual set valid=1 where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			if($phone ne "") { 
-				$sth = $dbh->prepare("update tc_individual set phone='$phone' where name=\"$indiv_name\"");
+				$sth = $dbh->prepare("update tc_individual set phone='$phone' where name=\"$individual_name\"");
 			} else {
-				$sth = $dbh->prepare("update tc_individual set phone=NULL where name=\"$indiv_name\"");
+				$sth = $dbh->prepare("update tc_individual set phone=NULL where name=\"$individual_name\"");
 			}
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			if($address ne "") { 
-				$sth = $dbh->prepare("update tc_individual set address='$address' where name=\"$indiv_name\"");
+				$sth = $dbh->prepare("update tc_individual set address='$address' where name=\"$individual_name\"");
 			} else {
-				$sth = $dbh->prepare("update tc_individual set address=NULL where name=\"$indiv_name\"");
+				$sth = $dbh->prepare("update tc_individual set address=NULL where name=\"$individual_name\"");
 			}
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			$sth = $dbh->prepare("update tc_individual set attending='$attending' where name=\"$indiv_name\"");
+			$sth = $dbh->prepare("update tc_individual set attending='$attending' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			$sth = $dbh->prepare("update tc_individual set mls_indiv_id='$id' where name=\"$indiv_name\"");
+			$sth = $dbh->prepare("update tc_individual set mls_indiv_id='$id' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			$sth = $dbh->prepare("update tc_individual set priesthood='$priesthood' where name=\"$indiv_name\"");
+			$sth = $dbh->prepare("update tc_individual set priesthood='$priesthood' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			$sth = $dbh->prepare("update tc_individual set email='$email' where name=\"$indiv_name\"");
+			$sth = $dbh->prepare("update tc_individual set email='$email' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			$sth = $dbh->prepare("update tc_individual set hh_position='$hhposition' where name=\"$indiv_name\"");
+			$sth = $dbh->prepare("update tc_individual set hh_position='$hhposition' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 			# More than one record was found. Error! This shouldn't happen.
-			print "   -E- More than one record found ($rows) for indiv: $indiv_name\n";
+			print "   -E- More than one record found ($rows) for individual: $individual_name\n";
 		}
 	}
 	$sth->finish();
@@ -261,7 +261,7 @@ sub update_tc_district_table
 	$sth2 = $dbh->prepare("select * from tc_individual where name='$supervisor_name'");
 	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 	$sqlhashref2 = $sth2->fetchrow_hashref;
-	$supervisor_id = $sqlhashref2->{indiv};
+	$supervisor_id = $sqlhashref2->{individual};
 	$sth2->finish();
 	$sth2 = $dbh->prepare("update tc_district set supervisor='$supervisor_id' where district='$district'");
 	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
@@ -275,7 +275,7 @@ sub update_tc_district_table
 #| Field         | Type             | Null | Key | Default | Extra |
 #+---------------+------------------+------+-----+---------+-------+
 #| companionship | int(16) unsigned |      |     | 0       |       |
-#| indiv         | int(16) unsigned | YES  |     | NULL    |       |
+#| individual    | int(16) unsigned | YES  |     | NULL    |       |
 #| district      | int(16) unsigned | YES  |     | NULL    |       |
 #| valid         | tinyint(1)       | YES  |     | NULL    |       |
 #+---------------+------------------+------+-----+---------+-------+
@@ -293,34 +293,34 @@ sub update_tc_companionship_table
 		foreach $key (keys %$hashref) {
 			if($key =~ /Quorum/i && $hometeaching_data{$index}{$key} =~ /Elders/i) {
 				foreach $field ("Home Teacher 1","Home Teacher 2") {
-					$indiv_name = $hometeaching_data{$index}{$field};
-					if($indiv_name eq "") { next; }
-					$sth2 = $dbh->prepare("select * from tc_individual where name='$indiv_name'");
+					$individual_name = $hometeaching_data{$index}{$field};
+					if($individual_name eq "") { next; }
+					$sth2 = $dbh->prepare("select * from tc_individual where name='$individual_name'");
 					$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 					$sqlhashref2 = $sth2->fetchrow_hashref;
-					$indiv = $sqlhashref2->{indiv};
+					$individual = $sqlhashref2->{individual};
 					$id = $hometeaching_data{$index}{'Comp ID'};
 					$district = $hometeaching_data{$index}{'HT District'};
-					$sth = $dbh->prepare("select * from tc_companionship where indiv='$indiv' and companionship='$id'");
+					$sth = $dbh->prepare("select * from tc_companionship where individual='$individual' and companionship='$id'");
 					$sth->execute or die "-E- DB error: $DBI::errstr\n";
 					my @data = ();
 					while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
 					my $rows = scalar @data;
 					if($rows == 0) {
 						# No existing records found for this companionship, make a new entry
-						print "   Adding Companion to companionship: $indiv_name -> $id\n";
-						$sth = $dbh->prepare("insert into tc_companionship values ($id,'$indiv','$district',1)");
+						print "   Adding Companion to companionship: $individual_name -> $id\n";
+						$sth = $dbh->prepare("insert into tc_companionship values ($id,'$individual','$district',1)");
 						$sth->execute or die "-E- DB error: $DBI::errstr\n";
 					} else {
 						# An existing companionship was found for this companionship, update it
 						$sth2 = $dbh->prepare("select * from tc_companionship where district='$district' and companionship='$id'");
 						$sth2->execute or die "-E- DB error: $DBI::errstr\n";
-						print "   Updating Companionship with indiv: $indiv_name ($indiv) -> $id\n";
-						$sth = $dbh->prepare("update tc_companionship set district='$district' where indiv='$indiv' and companionship='$id'");
+						print "   Updating Companionship with individual: $individual_name ($individual) -> $id\n";
+						$sth = $dbh->prepare("update tc_companionship set district='$district' where individual='$individual' and companionship='$id'");
 						$sth->execute or die "-E- DB error 'district': $DBI::errstr\n";
-						$sth = $dbh->prepare("update tc_companionship set indiv='$indiv' where indiv='$indiv' and companionship='$id'");
-						$sth->execute or die "-E- DB error 'indiv': $DBI::errstr\n";
-						$sth = $dbh->prepare("update tc_companionship set valid=1 where indiv='$indiv' and companionship='$id'");
+						$sth = $dbh->prepare("update tc_companionship set individual='$individual' where individual='$individual' and companionship='$id'");
+						$sth->execute or die "-E- DB error 'individual': $DBI::errstr\n";
+						$sth = $dbh->prepare("update tc_companionship set valid=1 where individual='$individual' and companionship='$id'");
 						$sth->execute or die "-E- DB error 'valid': $DBI::errstr\n";
 					}
 					$sth->finish();
@@ -393,7 +393,7 @@ sub update_tc_family_table
 				$sth = $dbh->prepare("select * from tc_individual WHERE name='$family_name'");
 				$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				while($sqlhashref = $sth->fetchrow_hashref) {
-					$individual = $sqlhashref->{indiv};
+					$individual = $sqlhashref->{individual};
 					print "   Updating family individual: $family_name -> $individual\n";
 					$sth = $dbh->prepare("update tc_family set individual=$individual where name_id='$name_id'");
 					$sth->execute or die "-E- DB error: $DBI::errstr\n";
