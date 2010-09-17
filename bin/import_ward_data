@@ -109,7 +109,7 @@ sub print_hash
 #| Field       | Type             | Null | Key | Default | Extra          |
 #+-------------+------------------+------+-----+---------+----------------+
 #| individual  | int(16) unsigned |      | PRI | NULL    | auto_increment |
-#| mls_indiv_id| int(16) unsigned |      |     | NULL    |                |
+#| mls_id      | int(16) unsigned |      |     | NULL    |                |
 #| name        | varchar(60)      | YES  |     | NULL    |                |
 #| phone       | varchar(12)      | YES  |     | NULL    |                |
 #| email       | varchar(120)     | YES  |     | NULL    |                |
@@ -181,7 +181,7 @@ sub update_tc_individual_table
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			$sth = $dbh->prepare("update tc_individual set attending='$attending' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-			$sth = $dbh->prepare("update tc_individual set mls_indiv_id='$id' where name=\"$individual_name\"");
+			$sth = $dbh->prepare("update tc_individual set mls_id='$id' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			$sth = $dbh->prepare("update tc_individual set priesthood='$priesthood' where name=\"$individual_name\"");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -546,7 +546,7 @@ sub check_for_changed_ids
 
 	foreach $oldindex (keys %$oldhashref)
 	{
-		$mls_indiv_id = $oldhashref->{$oldindex}{'Indiv ID'};
+		$mls_id = $oldhashref->{$oldindex}{'Indiv ID'};
 		$hofh_id  = $oldhashref->{$oldindex}{'HofH ID'};
 		$full_name = $oldhashref->{$oldindex}{'Full Name'};
 		$hh_position = $oldhashref->{$oldindex}{'HH Position'};
@@ -555,9 +555,9 @@ sub check_for_changed_ids
 		foreach $newindex (keys %$newhashref)
 		{
 			if($newhashref->{$newindex}{'Full Name'} eq $full_name &&
-			   $mls_indiv_id != $newhashref->{$newindex}{'Indiv ID'})
+			   $mls_id != $newhashref->{$newindex}{'Indiv ID'})
 			{
-				print "-W- Indiv ID for $full_name changed from $mls_indiv_id to $newhashref->{$newindex}{'Indiv ID'}\n";
+				print "-W- Indiv ID for $full_name changed from $mls_id to $newhashref->{$newindex}{'Indiv ID'}\n";
 				$found_problem = 1;
 			}
 

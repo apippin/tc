@@ -1367,9 +1367,9 @@ class tc
 			$sql = "SELECT * FROM tc_individual where individual='$president_id'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
-				$mls_indiv_id = $this->db2->f('mls_indiv_id');
+				$mls_id = $this->db2->f('mls_id');
 			}
-			$sql = "SELECT * FROM tc_individual where mls_indiv_id='$mls_indiv_id'";
+			$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$president_address = $this->db2->f('address');
@@ -1720,9 +1720,9 @@ class tc
 						$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
-							$mls_indiv_id = $this->db2->f('mls_indiv_id');
+							$mls_id = $this->db2->f('mls_id');
 						}
-						$sql = "SELECT * FROM tc_individual where mls_indiv_id='$mls_indiv_id'";
+						$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
 							$supervisor_address = $this->db2->f('address');
@@ -1806,9 +1806,9 @@ class tc
 			$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
-				$mls_indiv_id = $this->db2->f('mls_indiv_id');
+				$mls_id = $this->db2->f('mls_id');
 			}
-			$sql = "SELECT * FROM tc_individual where mls_indiv_id='$mls_indiv_id'";
+			$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$supervisor_address = $this->db2->f('address');
@@ -3629,9 +3629,9 @@ class tc
 							$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
-								$mls_indiv_id = $this->db2->f('mls_indiv_id');
+								$mls_id = $this->db2->f('mls_id');
 							}
-							$sql = "SELECT * FROM tc_individual where mls_indiv_id='$mls_indiv_id'";
+							$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
 								$supervisor_address = $this->db2->f('address');
@@ -3754,9 +3754,9 @@ class tc
 						$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
-							$mls_indiv_id = $this->db2->f('mls_indiv_id');
+							$mls_id = $this->db2->f('mls_id');
 						}
-						$sql = "SELECT * FROM tc_individual where mls_indiv_id='$mls_indiv_id'";
+						$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
 							$supervisor_address = $this->db2->f('address');

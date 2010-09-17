@@ -30,7 +30,7 @@ CREATE TABLE `tc_appointment` (
   `appointment` int(16) unsigned NOT NULL auto_increment,
   `presidency` int(16) unsigned NOT NULL default '0',
   `family` int(16) unsigned default '0',
-  `indiv` int(16) unsigned default '0',
+  `individual` int(16) unsigned default '0',
   `date` date NOT NULL default '0000-00-00',
   `time` time NOT NULL default '00:00:00',
   `location` varchar(120) default NULL,
@@ -61,9 +61,9 @@ UNLOCK TABLES;
 -- Table structure for table `tc_attendance`
 --
 CREATE TABLE `tc_attendance` (
-  `indiv` int(16) unsigned NOT NULL default '0',
+  `individual` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
-  KEY `indiv` (`indiv`)
+  KEY `individual` (`individual`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -85,7 +85,7 @@ CREATE TABLE `tc_calling` (
 
 CREATE TABLE `tc_companionship` (
   `companionship` int(16) unsigned NOT NULL default '0',
-  `indiv` int(16) unsigned NOT NULL default '0',
+  `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
   KEY `companionship` (`companionship`)
@@ -103,11 +103,11 @@ CREATE TABLE `tc_district` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `tc_indiv`
+-- Table structure for table `tc_individual`
 --
 CREATE TABLE `tc_individual` (
   `individual` int(16) unsigned NOT NULL auto_increment,
-  `mls_indiv_id` int(16) unsigned NOT NULL,
+  `mls_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
   `address` varchar(255) default NULL,
   `phone` varchar(12) default NULL,
@@ -122,7 +122,7 @@ CREATE TABLE `tc_individual` (
   `hti_notes` varchar(128) default NULL,
   `attending` tinyint(1) default '0',
   `valid` tinyint(1) default NULL,
-  PRIMARY KEY  (`indiv`)
+  PRIMARY KEY  (`individual`)
 ) ENGINE=MyISAM AUTO_INCREMENT=105 DEFAULT CHARSET=latin1;
 
 --
@@ -145,9 +145,9 @@ CREATE TABLE `tc_family` (
 -- Table structure for table `tc_participation`
 --
 CREATE TABLE `tc_participation` (
-  `indiv` int(16) unsigned NOT NULL default '0',
+  `individual` int(16) unsigned NOT NULL default '0',
   `activity` int(16) unsigned default NULL,
-  UNIQUE KEY `activity_ndx` (`indiv`,`activity`)
+  UNIQUE KEY `activity_ndx` (`individual`,`activity`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -156,7 +156,7 @@ CREATE TABLE `tc_participation` (
 CREATE TABLE `tc_interview` (
   `interview` int(16) unsigned NOT NULL auto_increment,
   `interviewer` int(16) unsigned default NULL,
-  `indiv` int(16) unsigned default NULL,
+  `individual` int(16) unsigned default NULL,
   `date` date default NULL,
   `notes` text,
   `interview_type` enum('hti','ppi') NOT NULL DEFAULT 'hti',
@@ -169,7 +169,7 @@ CREATE TABLE `tc_interview` (
 --
 CREATE TABLE `tc_presidency` (
   `presidency` int(16) unsigned NOT NULL auto_increment,
-  `indiv` int(16) unsigned NOT NULL default '0',
+  `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
   `name` varchar(60) NOT NULL,
   `email` varchar(60) NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE `tc_presidency` (
   `secretary` tinyint(1) default '0',
   `valid` tinyint(1) default '1',
   KEY `presidency` (`presidency`),
-  KEY `indiv` (`indiv`)
+  KEY `individual` (`individual`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 --
@@ -201,8 +201,8 @@ CREATE TABLE `tc_visit` (
 -- Table structure for table `tc_willingness`
 --
 CREATE TABLE `tc_willingness` (
-  `indiv` int(16) unsigned NOT NULL,
+  `individual` int(16) unsigned NOT NULL,
   `assignment` int(16) unsigned NOT NULL,
   `willing` enum('y','n','') NOT NULL,
-  KEY `indiv` (`indiv`,`assignment`)
+  KEY `individual` (`individual`,`assignment`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
