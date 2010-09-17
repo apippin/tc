@@ -1,6 +1,6 @@
 <center>
 	<form action="{actionurl}" method="POST">
-	<input type=hidden name=indiv_id value={indiv_id}>
+	<input type=hidden name=individual value={individual}>
 
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>

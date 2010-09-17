@@ -105,9 +105,9 @@ CREATE TABLE `tc_district` (
 --
 -- Table structure for table `tc_indiv`
 --
-CREATE TABLE `tc_indiv` (
-  `indiv` int(16) unsigned NOT NULL auto_increment,
-  `indiv_id` int(16) unsigned NOT NULL,
+CREATE TABLE `tc_individual` (
+  `individual` int(16) unsigned NOT NULL auto_increment,
+  `mls_indiv_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
   `address` varchar(255) default NULL,
   `phone` varchar(12) default NULL,
@@ -133,7 +133,7 @@ CREATE TABLE `tc_family` (
   `hofh_id` int(16) unsigned NOT NULL default '0',
   `name` varchar(30) NOT NULL default '',
   `name_id` varchar(30) NOT NULL default '',
-  `indiv_id` int(16) unsigned default '0',
+  `individual` int(16) unsigned default '0',
   `companionship` int(16) unsigned default NULL,
   `visit_pri` int(10) unsigned default '1',
   `visit_notes` varchar(128) default NULL,
