@@ -109,6 +109,18 @@ class tc
 		echo parse_navbar();
 		$this->display_app_header();	
 	}
+	
+	function logToFile($func, $msg)
+	{
+		// open file
+		$fd = fopen($this->upload_target_path . "/tc_trace.log", "a");
+		// append date/time to message
+		$str = "[" . date("Y/m/d h:i:s", mktime()) . "] [" . $func . "] " . $msg;
+		// write string
+		fwrite($fd, $str . "\n");
+		// close file
+		fclose($fd);
+	}
   
 	function save_sessiondata()
 	{
@@ -1418,17 +1430,9 @@ class tc
 				$this->db->query($sql,__LINE__,__FILE__);
 				if ($this->db->next_record()) {
 					$scheduling_priority = $this->db->f('scheduling_priority');
-					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$priority' AND notes=\"$notes\" WHERE scheduling_priority='$scheduling_priority'", __LINE__, __FILE__);
+					//$this->logToFile("ppi_sched", "UPDATE tc_scheduling_priority SET priority='$priority', notes=\"$notes\" WHERE scheduling_priority='$scheduling_priority'");
+					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$priority', notes=\"$notes\" WHERE scheduling_priority='$scheduling_priority'", __LINE__, __FILE__);
 				}
-
-/*
-				$this->db->query("UPDATE tc_individual set " .
-				                 " notes='" . $notes . "'" .
-				                 ",priority='" . $priority . "'" .
-				                 " WHERE individual=" . $individual,__LINE__,__FILE__);
-*/
-
-
 			}
 
 			$take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched');
@@ -1519,7 +1523,7 @@ class tc
 
 		// PPI SCHEDULING TABLE
 		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual as ti JOIN tc_scheduling_priority as tsp where ti.scheduling_priority=tsp.scheduling_priority and steward='Elder' and valid=1 ORDER by tsp.priority ASC, ti.name ASC";
+		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority AS tsp WHERE ti.scheduling_priority=tsp.scheduling_priority AND steward='Elder' AND valid=1 ORDER BY tsp.priority ASC, ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		$i=0; 
@@ -1770,14 +1774,9 @@ class tc
 				$this->db->query("SELECT * FROM tc_companionship WHERE individual=$individual and valid=1",__LINE__,__FILE__);
 				if ($this->db->next_record()) {
 					$scheduling_priority = $this->db->f('scheduling_priority');
-					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$hti_pri' and notes=\"hti_notes\" where scheduling_priority=$scheduling_priority",__LINE__,__FILE__);
+					//$this->logToFile("int_sched", "UPDATE tc_scheduling_priority SET priority='$hti_pri', notes=\"$hti_notes\" WHERE scheduling_priority='$scheduling_priority'");
+					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$hti_pri', notes=\"$hti_notes\" WHERE scheduling_priority='$scheduling_priority'",__LINE__,__FILE__);
 				}
-/*
-				$this->db->query("UPDATE tc_individual set " .
-				                 " hti_notes='" . $hti_notes . "'" .
-				                 ",hti_pri='" . $hti_pri . "'" .
-				                 " WHERE individual=" . $individual,__LINE__,__FILE__);
-*/
 			}
 
 			$take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched');
@@ -2126,14 +2125,9 @@ class tc
 				$this->db->query("SELECT * FROM tc_family WHERE family='$family'",__LINE__,__FILE__);
 				if ($this->db->next_record()) {
 					$scheduling_priority = $this->db->f('scheduling_priority');
-					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$visit_pri' AND notes=\"$visit_notes\" WHERE scheduling_priority='$scheduling_priority'",__LINE__,__FILE__);
+					//$this->logToFile("vis_sched", "UPDATE tc_scheduling_priority SET priority='$visit_pri', notes=\"$visit_notes\" WHERE scheduling_priority='$scheduling_priority'");
+					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$visit_pri', notes=\"$visit_notes\" WHERE scheduling_priority='$scheduling_priority'", __LINE__, __FILE__);
 				}
-/*
-				$this->db->query("UPDATE tc_family set " .
-				                 " visit_notes='" . $visit_notes . "'" .
-				                 ",visit_pri='" . $visit_pri . "'" .
-				                 " WHERE family=" . $family,__LINE__,__FILE__);
-*/
 			}
 
 			$take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched');

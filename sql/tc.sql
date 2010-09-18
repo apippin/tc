@@ -202,43 +202,43 @@ CREATE TABLE `tc_willingness` (
 -- Table structure for table `tc_scheduling_priority`
 --
 CREATE TABLE `tc_scheduling_priority` (
-`scheduling_priority` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`priority` INT( 10 ) UNSIGNED NOT NULL DEFAULT '30',
-`notes` VARCHAR( 128 ) NOT NULL DEFAULT ''
+  `scheduling_priority` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `priority` INT( 10 ) UNSIGNED NOT NULL DEFAULT '30',
+  `notes` VARCHAR( 128 ) NOT NULL DEFAULT ''
 ) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_email_list`
 --
 CREATE TABLE `tc_email_list` (
-`email_list` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`name` VARCHAR( 128 ) NULL DEFAULT NULL
+  `email_list` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `name` VARCHAR( 128 ) NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_email_list_membership`
 --
 CREATE TABLE `tc_email_list_membership` (
-`individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
-`email_list` INT( 16 ) UNSIGNED NULL DEFAULT NULL
+  `individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+  `email_list` INT( 16 ) UNSIGNED NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_accomplishment`
 --
 CREATE TABLE `tc_accomplishment` (
-`accomplishment` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
-`date` DATE NULL DEFAULT NULL ,
-`task` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
-`note` VARCHAR( 128 ) NOT NULL
+  `accomplishment` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+  `date` DATE NULL DEFAULT NULL ,
+  `task` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+  `note` VARCHAR( 128 ) NOT NULL
 ) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_task`
 --
 CREATE TABLE `tc_task` (
-`task` INT( 16 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`name` VARCHAR( 128 ) NOT NULL ,
-`description` VARCHAR( 128 ) NOT NULL
+  `task` INT( 16 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `name` VARCHAR( 128 ) NOT NULL ,
+  `description` VARCHAR( 128 ) NOT NULL
 ) ENGINE = MYISAM ;
