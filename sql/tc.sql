@@ -212,3 +212,19 @@ CREATE TABLE `phpgroupware`.`tc_scheduling_priority` (
 `priority` INT( 10 ) UNSIGNED NOT NULL DEFAULT '30',
 `notes` VARCHAR( 128 ) NOT NULL DEFAULT ''
 ) ENGINE = MYISAM ;
+
+--
+-- Table structure for table `tc_email_list`
+--
+CREATE TABLE `phpgroupware`.`tc_email_list` (
+`email_list` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`name` VARCHAR( 128 ) NULL DEFAULT NULL
+) ENGINE = MYISAM ;
+
+--
+-- Table structure for table `tc_email_list_membership`
+--
+CREATE TABLE `phpgroupware`.`tc_email_list_membership` (
+`individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+`email_list` INT( 16 ) UNSIGNED NULL DEFAULT NULL
+) ENGINE = MYISAM ;
