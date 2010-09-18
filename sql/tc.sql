@@ -110,7 +110,6 @@ CREATE TABLE `tc_individual` (
   `address` varchar(255) default NULL,
   `phone` varchar(12) default NULL,
   `email` varchar(120) default NULL,
-  `family` int(16) unsigned default NULL,
   `hh_position` enum('Head of Household','Spouse','Other') DEFAULT 'Other',
   `priesthood` enum('High Priest','Elder','Priest','Teacher','Deacon','Unordained') DEFAULT NULL,
   `steward` enum('High Priest','Elder') DEFAULT NULL,

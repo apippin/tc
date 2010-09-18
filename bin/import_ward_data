@@ -157,7 +157,7 @@ sub update_tc_individual_table
 		if($rows == 0) {
 			# No existing records found for this individual, make a new entry
 			print "   Adding new individual: $individual_name\n";
-			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','','$hhposition','$priesthood',NULL,$attending,1)");
+			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','$hhposition','$priesthood',NULL,$attending,1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 			# An existing record was found for this individual, update it
@@ -330,9 +330,6 @@ sub update_tc_companionship_table
 #| Field                | Type             | Null | Key | Default | Extra |
 #+----------------------+------------------+------+-----+---------+-------+
 #| family               | int(16) unsigned |      | PRI | 0       |   A   |
-#| hofh_id              | int(16) unsigned | YES  |     | NULL    |       |
-#| name                 | varchar(30)      | YES  |     | NULL    |       |
-#| name_id              | varchar(30)      | YES  |     | NULL    |       |
 #| individual           | int(16) unsigned | YES  |     | NULL    |       |
 #| companionship        | int(16) unsigned | YES  |     | NULL    |       |
 #| scheduling_priority  | int(10) unsigned | YES  |     | 30      |       |
@@ -343,83 +340,64 @@ sub update_tc_family_table
 	print "\n-> Updating tc_family table\n";
 
 	# Set all records to be invalid. Only mark them as valid if they appear on the new list.
-	$sth = $dbh->prepare("update tc_family set valid=0");
-	$sth->execute or die "-E- DB error: $DBI::errstr\n";
-	$sth = $dbh->prepare("update tc_family set companionship=0");
+	$sth = $dbh->prepare("update tc_family set valid=0 and companionship=0");
 	$sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-	foreach $index (keys %membership_data)
-	{
-		$hashref = $membership_data{$index};
-		foreach $key (keys %$hashref) {
-			if($key =~ /HH Position/i && $membership_data{$index}{$key} =~ /Head of Household/i) {
-				$family_name = $membership_data{$index}{'Preferred Name'};
-				$family_name =~ s/\'/\\'/g; #'
-				$id = $membership_data{$index}{'HofH ID'};
-				$name_id = uc($family_name);
+	# find head of households in tc_individual
+	$sth = $dbh->prepare("SELECT * FROM tc_individual WHERE hh_position='Head of Household' and valid=1");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	while ($sqlhashref = $sth->fetchrow_hashref) {
+		$individual = $sqlhashref{individual};
+		$name = $sqlhashref{name};
+		
+		$sth2 = $dbh->prepare("SELECT * FROM tc_family WHERE individual='$individual'");
+		$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		
+		my @data = ();
+		while($sqlhashref2 = $sth2->fetchrow_hashref) { push(@data, $sqlhashref2); }
+		my $rows = scalar @data;
 
-				# Find out how many families match this family's name
-				$sth = $dbh->prepare("select * from tc_family where name_id='$name_id'");
-				$sth->execute or die "-E- DB error: $DBI::errstr\n";
-				my @data = ();
-				while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
-				my $rows = scalar @data;
-
-				if($rows == 0) {
-					# No existing records found for this family, make a new entry
-					print "   Adding new Family: $family_name\n";
-					$sth = $dbh->prepare("insert into tc_family values (NULL,$id,'$family_name','$name_id','0','0',NULL,1)");
-					$sth->execute or die "-E- DB error: $DBI::errstr\n";
-				} elsif($rows == 1) {
-					# An existing record was found for this family, update it
-					print "   Updating existing family: $family_name\n";
-					$sth = $dbh->prepare("update tc_family set hofh_id=$id where name_id='$name_id'");
-					$sth->execute or die "-E- DB error: $DBI::errstr\n";
-					$sth = $dbh->prepare("update tc_family set valid=1 where name_id='$name_id'");
-					$sth->execute or die "-E- DB error: $DBI::errstr\n";
-				} else {
-					# More than one record was found. Error! This shouldn't happen.
-					print "   -E- More than one record found ($rows) for family name: $family_name\n";
-				}
-
-				# Now update the individual field for this family
-				$sth = $dbh->prepare("select * from tc_individual WHERE name='$family_name'");
-				$sth->execute or die "-E- DB error: $DBI::errstr\n";
-				while($sqlhashref = $sth->fetchrow_hashref) {
-					$individual = $sqlhashref->{individual};
-					print "   Updating family individual: $family_name -> $individual\n";
-					$sth = $dbh->prepare("update tc_family set individual=$individual where name_id='$name_id'");
-					$sth->execute or die "-E- DB error: $DBI::errstr\n";
-				}
-
-				# Now update the hometeaching field for this family
-				foreach $index (keys %hometeaching_data)
-				{
-					$hashref = $hometeaching_data{$index};
-					foreach $key (keys %$hashref) {
-						if($hometeaching_data{$index}{'Household'} =~ /(\S+)\s+(\S+),\s+(\S+)\s+(.*)/) {
-							$a = $1; $b = $2; $c = $3; $d = $4;
-							if($family_name =~ /$a/ && $hometeaching_data{$index}{'Household'} !~ /$family_name/i) { 
-								print "I: Adjusting hometeaching match from: $hometeaching_data{$index}{'Household'} to $a, $c $d\n";
-								$hometeaching_data{$index}{'Household'} = "$a, $c $d";
-							}
-						}
-						if($key =~ /Quorum/i &&
-						   $hometeaching_data{$index}{$key} =~ /Elders/i &&
-						   $hometeaching_data{$index}{'Household'} =~ /$family_name/i &&
-						   $data[0]->{companionship} != $hometeaching_data{$index}{'Comp ID'}
-						   )
-						{
-							print "   Updating hometeaching assignment for $family_name family\n";
-							$companionship = $hometeaching_data{$index}{'Comp ID'};
-							$sth = $dbh->prepare("update tc_family set companionship='$companionship' where name_id='$name_id'");
-							$sth->execute or die "-E- DB error: $DBI::errstr\n";
-						}
+		if($rows == 0) {
+			# No existing records found for this family, make a new entry
+			print "   Adding new Family: $name\n";
+			$sth2 = $dbh->prepare("insert into tc_family values (NULL,'$individual','0',NULL,1)");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		} elsif($rows == 1) {
+			# An existing record was found for this family, update it
+			print "   Updating existing family: $name\n";
+			$sth2 = $dbh->prepare("update tc_family set valid='1' where individual=$individual'");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		} else {
+			# More than one record was found. Error! This shouldn't happen.
+			print "   -E- More than one record found ($rows) for family name: $name\n";
+		}
+		
+		# Now update the hometeaching field for this family
+		foreach $index (keys %hometeaching_data)
+		{
+			$hashref = $hometeaching_data{$index};
+			foreach $key (keys %$hashref) {
+				if($hometeaching_data{$index}{'Household'} =~ /(\S+)\s+(\S+),\s+(\S+)\s+(.*)/) {
+					$a = $1; $b = $2; $c = $3; $d = $4;
+					if($name =~ /$a/ && $hometeaching_data{$index}{'Household'} !~ /$name/i) { 
+						print "I: Adjusting hometeaching match from: $hometeaching_data{$index}{'Household'} to $a, $c $d\n";
+						$hometeaching_data{$index}{'Household'} = "$a, $c $d";
 					}
 				}
-				$sth->finish();
+				if($key =~ /Quorum/i &&
+				   $hometeaching_data{$index}{$key} =~ /Elders/i &&
+				   $hometeaching_data{$index}{'Household'} =~ /$name/i &&
+				   $data[0]->{companionship} != $hometeaching_data{$index}{'Comp ID'}
+				  )
+				{
+					print "   Updating hometeaching assignment for $name family\n";
+					$companionship = $hometeaching_data{$index}{'Comp ID'};
+					$sth2 = $dbh->prepare("update tc_family set companionship='$companionship' where individual='$individual'");
+					$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+				}
 			}
 		}
+		$sth->finish();
 	}
 }
 
@@ -564,38 +542,6 @@ sub check_for_changed_ids
 	}
 
 	return $found_problem;
-}
-
-sub update_family_in_tc_individual_table
-{
-	print "\n-> Updating family info in tc_individual table\n";
-
-	foreach $index (keys %membership_data)
-	{
-		$hashref = $membership_data{$index};
-
-		# get some information from hash about this individual
-		$name = $membership_data{$index}{'Preferred Name'};
-		$hofh_id = $membership_data{$index}{'HofH ID'};
-
-		# Find the family id for this individual's HofH_id
-		$sth = $dbh->prepare("select * from tc_family where hofh_id=$hofh_id and valid=1");
-		$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		my @family_data = ();
-		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
-		my $family_rows = scalar @family_data;
-		if($family_rows > 0) { 
-			$family_id = $family_data[0]->{'family'};
-
-			print "   Updating family data for: $name\n";
-
-			# write the family id to the individual's data in tc_individual
-			$sth = $dbh->prepare("update tc_individual set family='$family_id' where name=\"$name\""); 
-			$sth->execute or die "-E- DB error: $DBI::errstr\n";
-		} else {
-			$family_id = 0; 
-		}
-	}
 }
 
 sub update_organization_class_data
@@ -749,7 +695,6 @@ if($opt_s) { $dbh->disconnect(); exit; }
 &update_tc_companionship_table();
 &update_tc_family_table();
 &update_tc_visit_table();
-&update_family_in_tc_individual_table();
 &update_organization_class_data();
 &update_tc_scheduling_priority_table();
 

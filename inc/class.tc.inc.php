@@ -15,6 +15,7 @@ class tc
 {
 	var $db;
 	var $db2;
+	var $db3;
 	var $t;
 	var $nextmatchs;
 	var $grants;
@@ -258,7 +259,7 @@ class tc
 				$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 
 				// Get the names of the families assigned this home teaching companionship
-				$sql = "SELECT * from tc_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
+				$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.companionship=".$unique_companionships[$j]['companionship'];
 				$sql = $sql . " ORDER BY name ASC";
 				$this->db->query($sql,__LINE__,__FILE__);
 				$k=0;
@@ -474,8 +475,8 @@ class tc
 			$table_data.= "<tr bgcolor=#d3dce3><td colspan=20><table><tr>$companion_table_entry</tr></table><hr></td></tr>";
 
 			// Get the names of the families assigned this home teaching companionship
-			$sql = "SELECT * from tc_family where valid=1 AND companionship=".$unique_companionships[$j]['companionship'];
-			$sql = $sql . " ORDER BY name ASC";
+			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.companionship=".$unique_companionships[$j]['companionship'];
+			$sql = $sql . " ORDER BY ti.name ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
 				$family_name = $this->db->f('name');
@@ -2069,7 +2070,7 @@ class tc
 		$year = date('Y');
 
 		// create the family id -> family name mapping
-		$sql = "SELECT * FROM tc_family where valid=1 and individual != 0 and companionship != 0 ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0 AND tf.companionship != 0 ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		$family_id = NULL;
@@ -2077,11 +2078,7 @@ class tc
 			$family_id[$i] = $this->db->f('family');
 			$family_name[$i] = $this->db->f('name');
 			$familyid2name[$family_id[$i]] = $family_name[$i];
-			$sql = "SELECT * FROM tc_individual where family='$family_id[$i]'";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				$familyid2address[$family_id[$i]] = $this->db2->f('address');
-			}
+			$familyid2address[$family_id[$i]] = $this->db->f('address');
 			$i++;
 		}
 		array_multisort($family_name, $family_id);
@@ -2218,43 +2215,18 @@ class tc
 
 
 		// VISIT SCHEDULING TABLE
-		$sql = "SELECT * FROM tc_family AS tf JOIN tc_scheduling_priority AS tsp WHERE tf.scheduling_priority=tsp.scheduling_priority AND tf.valid=1 AND tf.individual != 0  AND tf.companionship != 0 ORDER BY tsp.priority ASC, tf.name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN (tc_scheduling_priority AS tsp, tc_individual as ti) WHERE tf.scheduling_priority=tsp.scheduling_priority AND tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0  AND tf.companionship != 0 ORDER BY tsp.priority ASC, ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		$total_families=0; $families_with_yearly_visit=0;
 
-		$i=0; 
-		$family_id = NULL;
-		$family_name = NULL;
-		$family_phone = NULL;
-		$family_visit_pri = NULL;
-		$family_visit_notes = NULL;
-		while ($this->db->next_record()) {
-			$family_id[$i] = $this->db->f('family');
-			$family_name[$i] = $this->db->f('name');
-			$family_phone[$family_id[$i]] = $family_id[$i] . " ERROR";
-			$family_visit_pri[$family_id[$i]] = $this->db->f('visit_pri');
-			$family_visit_notes[$family_id[$i]] = $this->db->f('visit_notes');
-			$i++;
+		while ( $this->db->next_record()) {
 			$total_families++;
-		}
-
-		$sql = "SELECT * FROM tc_individual where valid=1";
-		$this->db->query($sql,__LINE__,__FILE__);
-		while ($this->db->next_record()) {
-			$family = $this->db->f('family');
+			$id = $this->db->f('family');
+			$name = $this->db->f('name');
 			$phone = $this->db->f('phone');
-			$family_phone[$family] = $phone;
-		}
-
-		$max = count($family_id);
-
-		for($i=0; $i < $max; $i++) {
-			$id = $family_id[$i];
-			$name = $family_name[$i];
-			$phone = $family_phone[$id];
-			$vis_pri = $family_visit_pri[$id];
-			$vis_notes = $family_visit_notes[$id];
+			$vis_pri = $this->db->f('priority');
+			$vis_notes = $this->db->f('notes');
 
 			// If this family has had a yearly visit this year, don't show them on the schedule list
 			$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
@@ -2264,9 +2236,9 @@ class tc
 
 			if(!$this->db2->next_record()) {
 				$sql = "SELECT * FROM tc_visit WHERE family=" . $id . " AND companionship=0 ORDER BY date DESC";
-				$this->db->query($sql,__LINE__,__FILE__);
-				if($this->db->next_record()) { 
-					$date = $this->db->f('date'); 
+				$this->db3->query($sql,__LINE__,__FILE__);
+				if($this->db3->next_record()) { 
+					$date = $this->db3->f('date'); 
 				} else { 
 					$date = ""; 
 				}
@@ -2980,7 +2952,7 @@ class tc
 		for ($i=0; $i < count($visit_list); $i++) {
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
 
-			$sql = "SELECT * FROM tc_family WHERE family=".$visit_list[$i]['family'];
+			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.family=".$visit_list[$i]['family'];
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 
@@ -3008,7 +2980,7 @@ class tc
 		}
 
 		// List the families that are available to record a visit against
-		$sql = "SELECT * FROM tc_family WHERE companionship != 0 and valid=1";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.companionship != 0 and tf.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$total_records = $this->db->num_rows();
 
@@ -3595,18 +3567,14 @@ class tc
 			$i++;
 		}
 
-		$sql = "SELECT * FROM tc_family where valid=1 and individual != 0 ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0 ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$family_id[$i] = $this->db->f('family');
 			$family_name[$i] = $this->db->f('name');
 			$familyid2name[$family_id[$i]] = $family_name[$i];
-			$sql = "SELECT * FROM tc_individual where family='$family_id[$i]' and hh_position='Head of Household'";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				$familyid2address[$family_id[$i]] = $this->db2->f('address');
-			}
+			$familyid2address[$family_id[$i]] = $this->db->f('address');
 			$i++;
 		}
 		array_multisort($family_name, $family_id);
@@ -4354,18 +4322,18 @@ class tc
 			}
 
 			if($family > 0) {
-				$sql = "SELECT * FROM tc_family where family='$family'";
+				$sql = "SELECT * FROM tc_family WHERE family='$family'";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				if($this->db2->next_record()) {
-					$family_name = $this->db2->f('name');
-					$phone = $this->db2->f('phone');
 					$individual = $this->db2->f('individual');
-					$appt_name = $family_name . " Family Visit";
 					$sql = "SELECT * FROM tc_individual where individual='$individual'";
 					$this->db3->query($sql,__LINE__,__FILE__);
 					if($this->db3->next_record()) {
 						$phone = $this->db3->f('phone');
+						$family_name = $this->db3->f('name');
+						$phone = $this->db3->f('phone');
 					}
+					$appt_name = $family_name . " Family Visit";
 					$duration = $this->default_visit_appt_duration * 60;
 				}
 			}
