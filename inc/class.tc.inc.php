@@ -3503,7 +3503,6 @@ class tc
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$calling[$i]['id'] = $this->db->f('individual');
 			$calling[$i]['name'] = $this->db->f('name');
 			$calling[$i]['position'] = $this->db->f('position');
 			$calling[$i]['sustained'] = $this->db->f('sustained');
@@ -3525,11 +3524,10 @@ class tc
 		}
 
 		# Display a list ordered by organization
-		$sql = "SELECT * FROM tc_calling ORDER BY sequence ASC";
+		$sql = "SELECT * FROM tc_calling ORDER BY organization ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$calling[$i]['id'] = $this->db->f('individual');
 			$calling[$i]['name'] = $this->db->f('name');
 			$calling[$i]['position'] = $this->db->f('position');
 			$calling[$i]['sustained'] = $this->db->f('sustained');

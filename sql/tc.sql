@@ -70,13 +70,10 @@ CREATE TABLE `tc_attendance` (
 -- Table structure for table `tc_calling`
 --
 CREATE TABLE `tc_calling` (
-  `indiv_id` int(16) unsigned default NULL,
   `name` varchar(30) default NULL,
   `organization` varchar(30) default NULL,
   `position` varchar(30) default NULL,
-  `sequence` int(16) unsigned default NULL,
   `sustained` varchar(30) default NULL,
-  KEY `indiv_id` (`indiv_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --

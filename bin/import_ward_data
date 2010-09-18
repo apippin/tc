@@ -104,7 +104,7 @@ sub print_hash
 
 ######################################################################
 
-# 3RD_INDIV
+# TC_INDIVIDUAL
 #+----------------------+------------------+------+-----+---------+----------------+
 #| Field                | Type             | Null | Key | Default | Extra          |
 #+----------------------+------------------+------+-----+---------+----------------+
@@ -194,15 +194,13 @@ sub update_tc_individual_table
 	$sth->finish();
 }
 
-# 3RD_CALLING
+# TC_CALLING
 #+--------------+------------------+------+-----+---------+-------+
 #| Field        | Type             | Null | Key | Default | Extra |
 #+--------------+------------------+------+-----+---------+-------+
-#| indiv_id     | int(16) unsigned | YES  |     | NULL    |       |
 #| name         | varchar(30)      | YES  |     | NULL    |       |
 #| organization | varchar(30)      | YES  |     | NULL    |       |
 #| position     | varchar(30)      | YES  |     | NULL    |       |
-#| sequence     | int(16) unsigned | YES  |     | NULL    |       |
 #| sustained    | date             | YES  |     | NULL    |       |
 #+--------------+------------------+------+-----+---------+-------+
 sub update_tc_calling_table()
@@ -219,24 +217,22 @@ sub update_tc_calling_table()
 
 	foreach $index (keys %organization_data)
 	{
-		$indiv_id = $organization_data{$index}{'Indiv ID'};
 		$name = $organization_data{$index}{'Indiv Name'};
 		$name =~ s/\'/\\'/g; #'
 		$organization = $organization_data{$index}{'Organization'};
 		$organization_by_name{$name} = $organization;
 		$organization_by_id{$indiv_id} = $organization;
 		$position = $organization_data{$index}{'Position'};
-		$sequence = $organization_data{$index}{'Org Seq'};
 		$sustained = $organization_data{$index}{'Sustained'};
 		$sustained =~ /(\S+) (\d+)/; $month=$1; $year=$2;
 		if($name eq "") { next; }
 		print "   Adding new Calling: $name -> $position\n";
-		$sth = $dbh->prepare("insert into tc_calling values ('$indiv_id','$name','$organization','$position','$sequence','$month $year')");
+		$sth = $dbh->prepare("insert into tc_calling values ('$name','$organization','$position','$month $year')");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	}
 }
 
-# 3RD_DISTRICT
+# TC_DISTRICT
 #+------------+------------------+------+-----+---------+-------+
 #| Field      | Type             | Null | Key | Default | Extra |
 #+------------+------------------+------+-----+---------+-------+
@@ -267,7 +263,7 @@ sub update_tc_district_table
     $sth->finish();
 }
 
-# 3RD_COMPANIONSHIP
+# TC_COMPANIONSHIP
 #+----------------------+------------------+------+-----+---------+-------+
 #| Field                | Type             | Null | Key | Default | Extra |
 #+----------------------+------------------+------+-----+---------+-------+
@@ -329,7 +325,7 @@ sub update_tc_companionship_table
 	}
 }
 
-# 3RD_FAMILY
+# TC_FAMILY
 #+----------------------+------------------+------+-----+---------+-------+
 #| Field                | Type             | Null | Key | Default | Extra |
 #+----------------------+------------------+------+-----+---------+-------+
@@ -427,7 +423,7 @@ sub update_tc_family_table
 	}
 }
 
-# 3RD_VISIT
+# TC_VISIT
 #+----------------+------------------+------+-----+---------+-------+
 #| Field          | Type             | Null | Key | Default | Extra |
 #+----------------+------------------+------+-----+---------+-------+
