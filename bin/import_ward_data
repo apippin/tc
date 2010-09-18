@@ -559,6 +559,7 @@ sub update_tc_scheduling_priority_table
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		}
 	}
+	&remove_obsolete_scheduling_priority("tc_individual");
 	
 	# families
 	# TODO: make steward flexible with a setting in the config file
@@ -577,6 +578,7 @@ sub update_tc_scheduling_priority_table
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		}
 	}
+	&remove_obsolete_scheduling_priority("tc_family");
 	
 	# companionships
 	# TODO: make steward flexible with a setting in the config file
@@ -595,7 +597,35 @@ sub update_tc_scheduling_priority_table
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		}
 	}
+	&remove_obsolete_scheduling_priority("tc_companionship");
+}
+
+sub remove_obsolete_scheduling_priority
+{
+	my $table_name = $_[0];
+
+	#print "\n-> Cleaning $table_name\n";
 	
+	#$sth = $dbh->prepare("SELECT scheduling_priority FROM $table_name where scheduling_priority IS NOT NULL AND valid=0");
+	$sth = $dbh->prepare("SELECT * FROM $table_name WHERE valid=0");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	while($sqlhashref = $sth->fetchrow_hashref) {
+		$scheduling_priority = $sqlhashref->{scheduling_priority};
+		$individual = $sqlhashref->{individual};
+		#$name = $sqlhashref->{name};
+		if ($scheduling_priority != "NULL") {
+			#print "$name\n";
+			# set scheduling_priority to NULL
+			#print "UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual\n";
+			$sth2 = $dbh->prepare("UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			
+			# remove entry from tc_scheduling_priority
+			#print "DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority\n";
+			$sth2 = $dbh->prepare("DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		}
+	}
 }
 
 ######################################################################
