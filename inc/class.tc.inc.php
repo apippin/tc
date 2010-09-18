@@ -1406,17 +1406,27 @@ class tc
 			}
 
 			// Save any changes made to the ppi notes table
-			$new_data = get_var('ppi_notes',array('POST'));
+			$new_data = get_var('notes',array('POST'));
 			foreach ($new_data as $entry) {
-				$ppi_notes = $entry['notes'];
+				$notes = $entry['notes'];
 				$individual = $entry['individual'];
-				$ppi_pri = $entry['pri'];
+				$priority = $entry['pri'];
 
 				// Perform database save actions here
+				$sql = "SELECT * FROM tc_individual WHERE individual='$individual'";
+				$this->db->query($sql,__LINE__,__FILE__);
+				if ($this->db->next_record()) {
+					$scheduling_priority = $this->db->f('scheduling_priority');
+					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$priority' AND notes=\"$notes\" WHERE scheduling_priority='$scheduling_priority'", __LINE__, __FILE__);
+				}
+
+/*
 				$this->db->query("UPDATE tc_individual set " .
-				                 " ppi_notes='" . $ppi_notes . "'" .
-				                 ",ppi_pri='" . $ppi_pri . "'" .
+				                 " notes='" . $notes . "'" .
+				                 ",priority='" . $priority . "'" .
 				                 " WHERE individual=" . $individual,__LINE__,__FILE__);
+*/
+
 
 			}
 
@@ -1508,7 +1518,7 @@ class tc
 
 		// PPI SCHEDULING TABLE
 		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where valid=1 and steward='Elder' ORDER BY ppi_pri ASC, name ASC";
+		$sql = "SELECT * FROM tc_individual as ti JOIN tc_scheduling_priority as tsp where ti.scheduling_priority=tsp.scheduling_priority and steward='Elder' and valid=1 ORDER by tsp.priority ASC, ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		$i=0; 
@@ -1517,8 +1527,8 @@ class tc
 			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
-			$indiv_ppi_pri[$individual[$i]] = $this->db->f('ppi_pri');
-			$indiv_ppi_notes[$individual[$i]] = $this->db->f('ppi_notes');
+			$indiv_priority[$individual[$i]] = $this->db->f('priority');
+			$indiv_notes[$individual[$i]] = $this->db->f('notes');
 			$i++;
 			$total_indivs++;
 		}
@@ -1529,8 +1539,8 @@ class tc
 			$id = $individual[$i];
 			$name = $indiv_name[$i];
 			$phone = $indiv_phone[$id];
-			$ppi_pri = $indiv_ppi_pri[$id];
-			$ppi_notes = $indiv_ppi_notes[$id];
+			$priority = $indiv_priority[$id];
+			$notes = $indiv_notes[$id];
 
 			// If this individual has had a yearly PPI this year, don't show him on the schedule list
 			$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
@@ -1558,12 +1568,12 @@ class tc
 				$this->t->set_var('tr_color',$tr_color);
 				$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 				$table_data.= "<td align=center>$phone</td>";
-				//$table_data.= "<td align=center>$ppi_pri</td>";
+				//$table_data.= "<td align=center>$priority</td>";
 				$table_data.= "<td align=center>";
-				$table_data.= '<select name=ppi_notes['.$i.'][pri]>';
+				$table_data.= '<select name=notes['.$i.'][pri]>';
 				foreach(range(0,6) as $num) {
 					if($num == 0) { $num = 1; } else {$num = $num*5; }
-					if($ppi_pri == $num) { 
+					if($priority == $num) { 
 						$selected[$num] = 'selected="selected"'; 
 					} else { 
 						$selected[$num] = ''; 
@@ -1572,9 +1582,9 @@ class tc
 				}
 				$table_data.= '</select></td>';
 				$table_data.= "<td align=center>$date</td>";
-				$table_data.= '<td><input type=text size="50" maxlength="128" name="ppi_notes['.$i.'][notes]" value="'.$ppi_notes.'">';
-				$table_data.= '<input type=hidden name="ppi_notes['.$i.'][individual]" value="'.$id.'">';
-				$table_data.= '<input type=hidden name="ppi_notes['.$i.'][indiv_name]" value="'.$name.'">';
+				$table_data.= '<td><input type=text size="50" maxlength="128" name="notes['.$i.'][notes]" value="'.$notes.'">';
+				$table_data.= '<input type=hidden name="notes['.$i.'][individual]" value="'.$id.'">';
+				$table_data.= '<input type=hidden name="notes['.$i.'][indiv_name]" value="'.$name.'">';
 				$table_data.= '</td>';
 				$table_data.= '</tr>';
 			} else {
@@ -1588,14 +1598,14 @@ class tc
 				$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 				$indivs_with_yearly_ppi++;
 				$date = $this->db2->f('date');
-				$ppi_notes = $this->db2->f('notes');
-				if(strlen($ppi_notes) > 40) { $ppi_notes = substr($ppi_notes,0,40) . "..."; }
+				$notes = $this->db2->f('notes');
+				if(strlen($notes) > 40) { $notes = substr($notes,0,40) . "..."; }
 				$tr_color2 = $this->nextmatchs->alternate_row_color($tr_color2);
 				$this->t->set_var('tr_color2',$tr_color2);
 				$completed_data.= "<tr bgcolor=". $this->t->get_var('tr_color2') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 				$completed_data.= "<td align=center>$phone</td>";
 				$completed_data.= "<td align=center><a href=".$link.">$date</a></td>";
-				$completed_data.= "<td align=left>$ppi_notes</td>";
+				$completed_data.= "<td align=left>$notes</td>";
 				$completed_data.= '</tr>';
 			}
 		} // End for individuals Loop
@@ -1756,10 +1766,17 @@ class tc
 				$hti_pri = $entry['pri'];
 				//print "hti_notes: $hti_notes indiv_name: $indiv_name <Br>";
 				// Perform database save actions here
+				$this->db->query("SELECT * FROM tc_companionship WHERE individual=$individual and valid=1",__LINE__,__FILE__);
+				if ($this->db->next_record()) {
+					$scheduling_priority = $this->db->f('scheduling_priority');
+					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$hti_pri' and notes=\"hti_notes\" where scheduling_priority=$scheduling_priority",__LINE__,__FILE__);
+				}
+/*
 				$this->db->query("UPDATE tc_individual set " .
 				                 " hti_notes='" . $hti_notes . "'" .
 				                 ",hti_pri='" . $hti_pri . "'" .
 				                 " WHERE individual=" . $individual,__LINE__,__FILE__);
+*/
 			}
 
 			$take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched');
@@ -1885,7 +1902,7 @@ class tc
 			$i=0;
 			for ($j=0; $j < count($unique_companionships); $j++) {
 				// Select all the companions from each companionship
-				$sql = "SELECT * FROM tc_companionship where valid=1 and companionship=". $unique_companionships[$j]['companionship'];
+				$sql = "SELECT * FROM tc_companionship AS tc JOIN (tc_scheduling_priority AS tsp, tc_individual as ti) WHERE tc.scheduling_priority=tsp.scheduling_priority AND tc.individual=ti.individual AND tc.valid=1 AND tc.companionship=". $unique_companionships[$j]['companionship'];
 				$this->db->query($sql,__LINE__,__FILE__);
 				$k=0; $int_completed=0;
 				$comp = $unique_companionships[$j]['companionship'];
@@ -1896,20 +1913,11 @@ class tc
 					// Get this companions information
 					$individual = $this->db->f('individual');
 
-					$sql = "SELECT * FROM tc_individual where individual='$individual'";
-					$this->db2->query($sql,__LINE__,__FILE__);	
-					if($this->db2->next_record()) {
-						$individual = $this->db2->f('individual');
-						$indiv_name = $this->db2->f('name');
-						$indiv_phone[$individual] = $this->db2->f('phone');
-						$indiv_hti_pri[$individual] = $this->db2->f('hti_pri');
-						$indiv_hti_notes[$individual] = $this->db2->f('hti_notes');
-					}
-					$id = $individual;
-					$name = $indiv_name;
-					$phone = $indiv_phone[$id];
-					$hti_pri = $indiv_hti_pri[$id];
-					$hti_notes = $indiv_hti_notes[$id];
+					$id = $this->db->f('individual');
+					$name = $this->db->f('name');
+					$phone = $this->db->f('phone');
+					$hti_pri = $this->db->f('priority');
+					$hti_notes = $this->db->f('notes');
 
 					// If the companionship has already had its quarterly interview,
 					// Skip the other companion in the companionship.
@@ -2118,10 +2126,17 @@ class tc
 				$visit_pri = $entry['pri'];
 
 				// Perform database save actions here
+				$this->db->query("SELECT * FROM tc_family WHERE family='$family'",__LINE__,__FILE__);
+				if ($this->db->next_record()) {
+					$scheduling_priority = $this->db->f('scheduling_priority');
+					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$visit_pri' AND notes=\"$visit_notes\" WHERE scheduling_priority='$scheduling_priority'",__LINE__,__FILE__);
+				}
+/*
 				$this->db->query("UPDATE tc_family set " .
 				                 " visit_notes='" . $visit_notes . "'" .
 				                 ",visit_pri='" . $visit_pri . "'" .
 				                 " WHERE family=" . $family,__LINE__,__FILE__);
+*/
 			}
 
 			$take_me_to_url = $GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched');
@@ -2203,7 +2218,7 @@ class tc
 
 
 		// VISIT SCHEDULING TABLE
-		$sql = "SELECT * FROM tc_family where valid=1 and individual != 0  and companionship != 0 ORDER BY visit_pri ASC, name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_scheduling_priority AS tsp WHERE tf.scheduling_priority=tsp.scheduling_priority AND tf.valid=1 AND tf.individual != 0  AND tf.companionship != 0 ORDER BY tsp.priority ASC, tf.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		$total_families=0; $families_with_yearly_visit=0;
@@ -2390,15 +2405,15 @@ class tc
 		$this->t->set_var('district_name',$president_name);
 
 		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY individual ASC";
+		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority as tsp where ti.scheduling_priority=tsp.scheduling_priority and ti.steward='Elder' and ti.valid=1 ORDER BY ti.individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$individual[$i] = $this->db->f('individual');
 			$indiv_name[$i] = $this->db->f('name');
 			$indiv_phone[$individual[$i]] = $this->db->f('phone');
-			$indiv_ppi_pri[$individual[$i]] = $this->db->f('ppi_pri');
-			$indiv_ppi_notes[$individual[$i]] = $this->db->f('ppi_notes');
+			$indiv_priority[$individual[$i]] = $this->db->f('priority');
+			$indiv_notes[$individual[$i]] = $this->db->f('notes');
 			$i++;
 		}
 		$total_indivs=$i;

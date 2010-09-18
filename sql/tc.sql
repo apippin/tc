@@ -87,6 +87,7 @@ CREATE TABLE `tc_companionship` (
   `companionship` int(16) unsigned NOT NULL default '0',
   `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default NULL,
+  `scheduling_priority` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
   KEY `companionship` (`companionship`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -116,10 +117,7 @@ CREATE TABLE `tc_individual` (
   `hh_position` enum('Head of Household','Spouse','Other') DEFAULT 'Other',
   `priesthood` enum('High Priest','Elder','Priest','Teacher','Deacon','Unordained') DEFAULT NULL,
   `steward` enum('High Priest','Elder') DEFAULT NULL,
-  `ppi_pri` int(10) unsigned NOT NULL default '1',
-  `ppi_notes` varchar(128) default NULL,
-  `hti_pri` int(10) unsigned default '1',
-  `hti_notes` varchar(128) default NULL,
+  `scheduling_priority` int(16) unsigned default NULL,
   `attending` tinyint(1) default '0',
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`individual`)
@@ -135,8 +133,7 @@ CREATE TABLE `tc_family` (
   `name_id` varchar(30) NOT NULL default '',
   `individual` int(16) unsigned default '0',
   `companionship` int(16) unsigned default NULL,
-  `visit_pri` int(10) unsigned default '1',
-  `visit_notes` varchar(128) default NULL,
+  `scheduling_priority` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`family`)
 ) ENGINE=MyISAM AUTO_INCREMENT=277 DEFAULT CHARSET=latin1;
@@ -206,3 +203,12 @@ CREATE TABLE `tc_willingness` (
   `willing` enum('y','n','') NOT NULL,
   KEY `individual` (`individual`,`assignment`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `tc_scheduling_priority`
+--
+CREATE TABLE `phpgroupware`.`tc_scheduling_priority` (
+`scheduling_priority` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`priority` INT( 10 ) UNSIGNED NOT NULL DEFAULT '30',
+`notes` VARCHAR( 128 ) NOT NULL DEFAULT ''
+) ENGINE = MYISAM ;

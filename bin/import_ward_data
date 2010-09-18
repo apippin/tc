@@ -105,22 +105,19 @@ sub print_hash
 ######################################################################
 
 # 3RD_INDIV
-#+-------------+------------------+------+-----+---------+----------------+
-#| Field       | Type             | Null | Key | Default | Extra          |
-#+-------------+------------------+------+-----+---------+----------------+
-#| individual  | int(16) unsigned |      | PRI | NULL    | auto_increment |
-#| mls_id      | int(16) unsigned |      |     | NULL    |                |
-#| name        | varchar(60)      | YES  |     | NULL    |                |
-#| phone       | varchar(12)      | YES  |     | NULL    |                |
-#| email       | varchar(120)     | YES  |     | NULL    |                |
-#| priesthood  | enum             | YES  |     | NULL    |                |
-#| ppi_pri     | int(10) unsigned | YES  |     | 1       |                |
-#| ppi_notes   | varchar(128)     | YES  |     | NULL    |                |
-#| hti_pri     | int(10) unsigned | YES  |     | 1       |                |
-#| hti_notes   | varchar(128)     | YES  |     | NULL    |                |
-#| attending   | tinyint(1)       | YES  |     | 0       |                |
-#| valid       | tinyint(1)       | YES  |     | NULL    |                |
-#+-------------+------------------+------+-----+---------+----------------+
+#+----------------------+------------------+------+-----+---------+----------------+
+#| Field                | Type             | Null | Key | Default | Extra          |
+#+----------------------+------------------+------+-----+---------+----------------+
+#| individual           | int(16) unsigned |      | PRI | NULL    | auto_increment |
+#| mls_id               | int(16) unsigned |      |     | NULL    |                |
+#| name                 | varchar(60)      | YES  |     | NULL    |                |
+#| phone                | varchar(12)      | YES  |     | NULL    |                |
+#| email                | varchar(120)     | YES  |     | NULL    |                |
+#| priesthood           | enum             | YES  |     | NULL    |                |
+#| scheduling_priority  | int(10) unsigned | YES  |     | 30      |                |
+#| attending            | tinyint(1)       | YES  |     | 0       |                |
+#| valid                | tinyint(1)       | YES  |     | NULL    |                |
+#+----------------------+------------------+------+-----+---------+----------------+
 sub update_tc_individual_table
 {
 	print "\n-> Updating tc_individual table\n";
@@ -160,7 +157,7 @@ sub update_tc_individual_table
 		if($rows == 0) {
 			# No existing records found for this individual, make a new entry
 			print "   Adding new individual: $individual_name\n";
-			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','','$hhposition','$priesthood','','$default_interview_pri','','$default_interview_pri','',$attending,1)");
+			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','','$hhposition','$priesthood',NULL,$attending,1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 			# An existing record was found for this individual, update it
@@ -271,14 +268,15 @@ sub update_tc_district_table
 }
 
 # 3RD_COMPANIONSHIP
-#+---------------+------------------+------+-----+---------+-------+
-#| Field         | Type             | Null | Key | Default | Extra |
-#+---------------+------------------+------+-----+---------+-------+
-#| companionship | int(16) unsigned |      |     | 0       |       |
-#| individual    | int(16) unsigned | YES  |     | NULL    |       |
-#| district      | int(16) unsigned | YES  |     | NULL    |       |
-#| valid         | tinyint(1)       | YES  |     | NULL    |       |
-#+---------------+------------------+------+-----+---------+-------+
+#+----------------------+------------------+------+-----+---------+-------+
+#| Field                | Type             | Null | Key | Default | Extra |
+#+----------------------+------------------+------+-----+---------+-------+
+#| companionship        | int(16) unsigned |      |     | 0       |       |
+#| individual           | int(16) unsigned | YES  |     | NULL    |       |
+#| district             | int(16) unsigned | YES  |     | NULL    |       |
+#| scheduling_priority  | int(10) unsigned | YES  |     | 30      |       |
+#| valid                | tinyint(1)       | YES  |     | NULL    |       |
+#+----------------------+------------------+------+-----+---------+-------+
 sub update_tc_companionship_table
 {
 	print "\n-> Updating tc_companionship table\n";
@@ -309,7 +307,7 @@ sub update_tc_companionship_table
 					if($rows == 0) {
 						# No existing records found for this companionship, make a new entry
 						print "   Adding Companion to companionship: $individual_name -> $id\n";
-						$sth = $dbh->prepare("insert into tc_companionship values ($id,'$individual','$district',1)");
+						$sth = $dbh->prepare("insert into tc_companionship values ($id,'$individual','$district',NULL,1)");
 						$sth->execute or die "-E- DB error: $DBI::errstr\n";
 					} else {
 						# An existing companionship was found for this companionship, update it
@@ -332,19 +330,18 @@ sub update_tc_companionship_table
 }
 
 # 3RD_FAMILY
-#+---------------+------------------+------+-----+---------+-------+
-#| Field         | Type             | Null | Key | Default | Extra |
-#+---------------+------------------+------+-----+---------+-------+
-#| family        | int(16) unsigned |      | PRI | 0       |   A   |
-#| hofh_id       | int(16) unsigned | YES  |     | NULL    |       |
-#| name          | varchar(30)      | YES  |     | NULL    |       |
-#| name_id       | varchar(30)      | YES  |     | NULL    |       |
-#| individual    | int(16) unsigned | YES  |     | NULL    |       |
-#| companionship | int(16) unsigned | YES  |     | NULL    |       |
-#| visit_pri     | int(10) unsigned | YES  |     | 1       |       |
-#| visit_notes   | varchar(128)     | YES  |     | NULL    |       |
-#| valid         | tinyint(1)       | YES  |     | NULL    |       |
-#+---------------+------------------+------+-----+---------+-------+
+#+----------------------+------------------+------+-----+---------+-------+
+#| Field                | Type             | Null | Key | Default | Extra |
+#+----------------------+------------------+------+-----+---------+-------+
+#| family               | int(16) unsigned |      | PRI | 0       |   A   |
+#| hofh_id              | int(16) unsigned | YES  |     | NULL    |       |
+#| name                 | varchar(30)      | YES  |     | NULL    |       |
+#| name_id              | varchar(30)      | YES  |     | NULL    |       |
+#| individual           | int(16) unsigned | YES  |     | NULL    |       |
+#| companionship        | int(16) unsigned | YES  |     | NULL    |       |
+#| scheduling_priority  | int(10) unsigned | YES  |     | 30      |       |
+#| valid                | tinyint(1)       | YES  |     | NULL    |       |
+#+----------------------+------------------+------+-----+---------+-------+
 sub update_tc_family_table
 {
 	print "\n-> Updating tc_family table\n";
@@ -375,7 +372,7 @@ sub update_tc_family_table
 				if($rows == 0) {
 					# No existing records found for this family, make a new entry
 					print "   Adding new Family: $family_name\n";
-					$sth = $dbh->prepare("insert into tc_family values (NULL,$id,'$family_name','$name_id','0','0','$default_visit_pri','',1)");
+					$sth = $dbh->prepare("insert into tc_family values (NULL,$id,'$family_name','$name_id','0','0',NULL,1)");
 					$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				} elsif($rows == 1) {
 					# An existing record was found for this family, update it
@@ -628,6 +625,65 @@ sub update_organization_class_data
 	}
 }
 
+sub update_tc_scheduling_priority_table
+{
+	print "\n-> Updating scheduling priority table\n";
+	
+	# individuals
+	# TODO: make steward flexible with a setting in the config file
+	$sth = $dbh->prepare("select * from tc_individual where steward='Elder' and valid=1");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	while($sqlhashref = $sth->fetchrow_hashref) {
+		$individual = $sqlhashref->{individual};
+		$scheduling_priority = $sqlhashref->{scheduling_priority};
+		if ($scheduling_priority == 'NULL')
+		{
+			$sth2 = $dbh->prepare("insert into tc_scheduling_priority values (NULL, 30, '')");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			$scheduling_priority = $dbh->last_insert_id(NULL,NULL,'tc_scheduling_priority',NULL);
+			$sth2 = $dbh->prepare("update tc_individual set scheduling_priority=$scheduling_priority where individual=$individual");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		}
+	}
+	
+	# families
+	# TODO: make steward flexible with a setting in the config file
+	$sth = $dbh->prepare("select tf.scheduling_priority, tf.family from tc_family AS tf JOIN tc_individual AS ti ON tf.individual=ti.individual and ti.steward='Elder' and tf.valid=1");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	while($sqlhashref = $sth->fetchrow_hashref) {
+		$family = $sqlhashref->{family};
+		$scheduling_priority = $sqlhashref->{scheduling_priority};
+		#print "$family   $scheduling_priority\n";
+		if ($scheduling_priority == 'NULL')
+		{
+			$sth2 = $dbh->prepare("insert into tc_scheduling_priority values (NULL, 30, '')");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			$scheduling_priority = $dbh->last_insert_id(NULL,NULL,'tc_scheduling_priority',NULL);
+			$sth2 = $dbh->prepare("update tc_family set scheduling_priority=$scheduling_priority where family=$family");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		}
+	}
+	
+	# companionships
+	# TODO: make steward flexible with a setting in the config file
+	$sth = $dbh->prepare("select tc.individual, tc.scheduling_priority from tc_companionship AS tc JOIN tc_individual AS ti ON tc.individual=ti.individual and (ti.steward='Elder' or ti.steward='') and tc.valid=1");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
+	while($sqlhashref = $sth->fetchrow_hashref) {
+		$individual = $sqlhashref->{individual};
+		$scheduling_priority = $sqlhashref->{scheduling_priority};
+		#print "$individual   $scheduling_priority\n";
+		if ($scheduling_priority == 'NULL')
+		{
+			$sth2 = $dbh->prepare("insert into tc_scheduling_priority values (NULL, 30, '')");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			$scheduling_priority = $dbh->last_insert_id(NULL,NULL,'tc_scheduling_priority',NULL);
+			$sth2 = $dbh->prepare("update tc_companionship set scheduling_priority=$scheduling_priority where individual=$individual");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		}
+	}
+	
+}
+
 ######################################################################
 # MAIN
 ######################################################################
@@ -699,6 +755,7 @@ if($opt_s) { $dbh->disconnect(); exit; }
 &update_tc_visit_table();
 &update_family_in_tc_individual_table();
 &update_organization_class_data();
+&update_tc_scheduling_priority_table();
 
 print "\n-> Import Successful! DONE...\n";
 
