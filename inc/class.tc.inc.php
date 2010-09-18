@@ -203,7 +203,7 @@ class tc
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_view'));
 		$this->t->set_var('title','Hometeaching'); 
 
-		$sql = "SELECT * FROM tc_district where valid=1 ORDER BY district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -1775,7 +1775,7 @@ class tc
 		}
 
 		// Get the Districts
-		$sql = "SELECT * FROM tc_district AS td JOIN tc_presidency AS tp WHERE td.district=tp.district AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN (tc_presidency AS tp, tc_individual AS ti) WHERE td.district=tp.district AND td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -1889,7 +1889,7 @@ class tc
 			$i=0;
 			for ($j=0; $j < count($unique_companionships); $j++) {
 				// Select all the companions from each companionship
-				$sql = "SELECT * FROM tc_companionship AS tc JOIN (tc_scheduling_priority AS tsp, tc_individual as ti) WHERE tc.scheduling_priority=tsp.scheduling_priority AND tc.individual=ti.individual AND tc.valid=1 AND tc.companionship=". $unique_companionships[$j]['companionship'];
+				$sql = "SELECT * FROM tc_companionship AS tc JOIN (tc_scheduling_priority AS tsp, tc_individual AS ti) WHERE tc.scheduling_priority=tsp.scheduling_priority AND tc.individual=ti.individual AND tc.valid=1 AND tc.companionship=". $unique_companionships[$j]['companionship'];
 				$this->db->query($sql,__LINE__,__FILE__);
 				$k=0; $int_completed=0;
 				$comp = $unique_companionships[$j]['companionship'];
@@ -2601,7 +2601,7 @@ class tc
 		else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
 		else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-		$sql = "SELECT * FROM tc_district where valid=1 ORDER BY district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -4073,8 +4073,8 @@ class tc
 			$name = "High Priests";
 			$indiv = 0;
 			$valid = 0;
-			$this->db2->query("INSERT INTO tc_district (district,name,supervisor,valid) " .
-			                  "VALUES ('" . $district . "','" . $name . "','" .
+			$this->db2->query("INSERT INTO tc_district (district,supervisor,valid) " .
+			                  "VALUES ('" . $district . "','" . 
 			                  $indiv . "','" . $valid . "'" .
 			                  ")",__LINE__,__FILE__);
 
@@ -4091,8 +4091,8 @@ class tc
 
 				// If we have a valid district, add it to the district table
 				if($district > 0) {
-					$this->db2->query("INSERT INTO tc_district (district,name,supervisor,valid) " .
-					                  "VALUES ('" . $district . "','" . $name . "','" .
+					$this->db2->query("INSERT INTO tc_district (district,supervisor,valid) " .
+					                  "VALUES ('" . $district . "','" . 
 					                  $indiv . "','" . $valid . "'" .
 					                  ")",__LINE__,__FILE__);
 				}

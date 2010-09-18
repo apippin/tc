@@ -27,7 +27,7 @@ digraph schema {
     shape = "record"
   ];
   district      [
-    label = "district||<d> district|<n> name|<s> supervisor|<v> valid"
+    label = "district||<d> district|<s> supervisor|<v> valid"
     shape = "record"
   ];
   individual   [

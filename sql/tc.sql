@@ -95,7 +95,6 @@ CREATE TABLE `tc_companionship` (
 --
 CREATE TABLE `tc_district` (
   `district` int(16) unsigned NOT NULL default '0',
-  `name` varchar(30) default NULL,
   `supervisor` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`district`)
