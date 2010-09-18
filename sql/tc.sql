@@ -74,6 +74,7 @@ CREATE TABLE `tc_calling` (
   `organization` varchar(30) default NULL,
   `position` varchar(30) default NULL,
   `sustained` varchar(30) default NULL,
+  KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -124,9 +125,6 @@ CREATE TABLE `tc_individual` (
 --
 CREATE TABLE `tc_family` (
   `family` int(16) unsigned NOT NULL auto_increment,
-  `hofh_id` int(16) unsigned NOT NULL default '0',
-  `name` varchar(30) NOT NULL default '',
-  `name_id` varchar(30) NOT NULL default '',
   `individual` int(16) unsigned default '0',
   `companionship` int(16) unsigned default NULL,
   `scheduling_priority` int(16) unsigned default NULL,
@@ -153,7 +151,7 @@ CREATE TABLE `tc_interview` (
   `date` date default NULL,
   `notes` text,
   `interview_type` enum('hti','ppi') NOT NULL DEFAULT 'hti',
-  PRIMARY KEY  (`ppi`)
+  PRIMARY KEY  (`interview`)
 ) ENGINE=MyISAM AUTO_INCREMENT=248 DEFAULT CHARSET=latin1;
 
 

@@ -157,7 +157,7 @@ sub update_tc_individual_table
 		if($rows == 0) {
 			# No existing records found for this individual, make a new entry
 			print "   Adding new individual: $individual_name\n";
-			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','$hhposition','$priesthood',NULL,$attending,1)");
+			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','$hhposition','$priesthood','',NULL,$attending,1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 			# An existing record was found for this individual, update it
@@ -346,9 +346,12 @@ sub update_tc_family_table
 	# find head of households in tc_individual
 	$sth = $dbh->prepare("SELECT * FROM tc_individual WHERE hh_position='Head of Household' and valid=1");
 	$sth->execute or die "-E- DB error: $DBI::errstr\n";
-	while ($sqlhashref = $sth->fetchrow_hashref) {
-		$individual = $sqlhashref{individual};
-		$name = $sqlhashref{name};
+	my @individual_data = ();
+	while ($sqlhashref = $sth->fetchrow_hashref) { push(@individual_data, $sqlhashref); }
+	my $individual_count = scalar @individual_data;
+	for($i=0;$i<$individual_count;$i++) {
+		$individual = $individual_data[$i]{'individual'};
+		$name = $individual_data[$i]{'name'};
 		
 		$sth2 = $dbh->prepare("SELECT * FROM tc_family WHERE individual='$individual'");
 		$sth2->execute or die "-E- DB error: $DBI::errstr\n";
@@ -360,12 +363,12 @@ sub update_tc_family_table
 		if($rows == 0) {
 			# No existing records found for this family, make a new entry
 			print "   Adding new Family: $name\n";
-			$sth2 = $dbh->prepare("insert into tc_family values (NULL,'$individual','0',NULL,1)");
+			$sth2 = $dbh->prepare("INSERT INTO tc_family VALUES (NULL,'$individual','0',NULL,1)");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 			# An existing record was found for this family, update it
 			print "   Updating existing family: $name\n";
-			$sth2 = $dbh->prepare("update tc_family set valid='1' where individual=$individual'");
+			$sth2 = $dbh->prepare("UPDATE tc_family SET valid='1' WHERE individual='$individual'");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		} else {
 			# More than one record was found. Error! This shouldn't happen.
@@ -432,7 +435,7 @@ sub update_tc_visit_table
 		print "   Updating visit data: $family_name\n";
 
 		# get family id from tc_family
-		$sth = $dbh->prepare("select * from tc_family where name=\"$family_name\" and valid=1");
+		$sth = $dbh->prepare("SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND ti.name=\"$family_name\" AND tf.valid=1");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		my @family_data = ();
 		while($sqlhashref = $sth->fetchrow_hashref) { push(@family_data, $sqlhashref); }
