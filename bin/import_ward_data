@@ -249,16 +249,16 @@ sub update_tc_district_table
     $sth = $dbh->prepare("select * from tc_district");
     $sth->execute or die "-E- DB error: $DBI::errstr\n";
     while($sqlhashref = $sth->fetchrow_hashref) {
-	$supervisor_name = $sqlhashref->{name};
-	$district = $sqlhashref->{district};
-	$sth2 = $dbh->prepare("select * from tc_individual where name='$supervisor_name'");
-	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
-	$sqlhashref2 = $sth2->fetchrow_hashref;
-	$supervisor_id = $sqlhashref2->{individual};
-	$sth2->finish();
-	$sth2 = $dbh->prepare("update tc_district set supervisor='$supervisor_id' where district='$district'");
-	$sth2->execute or die "-E- DB error: $DBI::errstr\n";
-	$sth2->finish();
+		$supervisor_name = $sqlhashref->{name};
+		$district = $sqlhashref->{district};
+		$sth2 = $dbh->prepare("select * from tc_individual where name='$supervisor_name'");
+		$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		$sqlhashref2 = $sth2->fetchrow_hashref;
+		$supervisor_id = $sqlhashref2->{individual};
+		$sth2->finish();
+		$sth2 = $dbh->prepare("update tc_district set supervisor='$supervisor_id' where district='$district'");
+		$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+		$sth2->finish();
     }
     $sth->finish();
 }

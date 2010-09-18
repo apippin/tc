@@ -2,89 +2,124 @@ digraph schema {
   graph [
     rankdir = "LR"
   ];
-  family   [
-    label = "<f> family||<i> hofh_id|<n> name|<ni> name_id|<i> indiv_id|<c> companionship|<vp> visit_pri|<vn> visit_notes|<v> valid"
-    shape = "record"
-  ];
-  indiv   [
-    label = "<i> indiv||<id> indiv_id|<n> name|<a> address|<p> phone|<em> email|<f> family|<hh> hh position|<po> priesthood|<st> steward|<pr> prospective|<pp> ppi_pri|<t> ppi_notes|<hp> hti_pri|<hn> hti_notes|<a> attending|<v> valid"
-    shape = "record"
-  ];
-  companionship   [
-    label = "<c> companionship||<i> indiv|<d> district|<v> valid"
-    shape = "record"
-  ];
-  visit   [
-    label = "<v> visit||<f> family|<c> companionship|<c1> companion1|<c2> companion2|<t> date|<n> notes|<v> visited|<vt> visit_type"
-    shape = "record"
-  ];
-  interview   [
-    label = "<in> interview||<i> interviewer|<il> indiv|<t> date|<n> notes|<it> interview_type"
-    shape = "record"
-  ];
   activity   [
-    label = "<a> activity||<s> assignment|<t> date|<n> notes"
-    shape = "record"
-  ];
-  participation   [
-    label = "participation||<i> indiv|<a> activity"
-    shape = "record"
-  ];
-  attendance   [
-    label = "attendance||<i> indiv|<d> date"
+    label = "activity||<a> activity|<s> assignment|<t> date|<n> notes"
     shape = "record"
   ];
   appointment   [
-    label = "<a> appointment||<p> presidency|<f> family|<i> indiv |<d> date|<t> time|<l> location|<u> uid"
+    label = "appointment||<a> appointment|<p> presidency|<f> family|<i> individual |<d> date|<t> time|<l> location|<u> uid"
     shape = "record"
   ];
   assignment    [
-    label = "<a> assignment||<n> name|<c> code"
+    label = "assignment||<a> assignment|<n> name|<ab> abbreviation"
+    shape = "record"
+  ];
+  attendance   [
+    label = "attendance||<i> individual|<d> date"
     shape = "record"
   ];
   calling       [
-    label = "calling||<i> indiv_id|<n> name|<o> organization|<p> position|<s> sequence|<t> sustained"
+    label = "calling||<n> name|<o> organization|<p> position|<s> sustained"
+    shape = "record"
+  ];
+  companionship   [
+    label = "companionship||<c> companionship|<i> individual|<d> district|<sp> scheduling_priority|<v> valid"
     shape = "record"
   ];
   district      [
-    label = "<d> district||<n> name|<s> supervisor|<v> valid"
+    label = "district||<d> district|<n> name|<s> supervisor|<v> valid"
+    shape = "record"
+  ];
+  individual   [
+    label = "individual||<i> individual|<id> mls_id|<n> name|<a> address|<p> phone|<em> email|<hh> hh position|<pr> priesthood|<st> steward|<sp> scheduling_priority|<a> attending|<v> valid"
+    shape = "record"
+  ];
+  family   [
+    label = "family||<f> family|<i> individual|<c> companionship|<sp> scheduling_priority|<v> valid"
+    shape = "record"
+  ];
+  participation   [
+    label = "participation||<i> individual|<a> activity"
+    shape = "record"
+  ];
+  interview   [
+    label = "interview||<in> interview|<i> interviewer|<il> individual|<t> date|<n> notes|<it> interview_type"
     shape = "record"
   ];
   presidency    [
-    label = "<p> presidency||<i> indiv|<d> district|<n> name|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+    label = "presidency||<p> presidency||<i> individual|<d> district|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+    shape = "record"
+  ];
+  visit   [
+    label = "visit||<v> visit|<f> family|<c> companionship|<c1> companion1|<c2> companion2|<t> date|<n> notes|<v> visited|<vt> visit_type"
     shape = "record"
   ];
   willingness   [
-    label = "<i> indiv||<a> assignment|<w> willing"
+    label = "willingness||<i> individual|<a> assignment|<w> willing"
+    shape = "record"
+  ];
+  scheduling_priority   [
+    label = "scheduling_priority||<sp> scheduling_priority|<p> priority|<n> notes"
+    shape = "record"
+  ];
+  email_list   [
+    label = "email_list||<e> email_list|<n> name"
+    shape = "record"
+  ];
+  email_list_membership   [
+    label = "email_list_membership||<i> individual|<e> email_list"
+    shape = "record"
+  ];
+  accomplishment   [
+    label = "accomplishment||<a> accomplishment|<i> individual|<d> date|<t> task|<n> note"
+    shape = "record"
+  ];
+  task   [
+    label = "task||<t> task|<n> name|<d> description"
     shape = "record"
   ];
 
-  family:c        -> companionship:c
-  companionship:i -> indiv:i
-
-  appointment:i   -> indiv:i
-  appointment:f   -> family:f
-
-  interview:il    -> indiv:i
-  interview:i     -> indiv:i
-
-  presidency:i    -> indiv:i
-  presidency:d    -> district:d
-
-  willingness:i   -> indiv:i
-  willingness:a   -> assignment:a
-
   activity:s      -> assignment:a
+
+  appointment:p   -> presidency:p
+  appointment:f   -> family:f
+  appointment:i   -> individual:i
+
+  attendance:i    -> individual:i
+
+  companionship:i -> individual:i
+  companionship:d -> district:d
+  companionship:sp -> scheduling_priority:sp
+  
+  district:s      -> individual:i
+  
+  individual:sp   -> scheduling_priority:sp
+  
+  family:i        -> individual:i
+  family:c        -> companionship:c
+  family:sp       -> scheduling_priority:sp
+
+  participation:i -> individual:i
+  participation:a -> activity:a
+
+  interview:il    -> individual:i
+  interview:i     -> individual:i
+
+  presidency:i    -> individual:i
+  presidency:d    -> district:d
 
   visit:c         -> companionship:c
   visit:f         -> family:f
   visit:c1        -> presidency:i
   visit:c2        -> presidency:i
 
-  participation:i -> indiv:i
-  participation:a -> activity:a
+  willingness:i   -> individual:i
+  willingness:a   -> assignment:a
 
-  attendance:i    -> indiv:i
-
-  indiv:f        -> family:f
+  email_list_membership:i  -> individual:i
+  email_list_membership:e  -> email_list:e
+  
+  accomplishment:i   -> individual:i
+  accomplishment:t   -> task:t
+  
 }

@@ -1366,7 +1366,7 @@ class tc
 		$year = date('Y');
 
 		// Get the President
-		$sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti where tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$president_name = $this->db->f('name');
@@ -1377,16 +1377,7 @@ class tc
 			$interviewer = $this->db->f('individual');
 			$district_number = '*';
 			$district_name = $president_name;
-			$sql = "SELECT * FROM tc_individual where individual='$president_id'";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				$mls_id = $this->db2->f('mls_id');
-			}
-			$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				$president_address = $this->db2->f('address');
-			}
+			$president_address = $this->db->f('address');
 		} else {
 			print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
 			return;
@@ -1784,7 +1775,7 @@ class tc
 		}
 
 		// Get the Districts
-		$sql = "SELECT * FROM tc_district where valid=1 ORDER BY district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN tc_presidency AS tp WHERE td.district=tp.district AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -1792,11 +1783,7 @@ class tc
 			$districts[$i]['district'] = $this->db->f('district');
 			$districts[$i]['name'] = $this->db->f('name');
 			$districts[$i]['supervisor'] = $this->db->f('supervisor');
-			$sql = "SELECT * FROM tc_presidency where district=$district and valid=1";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				$districts[$i]['presidency'] = $this->db2->f('presidency');
-			}
+			$districts[$i]['presidency'] = $this->db->f('presidency');
 			$i++;
 		}
 
@@ -2144,7 +2131,7 @@ class tc
 		$appt_table_data = ""; 
 
 		// Find out what the President ID is
-		$sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$presidency_name = $this->db->f('name');
@@ -2357,7 +2344,7 @@ class tc
 			$this->t->set_var('lang_num_months','Years of History');
 		}
 
-		$sql = "SELECT * FROM tc_presidency where president=1 and valid=1";
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$president_name = $this->db->f('name');
@@ -2481,7 +2468,7 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$interview_type = get_var('interview_type',array('GET','POST'));
 
-		$sql = "SELECT * FROM tc_presidency where valid=1 and (president=1 or counselor=1 or secretary=1)";
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -2804,7 +2791,7 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$interview_type = get_var('interview_type',array('GET','POST'));
 
-		$sql = "SELECT * FROM tc_presidency where valid=1 and (president=1 or counselor=1 or secretary=1 or district!=0)";
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1 OR tp.district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -3549,7 +3536,7 @@ class tc
 		$header_row.= "<th width=$location_width><font size=-2>Location</th>";
 		$table_data = "";
 
-		$sql = "SELECT * FROM tc_presidency where valid=1 GROUP BY individual ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 GROUP BY tp.individual ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -4056,7 +4043,6 @@ class tc
 						$this->db2->query("UPDATE tc_presidency set" .
 						                  " individual=" . $indiv . 
 						                  " ,district=" . $district . 
-						                  " ,name='" . $name . "'" .
 						                  " ,email='" . $email . "'" .
 						                  " ,president='" . $president . "'" .
 						                  " ,counselor='" . $counselor . "'" .
@@ -4064,10 +4050,10 @@ class tc
 						                  " WHERE presidency=" . $id,__LINE__,__FILE__);
 					} else {
 						//print "Adding New Entry<br>";
-						$this->db2->query("INSERT INTO tc_presidency (presidency,individual,district,name," .
+						$this->db2->query("INSERT INTO tc_presidency (presidency,individual,district," .
 						                  "email,president,counselor,secretary,valid) " .
 						                  "VALUES (NULL,'" . $indiv . "','" . $district . "','" .
-						                  $name . "','" . $email . "','" . $president  . "','" .
+						                  $email . "','" . $president  . "','" .
 						                  $counselor . "','" . $secretary . "','1'" .
 						                  ")",__LINE__,__FILE__);
 					}
@@ -4093,7 +4079,7 @@ class tc
 			                  ")",__LINE__,__FILE__);
 
 			// Requery the tc_presidency table
-			$sql = "SELECT * FROM tc_presidency where valid=1";
+			$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
 				// Extract the data for each presidency record
@@ -4101,7 +4087,6 @@ class tc
 				$indiv = $this->db->f('individual');
 				$name = $this->db->f('name');
 				$district = $this->db->f('district');
-				$name = $this->db->f('name');
 				$valid = 1;
 
 				// If we have a valid district, add it to the district table
@@ -4124,7 +4109,7 @@ class tc
 
 		// Now save off the data needed for a Presidency Table Update
 
-		$sql = "SELECT * FROM tc_presidency where valid=1";
+		$sql = "SELECT tp.*, ti.name FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$table_data = "";
 		$header_row = "<th>Individual</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th>";
@@ -4294,7 +4279,7 @@ class tc
 			$dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
 			$dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 
-			$sql = "SELECT * FROM tc_presidency where presidency='$presidency'";
+			$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.presidency='$presidency'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$email = $this->db2->f('email');

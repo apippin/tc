@@ -162,7 +162,6 @@ CREATE TABLE `tc_presidency` (
   `presidency` int(16) unsigned NOT NULL auto_increment,
   `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
-  `name` varchar(60) NOT NULL,
   `email` varchar(60) NOT NULL,
   `president` tinyint(1) default '0',
   `counselor` tinyint(1) default '0',
