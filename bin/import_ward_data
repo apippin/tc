@@ -669,7 +669,7 @@ print "\n-> Processing all ward data files in $datadir\n";
 
 ###################################################
 # Parse Ward Data Files
-&csv_to_hash("$datadir/Organization\ class\ per\ member.csv", \%organization_class_data);
+&optional_csv_to_hash("$datadir/Organization\ class\ per\ member.csv", \%organization_class_data);
 &csv_to_hash("$datadir/Membership.csv",\%membership_data);
 &csv_to_hash("$datadir/HomeTeaching.csv",\%hometeaching_data);
 &csv_to_hash("$datadir/Organization.csv",\%organization_data);
