@@ -138,7 +138,16 @@ sub update_tc_individual_table
 		$phone = $membership_data{$index}{'Household Phone'};
 		$priesthood = $membership_data{$index}{'Priesthood'};
 		$hhposition = $membership_data{$index}{'HH Position'};
-		$organization = $organization_by_id{$id};
+                $steward = ""; # This will be set later
+                # Default to the "Elders" quorum if the Organization data per member isn't available
+		# Only add "Elders" to the quorum since we don't have any other data availalbe to us to make a call
+	 	# TODO: make steward flexible with a setting in the config file	
+                if((! -e "$datadir/Organization\ class\ per\ member.csv") && ($priesthood =~ /Elder/i)) { 
+			$steward = "Elder";
+			$organization = "Elders"; 
+		}
+                # Preferred method is to pull organization data from the csv file
+		else { $organization = $organization_by_id{$id}; }
 		$attending = 0;
 		if(($organization =~ /Elders/) ||
 		   ($organization =~ /Young Men/) ||
@@ -157,7 +166,7 @@ sub update_tc_individual_table
 		if($rows == 0) {
 			# No existing records found for this individual, make a new entry
 			print "   Adding new individual: $individual_name\n";
-			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','$hhposition','$priesthood','',NULL,$attending,1)");
+			$sth = $dbh->prepare("insert into tc_individual values (NULL,'$id',\"$individual_name\",'$address','$phone','$email','$hhposition','$priesthood','$steward',NULL,$attending,1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 		} elsif($rows == 1) {
 			# An existing record was found for this individual, update it
@@ -663,6 +672,7 @@ if(defined $opt_o) {
 
 ###################################################
 # Process command line options
+our $datadir;
 if(defined $opt_n) { $datadir = $opt_n; }
 else { $datadir = shift(@ARGV); }
 print "\n-> Processing all ward data files in $datadir\n";
