@@ -690,7 +690,7 @@ if($opt_v) {
 
 if($opt_s) { $dbh->disconnect(); exit; }
 
-# Now update the various eq DB tables
+# Now update the various DB tables
 &update_tc_calling_table();
 &update_tc_individual_table();
 &update_tc_companionship_table();
