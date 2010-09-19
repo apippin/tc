@@ -692,7 +692,7 @@ class tc
 
 		for ($i=0; $i < count($names); $i++) {
 			//$this->nextmatchs->template_alternate_row_color(&$this->t);
-			$this->t->set_var('indiv_name',$names[$i]);
+			$this->t->set_var('individual_name',$names[$i]);
 			if(($i+1) % 3 == 0) {
 				$this->t->set_var('table_sep',"</td></tr><tr>"); 
 			} else { 
@@ -734,7 +734,7 @@ class tc
 			// Re-add the individuals who are checked as having participated in this activity
 			$indivs = get_var('individual_name',array('POST'));
 			if(is_array($indivs)) { // Only do the foreach loop if we have a valid array of indivs to work with
-				foreach ($indivs as $indiv) {
+				foreach ($indivs as $individual) {
 					$this->db->query("INSERT INTO tc_participation (individual,activity) " .
 					                 "VALUES (" . $individual . ",". $activity['activity'] . ")",__LINE__,__FILE__);
 				}
@@ -761,7 +761,7 @@ class tc
 			}
 
 			$indivs = get_var('individual_name',array('POST'));
-			foreach ($indivs as $indiv)
+			foreach ($indivs as $individual)
 			{
 				$this->db->query("INSERT INTO tc_participation (individual,activity) " .
 				                 "VALUES (" . $individual . ",". $activity['activity'] . ")",__LINE__,__FILE__);
