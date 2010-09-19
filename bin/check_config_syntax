@@ -1,6 +1,6 @@
 #!/bin/bash
 
-perl ../setup/db_config
-[ $? == 0 ] && echo "No syntax errors detected in ../setup/db_config"
-php -l ../setup/eq_config
+perl ../setup/db_config.local
+[ $? == 0 ] && echo "No syntax errors detected in ../setup/db_config.local"
+php -l ../setup/eq_config.local
 
