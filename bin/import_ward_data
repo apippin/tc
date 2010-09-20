@@ -138,22 +138,22 @@ sub update_tc_individual_table
 		$phone = $membership_data{$index}{'Household Phone'};
 		$priesthood = $membership_data{$index}{'Priesthood'};
 		$hhposition = $membership_data{$index}{'HH Position'};
-                $steward = ""; # This will be set later
-                # Default to the "Elders" quorum if the Organization data per member isn't available
+		$steward = ""; # This will be set later
+		# Default to the "Elders" quorum if the Organization data per member isn't available
 		# Only add "Elders" to the quorum since we don't have any other data availalbe to us to make a call
 	 	# TODO: make steward flexible with a setting in the config file	
-                if((! -e "$datadir/Organization\ class\ per\ member.csv") && ($priesthood =~ /Elder/i)) { 
+		if((! -e "$datadir/Organization\ class\ per\ member.csv") && ($priesthood =~ /Elder/i)) { 
 			$steward = "Elder";
 			$organization = "Elders"; 
 		}
-                # Preferred method is to pull organization data from the csv file
+		# Preferred method is to pull organization data from the csv file
 		else { $organization = $organization_by_id{$id}; }
 		$attending = 0;
 		if(($organization =~ /Elders/) ||
 		   ($organization =~ /Young Men/) ||
 		   ($organization =~ /Sunday School/) ||
 		   ($organization =~ /Primary/)
-		   ) { $attending = 1; }
+		  ) { $attending = 1; }
 		if($phone =~ /(\d\d\d-\d\d\d\d)/) { $phone = "$areacode-$1"; }
 		if($phone =~ /^\(\d\d\d\) (\d\d\d-\d\d\d\d)/) { $phone = "$1-$2"; }
 		$email = $membership_data{$index}{'indiv E-mail'};
@@ -230,6 +230,7 @@ sub update_tc_calling_table()
 		$name =~ s/\'/\\'/g; #'
 		$organization = $organization_data{$index}{'Organization'};
 		$organization_by_name{$name} = $organization;
+		$indiv_id = $organization_data{$index}{'Indiv ID'};
 		$organization_by_id{$indiv_id} = $organization;
 		$position = $organization_data{$index}{'Position'};
 		$sustained = $organization_data{$index}{'Sustained'};
