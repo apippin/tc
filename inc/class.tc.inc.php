@@ -2106,8 +2106,7 @@ class tc
 			foreach ($new_data as $entry) {
 				$visit_notes = $entry['notes'];
 				$family = $entry['family_id'];
-				$visit_pri = $entry['pri'];
-
+			        $visit_pri = $entry['pri'];
 				// Perform database save actions here
 				$this->db->query("SELECT * FROM tc_family WHERE family='$family'",__LINE__,__FILE__);
 				if ($this->db->next_record()) {
@@ -2232,7 +2231,7 @@ class tc
 				$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name Family</a></td>";
 				$table_data.= "<td align=center>$phone</td>";
 				$table_data.= "<td align=center>";
-				$table_data.= '<select name=vis_notes['.$i.'][pri]>';
+				$table_data.= '<select name=vis_notes['.$id.'][pri]>';
 				foreach(range(0,6) as $num) {
 					if($num == 0) { $num = 1; } else {$num = $num*5; }
 					if($vis_pri == $num) { 
@@ -2244,9 +2243,9 @@ class tc
 				}
 				$table_data.= '</select></td>';
 				$table_data.= "<td align=center>$date</td>";
-				$table_data.= '<td><input type=text size="50" maxlength="128" name="vis_notes['.$i.'][notes]" value="'.$vis_notes.'">';
-				$table_data.= '<input type=hidden name="vis_notes['.$i.'][family_id]" value="'.$id.'">';
-				$table_data.= '<input type=hidden name="vis_notes['.$i.'][family_name]" value="'.$name.'">';
+				$table_data.= '<td><input type=text size="50" maxlength="128" name="vis_notes['.$id.'][notes]" value="'.$vis_notes.'">';
+				$table_data.= '<input type=hidden name="vis_notes['.$id.'][family_id]" value="'.$id.'">';
+				$table_data.= '<input type=hidden name="vis_notes['.$id.'][family_name]" value="'.$name.'">';
 				$table_data.= '</td>';
 				$table_data.= '</tr>';
 				$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
