@@ -138,16 +138,13 @@ sub update_tc_individual_table
 		$phone = $membership_data{$index}{'Household Phone'};
 		$priesthood = $membership_data{$index}{'Priesthood'};
 		$hhposition = $membership_data{$index}{'HH Position'};
-		$steward = ""; # This will be set later
-		# Default to the "Elders" quorum if the Organization data per member isn't available
-		# Only add "Elders" to the quorum since we don't have any other data availalbe to us to make a call
-	 	# TODO: make steward flexible with a setting in the config file	
-		if((! -e "$datadir/Organization\ class\ per\ member.csv") && ($priesthood =~ /Elder/i)) { 
-			$steward = "Elder";
-			$organization = "Elders"; 
+		$steward = ""; # This will be set correctly in a later method
+		# Set the default stewardship if the "Organization data per member.csv" isn't available.
+		# Only validate priesthood holders that match the $default_stewardship since 
+		# we don't have any other data available to us to make this call if we don't have the report.
+		if((! -e "$datadir/Organization\ class\ per\ member.csv") && ($priesthood =~ /$default_stewardship/i)) { 
+			$steward = "$default_stewardship";
 		}
-		# Preferred method is to pull organization data from the csv file
-		else { $organization = $organization_by_id{$id}; }
 		$attending = 0;
 		if(($organization =~ /Elders/) ||
 		   ($organization =~ /Young Men/) ||
@@ -554,8 +551,7 @@ sub update_tc_scheduling_priority_table
 	print "\n-> Updating scheduling priority table\n";
 	
 	# individuals
-	# TODO: make steward flexible with a setting in the config file
-	$sth = $dbh->prepare("select * from tc_individual where steward='Elder' and valid=1");
+	$sth = $dbh->prepare("select * from tc_individual where steward='$default_stewardship' and valid=1");
 	$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	while($sqlhashref = $sth->fetchrow_hashref) {
 		$individual = $sqlhashref->{individual};
@@ -572,8 +568,7 @@ sub update_tc_scheduling_priority_table
 	&remove_obsolete_scheduling_priority("tc_individual");
 	
 	# families
-	# TODO: make steward flexible with a setting in the config file
-	$sth = $dbh->prepare("select tf.scheduling_priority, tf.family from tc_family AS tf JOIN tc_individual AS ti ON tf.individual=ti.individual and ti.steward='Elder' and tf.valid=1");
+	$sth = $dbh->prepare("select tf.scheduling_priority, tf.family from tc_family AS tf JOIN tc_individual AS ti ON tf.individual=ti.individual and ti.steward='$default_stewardship' and tf.valid=1");
 	$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	while($sqlhashref = $sth->fetchrow_hashref) {
 		$family = $sqlhashref->{family};
@@ -591,8 +586,7 @@ sub update_tc_scheduling_priority_table
 	&remove_obsolete_scheduling_priority("tc_family");
 	
 	# companionships
-	# TODO: make steward flexible with a setting in the config file
-	$sth = $dbh->prepare("select tc.individual, tc.scheduling_priority from tc_companionship AS tc JOIN tc_individual AS ti ON tc.individual=ti.individual and (ti.steward='Elder' or ti.steward='') and tc.valid=1");
+	$sth = $dbh->prepare("select tc.individual, tc.scheduling_priority from tc_companionship AS tc JOIN tc_individual AS ti ON tc.individual=ti.individual and (ti.steward='$default_stewardship' or ti.steward='') and tc.valid=1");
 	$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	while($sqlhashref = $sth->fetchrow_hashref) {
 		$individual = $sqlhashref->{individual};

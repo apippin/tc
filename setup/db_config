@@ -5,12 +5,22 @@
 # This will prevent your settings from being overwritten by future code updates.
 ################################################################################
 
+# Database variables/settings/configuration
 $dbname = "phpgroupware";
 $dbhost = "192.168.0.4"; # This can be an IP address or name
 $dbport = 3306;
 $dbuser = "phpgroupware"; # This may require an additional '\@localhost'
 $dbpass = "phpgroupware";
 
+# Set a default area code to add to the phone number if an area code is missing
 $areacode = "970";
+
+# Set the default visiting priority (1=highest 30=lowest)
 $default_visit_pri = 30;
+
+# Set the default interview priority (1=highest 30=lowest)
 $default_interview_pri = 30;
+
+# Set the default stewardship: "High Priest" or "Elder"
+$default_stewardship = "Elder";
+
