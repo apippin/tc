@@ -2101,7 +2101,7 @@ class tc
 			foreach ($new_data as $entry) {
 				$visit_notes = $entry['notes'];
 				$family = $entry['family_id'];
-			        $visit_pri = $entry['pri'];
+				$visit_pri = $entry['pri'];
 				// Perform database save actions here
 				$this->db->query("SELECT * FROM tc_family WHERE family='$family'",__LINE__,__FILE__);
 				if ($this->db->next_record()) {

@@ -402,6 +402,8 @@ sub update_tc_visit_table
 	($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
 	my %visit_status = ('X', 'y', '-', 'n', '', '');
 	
+	$sth = $dbh->prepare("TRUNCATE TABLE tc_visit");
+	$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	foreach $index (keys %hometeaching_stats_data)
 	{
 		$hashref = $hometeaching_stats_data{$index};
@@ -448,7 +450,7 @@ sub update_tc_visit_table
 		#print "$month_header\n";
 		#print $hometeaching_stats_data{$index}{$month_header};
 		#print "\n";
-		foreach $i (reverse(0..$#history)) {
+		foreach $i (reverse(0..$#history-1)) {
 			# went back a calendar year, decrement $data_year
 			if ($months{$data_months[$i]} > $data_month)
 			{
