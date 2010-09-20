@@ -5,6 +5,12 @@
 # This will prevent your settings from being overwritten by future code updates.
 ################################################################################
 
+# Set the default stewardship: "High Priest" or "Elder"
+# Remember to set this same variable in the tc_config file to the same value as well
+# EX: For an Elder's Quorum, stewardship should be set to "Elder"
+# EX: For a High Priest Group, stewardship should be set to "High Priest"
+$default_stewardship = "Elder";
+
 # Database variables/settings/configuration
 $dbname = "phpgroupware";
 $dbhost = "192.168.0.4"; # This can be an IP address or name
@@ -20,7 +26,4 @@ $default_visit_pri = 30;
 
 # Set the default interview priority (1=highest 30=lowest)
 $default_interview_pri = 30;
-
-# Set the default stewardship: "High Priest" or "Elder"
-$default_stewardship = "Elder";
 

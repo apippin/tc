@@ -825,7 +825,7 @@ class tc
 		$this->t->set_var('assignment_data',$assignment_data);
 
 		// Create individual selection boxes
-		$sql = "SELECT * FROM tc_individual";
+		$sql = "SELECT * FROM tc_individual WHERE steward='$this->default_stewardship'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -996,8 +996,7 @@ class tc
 		$this->t->set_block('par_view_t','header_list','list1');
 		$this->t->set_block('par_view_t','individual_list','list2');
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -1107,8 +1106,7 @@ class tc
 		}
 		$this->t->set_var('filter_input',$filter_input);
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -1431,8 +1429,7 @@ class tc
 		}
 
 		// create the individual id -> individual name mapping
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where valid=1 and steward='Elder' ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_individual where valid=1 and steward='$this->default_stewardship' ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		$individual = NULL;
@@ -1513,8 +1510,7 @@ class tc
 		$this->t->set_var('appt_table_width',$appt_table_width);
 
 		// PPI SCHEDULING TABLE
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority AS tsp WHERE ti.scheduling_priority=tsp.scheduling_priority AND steward='Elder' AND valid=1 ORDER BY tsp.priority ASC, ti.name ASC";
+		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority AS tsp WHERE ti.scheduling_priority=tsp.scheduling_priority AND steward='$this->default_stewardship' AND valid=1 ORDER BY tsp.priority ASC, ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		$i=0; 
@@ -1683,8 +1679,7 @@ class tc
 		//print "year: $year month: $month quarter_start: $quarter_start quarter_end: $quarter_end<br>";
 
 		// create the individual id -> individual name mapping
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1 ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		$individual_data = NULL;
@@ -2056,7 +2051,7 @@ class tc
 		$year = date('Y');
 
 		// create the family id -> family name mapping
-		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0 AND tf.companionship != 0 ORDER BY ti.name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0 AND tf.companionship != 0 AND ti.steward='$this->default_stewardship' ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		$family_id = NULL;
@@ -2111,7 +2106,6 @@ class tc
 				$this->db->query("SELECT * FROM tc_family WHERE family='$family'",__LINE__,__FILE__);
 				if ($this->db->next_record()) {
 					$scheduling_priority = $this->db->f('scheduling_priority');
-					//$this->logToFile("vis_sched", "UPDATE tc_scheduling_priority SET priority='$visit_pri', notes=\"$visit_notes\" WHERE scheduling_priority='$scheduling_priority'");
 					$this->db2->query("UPDATE tc_scheduling_priority SET priority='$visit_pri', notes=\"$visit_notes\" WHERE scheduling_priority='$scheduling_priority'", __LINE__, __FILE__);
 				}
 			}
@@ -2195,7 +2189,7 @@ class tc
 
 
 		// VISIT SCHEDULING TABLE
-		$sql = "SELECT * FROM tc_family AS tf JOIN (tc_scheduling_priority AS tsp, tc_individual as ti) WHERE tf.scheduling_priority=tsp.scheduling_priority AND tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0  AND tf.companionship != 0 ORDER BY tsp.priority ASC, ti.name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN (tc_scheduling_priority AS tsp, tc_individual as ti) WHERE tf.scheduling_priority=tsp.scheduling_priority AND tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0  AND tf.companionship != 0 AND ti.steward='$this->default_stewardship' ORDER BY tsp.priority ASC, ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		$total_families=0; $families_with_yearly_visit=0;
@@ -2356,8 +2350,7 @@ class tc
 		$this->t->set_var('district_number','*');
 		$this->t->set_var('district_name',$president_name);
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority as tsp where ti.scheduling_priority=tsp.scheduling_priority and ti.steward='Elder' and ti.valid=1 ORDER BY ti.individual ASC";
+		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority as tsp where ti.scheduling_priority=tsp.scheduling_priority and ti.steward='$this->default_stewardship' and ti.valid=1 ORDER BY ti.individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -2932,7 +2925,7 @@ class tc
 		for ($i=0; $i < count($visit_list); $i++) {
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
 
-			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.family=".$visit_list[$i]['family'];
+			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.family=".$visit_list[$i]['family']." AND ti.steward='$this->default_stewardship'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 
@@ -2960,7 +2953,7 @@ class tc
 		}
 
 		// List the families that are available to record a visit against
-		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.companionship != 0 and tf.valid=1";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.companionship != 0 AND tf.valid=1 AND ti.steward='$this->default_stewardship'";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$total_records = $this->db->num_rows();
 
@@ -3120,8 +3113,7 @@ class tc
 		else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
 		else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3310,8 +3302,7 @@ class tc
 			return false;
 		}
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3673,8 +3664,7 @@ class tc
 			//Header('Location: ' . $take_me_to_url);
 		}
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY individual ASC";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3895,8 +3885,7 @@ class tc
 
 		$this->t->pfp('out','admin_t');
 
-		// TODO:  changed this so it picks the quorum dynamically
-		$sql = "SELECT * FROM tc_individual where steward='Elder' and valid=1 ORDER BY individual ASC";
+		$sql = "SELECT * FROM tc_individual where steward='$this->default_stewardship' and valid=1 ORDER BY individual ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {

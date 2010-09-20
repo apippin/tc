@@ -7,6 +7,12 @@
 // This will prevent your settings from being overwritten by future code updates.
 ///////////////////////////////////////////////////////////////////////////////////
 
+// Set the default stewardship of this tool: "High Priest" or "Elder"
+// Remember to set this same variable in the db_config file to the same value as well
+// EX: For an Elder's Quorum, stewardship should be set to "Elder"
+// EX: For a High Priest Group, stewardship should be set to "High Priest"
+$this->default_stewardship = "Elder";
+
 // The full path to a directory readable and writable by your webserver user
 // that will be used to dump the MLS data uploaded via the web interface to.
 $this->upload_target_path = "/home/users/pres/tc_data";
