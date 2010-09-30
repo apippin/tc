@@ -70,25 +70,33 @@ CREATE TABLE `tc_attendance` (
 -- Table structure for table `tc_calling`
 --
 CREATE TABLE `tc_calling` (
-  `name` varchar(30) default NULL,
+  `individual` int(16) unsigned default '0',
   `organization` varchar(30) default NULL,
   `position` varchar(30) default NULL,
   `sustained` varchar(30) default NULL,
-  KEY `name` (`name`)
+  KEY `individual` (`individual`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `tc_companion`
+--
+CREATE TABLE `phpgroupware`.`tc_companion` (
+  `companion` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `individual` INT( 16 ) UNSIGNED NOT NULL ,
+  `companionship` INT( 16 ) UNSIGNED NOT NULL ,
+  `scheduling_priority` INT( 16 ) UNSIGNED NOT NULL ,
+  `valid` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0'
+) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_companionship`
 --
-
-CREATE TABLE `tc_companionship` (
-  `companionship` int(16) unsigned NOT NULL default '0',
-  `individual` int(16) unsigned NOT NULL default '0',
-  `district` int(16) unsigned default NULL,
-  `scheduling_priority` int(16) unsigned default NULL,
-  `valid` tinyint(1) default NULL,
-  KEY `companionship` (`companionship`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `phpgroupware`.`tc_companionship` (
+  `companionship` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `mls_id` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+  `district` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+  `valid` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1'
+) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_district`
@@ -107,6 +115,7 @@ CREATE TABLE `tc_individual` (
   `individual` int(16) unsigned NOT NULL auto_increment,
   `mls_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
+  `fullname` varchar(60) default NULL,
   `address` varchar(255) default NULL,
   `phone` varchar(12) default NULL,
   `email` varchar(120) default NULL,

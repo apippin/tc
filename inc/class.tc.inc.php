@@ -255,7 +255,7 @@ class tc
 			for ($j=0; $j < count($unique_companionships); $j++) {
 				$companion_table_entry = "";
 				// Select all the companions in each companionship
-				$sql = "SELECT * FROM tc_companionship where valid=1 and ".
+				$sql = "SELECT * FROM tc_companion where valid=1 and ".
 				"companionship=". $unique_companionships[$j]['companionship'];
 				$this->db->query($sql,__LINE__,__FILE__);
 
@@ -1884,7 +1884,7 @@ class tc
 			$i=0;
 			for ($j=0; $j < count($unique_companionships); $j++) {
 				// Select all the companions from each companionship
-				$sql = "SELECT * FROM tc_companionship AS tc JOIN (tc_scheduling_priority AS tsp, tc_individual AS ti) WHERE tc.scheduling_priority=tsp.scheduling_priority AND tc.individual=ti.individual AND tc.valid=1 AND tc.companionship=". $unique_companionships[$j]['companionship'];
+				$sql = "SELECT * FROM tc_companion AS tc JOIN (tc_scheduling_priority AS tsp, tc_individual AS ti) WHERE tc.scheduling_priority=tsp.scheduling_priority AND tc.individual=ti.individual AND tc.valid=1 AND tc.companionship=". $unique_companionships[$j]['companionship'];
 				$this->db->query($sql,__LINE__,__FILE__);
 				$k=0; $int_completed=0;
 				$comp = $unique_companionships[$j]['companionship'];
@@ -2639,7 +2639,7 @@ class tc
 			for($m=$num_months; $m >= 0; $m--) { $ints[$m] = 0; }
 			for ($j=0; $j < count($unique_companionships); $j++) {
 				// Select all the companions in each companionship
-				$sql = "SELECT * FROM tc_companionship where valid=1 and ".
+				$sql = "SELECT * FROM tc_companion where valid=1 and ".
 				       "companionship=". $unique_companionships[$j]['companionship'];
 				$this->db->query($sql,__LINE__,__FILE__);
 				$k=0;
@@ -3442,7 +3442,7 @@ class tc
 		$this->t->set_block('org_view_t','org_list','list2');
 
 		# Display a list ordered alphabetically
-		$sql = "SELECT * FROM tc_calling ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3467,7 +3467,7 @@ class tc
 		}
 
 		# Display a list ordered by organization
-		$sql = "SELECT * FROM tc_calling ORDER BY organization ASC";
+		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti where tc.individual=ti.individual ORDER BY organization ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3538,7 +3538,7 @@ class tc
 			$i++;
 		}
 
-		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 AND tf.individual != 0 ORDER BY ti.name ASC";
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND ti.steward='$this->default_stewardship' AND tf.valid=1 AND tf.individual != 0 ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {

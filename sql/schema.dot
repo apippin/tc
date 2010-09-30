@@ -19,11 +19,15 @@ digraph schema {
     shape = "record"
   ];
   calling       [
-    label = "calling||<n> name|<o> organization|<p> position|<s> sustained"
+    label = "calling||<i> individual|<o> organization|<p> position|<s> sustained"
+    shape = "record"
+  ];
+  companion   [
+    label = "companion||<c> companion|<i> individual|<cp> companionship|<sp> scheduling_priority|<v> valid"
     shape = "record"
   ];
   companionship   [
-    label = "companionship||<c> companionship|<i> individual|<d> district|<sp> scheduling_priority|<v> valid"
+    label = "companionship||<c> companionship|<d> district|<v> valid"
     shape = "record"
   ];
   district      [
@@ -31,7 +35,7 @@ digraph schema {
     shape = "record"
   ];
   individual   [
-    label = "individual||<i> individual|<id> mls_id|<n> name|<a> address|<p> phone|<em> email|<hh> hh position|<pr> priesthood|<st> steward|<sp> scheduling_priority|<a> attending|<v> valid"
+    label = "individual||<i> individual|<id> mls_id|<n> name|<fn> fullname|<a> address|<p> phone|<em> email|<hh> hh position|<pr> priesthood|<st> steward|<sp> scheduling_priority|<a> attending|<v> valid"
     shape = "record"
   ];
   family   [
@@ -47,7 +51,7 @@ digraph schema {
     shape = "record"
   ];
   presidency    [
-    label = "presidency||<p> presidency||<i> individual|<d> district|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+    label = "presidency||<p> presidency|<i> individual|<d> district|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
     shape = "record"
   ];
   visit   [
@@ -86,10 +90,14 @@ digraph schema {
   appointment:i   -> individual:i
 
   attendance:i    -> individual:i
+  
+  calling:i       -> individual:i
 
-  companionship:i -> individual:i
+  companion:cp    -> companionship:c
+  companion:i     -> individual:i
+  companion:sp    -> scheduling_priority:sp
+
   companionship:d -> district:d
-  companionship:sp -> scheduling_priority:sp
   
   district:s      -> individual:i
   
