@@ -4257,7 +4257,7 @@ class tc
 			$dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
 			$dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 
-			$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.presidency='$presidency'";
+			$sql = "SELECT tp.email AS email, ti.name AS name FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.presidency='$presidency'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$email = $this->db2->f('email');
