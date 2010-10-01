@@ -1757,7 +1757,7 @@ class tc
 				$hti_pri = $entry['pri'];
 				//print "hti_notes: $hti_notes indiv_name: $indiv_name <Br>";
 				// Perform database save actions here
-				$this->db->query("SELECT * FROM tc_companionship WHERE individual=$individual and valid=1",__LINE__,__FILE__);
+				$this->db->query("SELECT * FROM tc_companion WHERE individual=$individual and valid=1",__LINE__,__FILE__);
 				if ($this->db->next_record()) {
 					$scheduling_priority = $this->db->f('scheduling_priority');
 					//$this->logToFile("int_sched", "UPDATE tc_scheduling_priority SET priority='$hti_pri', notes=\"$hti_notes\" WHERE scheduling_priority='$scheduling_priority'");
