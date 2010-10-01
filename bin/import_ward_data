@@ -318,7 +318,7 @@ sub update_tc_companionship_table
 			if($rows == 0) {
 				print "   $companion is not in tc_companion\n";
 				$changed = 1;
-				last;
+				next;
 			}
 			$db_individual = $data[0]->{'individual'};
 			if ($tc_companionship_id == 0) {
@@ -392,12 +392,14 @@ sub update_tc_companionship_table
 			for my $companion (keys %{$companionships->{$companionship}->{'companions'}}) {
 				print "   companion=$companion\n";
 				# if companion exists, preserve scheduling_priority
-				$sth = $dbh->prepare("SELECT * FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name=\"$companion\" COLLATE latin1_general_cs AND tc.valid=1");
+				#print "SELECT tc.* FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name=\"$companion\" AND tc.valid=1\n";
+				$sth = $dbh->prepare("SELECT tc.* FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name=\"$companion\" AND tc.valid=1");
 				$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				if ($sqlhashref = $sth->fetchrow_hashref) {
 					my $individual = $sqlhashref->{'individual'};
 					my $scheduling_priority = $sqlhashref->{'scheduling_priority'};
 					print "   adding new companion $individual\n";
+					#print "INSERT INTO tc_companion values (NULL,$individual,$comp_id,$scheduling_priority,1)\n";
 					$sth = $dbh->prepare("INSERT INTO tc_companion values (NULL,$individual,$comp_id,$scheduling_priority,1)");
 					$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				} else {
@@ -422,6 +424,7 @@ sub update_tc_companionship_table
 			}
 			
 			# invalidate existing old companions in database
+			#print "UPDATE tc_companion SET valid=0 WHERE companionship=$tc_companionship_id AND valid=1\n";
 			$sth = $dbh->prepare("UPDATE tc_companion SET valid=0 WHERE companionship=$tc_companionship_id AND valid=1");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			
@@ -489,13 +492,6 @@ sub update_tc_family_table
 		{
 			$hashref = $hometeaching_data{$index};
 			foreach $key (keys %$hashref) {
-				#if($hometeaching_data{$index}{'Household'} =~ /(\S+)\s+(\S+),\s+(\S+)\s+(.*)/) {
-					#$a = $1; $b = $2; $c = $3; $d = $4;
-					#if($name =~ /$a/ && $hometeaching_data{$index}{'Household'} !~ /$name/i) { 
-						#print "I: Adjusting hometeaching match from: $hometeaching_data{$index}{'Household'} to $a, $c $d\n";
-						#$hometeaching_data{$index}{'Household'} = "$a, $c $d";
-					#}
-				#}
 				if($key =~ /Quorum/i &&
 				   $hometeaching_data{$index}{$key} =~ /Elders/i &&
 				   $hometeaching_data{$index}{'Household'} =~ /$name/i &&
@@ -738,6 +734,7 @@ sub update_tc_scheduling_priority_table
 			$sth2 = $dbh->prepare("insert into tc_scheduling_priority values (NULL, 30, '')");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 			$scheduling_priority = $dbh->last_insert_id(NULL,NULL,'tc_scheduling_priority',NULL);
+			#print "update tc_companion set scheduling_priority=$scheduling_priority where individual=$individual\n";
 			$sth2 = $dbh->prepare("update tc_companion set scheduling_priority=$scheduling_priority where individual=$individual");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 		}
@@ -751,26 +748,32 @@ sub remove_obsolete_scheduling_priority
 
 	#print "\n-> Cleaning $table_name\n";
 	
-	#$sth = $dbh->prepare("SELECT scheduling_priority FROM $table_name where scheduling_priority IS NOT NULL AND valid=0");
 	$sth = $dbh->prepare("SELECT * FROM $table_name WHERE valid=0");
 	$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	while($sqlhashref = $sth->fetchrow_hashref) {
 		$scheduling_priority = $sqlhashref->{scheduling_priority};
 		$individual = $sqlhashref->{individual};
-		#$name = $sqlhashref->{name};
 		if ($scheduling_priority != "NULL") {
-			#print "$name\n";
-			# set scheduling_priority to NULL
-			#print "UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual\n";
-			$sth2 = $dbh->prepare("UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual");
+			#print "SELECT * FROM $table_name WHERE scheduling_priority=$scheduling_priority AND valid=1\n";
+			$sth2 = $dbh->prepare("SELECT * FROM $table_name WHERE scheduling_priority=$scheduling_priority AND valid=1");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
-			
-			# remove entry from tc_scheduling_priority
-			#print "DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority\n";
-			$sth2 = $dbh->prepare("DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority");
-			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+			if (!($sqlhashref2 = $sth2->fetchrow_hashref)) {
+				#print "$name\n";
+				# set scheduling_priority to NULL
+				#print "UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual\n";
+				$sth3 = $dbh->prepare("UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual");
+				$sth3->execute or die "-E- DB error: $DBI::errstr\n";
+				
+				# remove entry from tc_scheduling_priority
+				#print "DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority\n";
+				$sth3 = $dbh->prepare("DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority");
+				$sth3->execute or die "-E- DB error: $DBI::errstr\n";
+				$sth3->finish();
+			}
+			$sth2->finish();
 		}
 	}
+	$sth->finish();
 }
 
 ######################################################################
