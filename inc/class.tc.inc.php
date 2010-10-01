@@ -1721,11 +1721,6 @@ class tc
 						$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
-							$mls_id = $this->db2->f('mls_id');
-						}
-						$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
-						$this->db2->query($sql,__LINE__,__FILE__);
-						if($this->db2->next_record()) {
 							$supervisor_address = $this->db2->f('address');
 						}
 						$location = "$supervisor_last_name"." home ($supervisor_address)";
@@ -1803,11 +1798,6 @@ class tc
 			$supervisor_array = explode(",", $supervisor);
 			$supervisor_last_name = $supervisor_array[0];
 			$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				$mls_id = $this->db2->f('mls_id');
-			}
-			$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				$supervisor_address = $this->db2->f('address');
@@ -3539,7 +3529,7 @@ class tc
 			$presidency_data[$i]['name'] = $this->db->f('name');
 			$presidency_data[$i]['indiv'] = $this->db->f('individual');
 			$presidency2name[$presidency_data[$i]['id']] = $presidency_data[$i]['name'];
-			$presidency2indiv[$presidency_data[$i]['id']] = $presidency_data[$i]['individual'];
+			$presidency2indiv[$presidency_data[$i]['id']] = $presidency_data[$i]['indiv'];
 			$i++;
 		}
 
@@ -3587,12 +3577,8 @@ class tc
 						} else if($indiv > 0) {
 							$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 							$supervisor_last_name = $supervisor_name_array[0];
+							print "presidency2indiv: $presidency $presidency2indiv[$presidency]<br>";
 							$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
-							$this->db2->query($sql,__LINE__,__FILE__);
-							if($this->db2->next_record()) {
-								$mls_id = $this->db2->f('mls_id');
-							}
-							$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
 								$supervisor_address = $this->db2->f('address');
@@ -3714,11 +3700,6 @@ class tc
 						$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
-							$mls_id = $this->db2->f('mls_id');
-						}
-						$sql = "SELECT * FROM tc_individual where mls_id='$mls_id'";
-						$this->db2->query($sql,__LINE__,__FILE__);
-						if($this->db2->next_record()) {
 							$supervisor_address = $this->db2->f('address');
 						}
 						$location = "$supervisor_last_name"." home ($supervisor_address)";
@@ -3751,7 +3732,7 @@ class tc
 				$table_data.= "</td>";
 
 				// individual drop down list (for PPIs)
-				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][indiv] STYLE="font-size : 8pt">';
+				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][individual] STYLE="font-size : 8pt">';
 				$table_data.= '<option value=0></option>';  
 				for ($j=0; $j < count($individual); $j++) {
 					$id = $individual[$j];
@@ -3807,7 +3788,7 @@ class tc
 				$table_data.= "</td>";
 
 				// individual drop down list
-				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][indiv] STYLE="font-size : 8pt">';
+				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][individual] STYLE="font-size : 8pt">';
 				$table_data.= '<option value=0></option>';  
 				for ($j=0; $j < count($individual); $j++) {
 					$id = $individual[$j];
