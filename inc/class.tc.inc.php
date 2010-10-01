@@ -1933,6 +1933,7 @@ class tc
 						$link_data['name'] = $name;
 						$link_data['interview'] = '';
 						$link_data['action'] = 'add';
+						$link_data['interview_type'] = 'hti';
 						$link_data['interviewer'] = $districts[$d]['supervisor'];
 						$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 						$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -1962,6 +1963,7 @@ class tc
 						$link_data['individual'] = $this->db2->f('individual');
 						$link_data['name'] = $name;
 						$link_data['interview'] = $this->db2->f('interview');
+						$link_data['interview_type'] = 'hti';
 						$link_data['action'] = 'view';
 						$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 						$comps_with_quarterly_int++;
@@ -2342,7 +2344,6 @@ class tc
 		if($this->db->next_record()) {
 			$president_name = $this->db->f('name');
 			$interviewer = $this->db->f('individual');
-			$interview_type = 'ppi';
 		} else {
 			print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
 			return;
@@ -2382,10 +2383,10 @@ class tc
 
 			$link_data['menuaction'] = 'tc.tc.ppi_update';
 			$link_data['interviewer'] = $interviewer;
-			$link_data['indiv'] = $id;
+			$link_data['individual'] = $id;
 			$link_data['name'] = $name;
 			$link_data['interview'] = '';
-			$link_data['interview_type'] = $interview_type;
+			$link_data['interview_type'] = 'ppi'; 
 			$link_data['action'] = 'add';
 			$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
@@ -2408,7 +2409,7 @@ class tc
 					$link_data['indiv'] = $id;
 					$link_data['name'] = $name;
 					$link_data['interview'] = $this->db2->f('interview');
-					$link_data['interview_type'] = $interview_type;
+					$link_data['interview_type'] = 'ppi';
 					$link_data['action'] = 'view';
 					$date = $this->db2->f('date');
 					$date_array = explode("-",$date);
@@ -2455,7 +2456,7 @@ class tc
 		$interviewer = get_var('interviewer',array('GET','POST'));      
 		$name = get_var('name',array('GET','POST'));
 		$interview = get_var('interview',array('GET','POST'));
-		$indiv = get_var('indiv',array('GET','POST'));
+		$individual = get_var('individual',array('GET','POST'));
 		$date = get_var('date',array('GET','POST'));
 		$notes = get_var('notes',array('GET','POST'));
 		$interview_type = get_var('interview_type',array('GET','POST'));
@@ -2471,7 +2472,7 @@ class tc
 				$this->t->set_var('interviewer',$interviewer);
 			}
 			$this->t->set_var('interviewer_name',$interviewer_name);
-			$this->t->set_var('interview_type_checked','');
+			$this->t->set_var('eqpresppi_checked','checked');
 			$this->t->fp('int_list','interviewer_list',True);
 		}
 
@@ -2480,7 +2481,7 @@ class tc
 			$this->db->query("UPDATE tc_interview set " .
 			                 "   interview='" . $interview . "'" .
 			                 ", interviewer='" . $interviewer . "'" .
-			                 ", individual='" . $indiv . "'" .
+			                 ", individual='" . $individual . "'" .
 			                 ", date='" . $date . "'" .
 			                 ", notes='" . $notes . "'" .
 			                 ", interview_type='" . $interview_type . "'" .
@@ -2492,7 +2493,7 @@ class tc
 		if($action == 'insert') {
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
-			                 "VALUES ('" . $interviewer . "','" . $indiv . "','" .
+			                 "VALUES ('" . $interviewer . "','" . $individual . "','" .
 			                 $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
 			$this->ppi_view();
 			return false;
@@ -2503,11 +2504,11 @@ class tc
 			$this->t->set_var('interview', '');
 			$this->t->set_var('interviewer', $interviewer);
 			$this->t->set_var('name',$name);
-			$this->t->set_var('indiv',$indiv);
+			$this->t->set_var('individual',$individual);
 			$this->t->set_var('date','');
 			$this->t->set_var('notes','');
 			$this->t->set_var('interview_type',$interview_type);
-			$this->t->set_var('interview_type_checked','checked');
+			$this->t->set_var('eqpresppi_checked','checked');
 			$this->t->set_var('lang_done','Cancel');
 			$this->t->set_var('lang_action','Adding New PPI');
 			$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_update&interview=' .
@@ -2521,11 +2522,11 @@ class tc
 			$this->t->set_var('interview',$interview);
 			$this->t->set_var('name',$name);
 			$this->t->set_var('interviewer', $this->db->f('interviewer'));
-			$this->t->set_var('indiv',$this->db->f('indiv'));
+			$this->t->set_var('individual',$this->db->f('individual'));
 			$this->t->set_var('date',$this->db->f('date'));
 			$this->t->set_var('notes',$this->db->f('notes'));
 			$this->t->set_var('interview_type',$this->db->f('interview_type'));
-			if($this->db->f('interview_type') == 1) { $this->t->set_var('interview_type_checked','checked'); }
+			if($this->db->f('interview_type') == 'ppi') { $this->t->set_var('eqpresppi_checked','checked'); }
 		}
 
 		if($action == 'edit') {
@@ -2655,9 +2656,10 @@ class tc
 					$link_data['menuaction'] = 'tc.tc.int_update';
 					$link_data['companionship'] = $companionship;
 					$link_data['interviewer'] = $supervisor;
-					$link_data['indiv'] = $individual;
+					$link_data['individual'] = $individual;
 					$link_data['name'] = $name;
 					$link_data['interview'] = '';
+					$link_data['interview_type'] = 'hti';
 					$link_data['action'] = 'add';
 					$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 					$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -2691,10 +2693,11 @@ class tc
 							$link_data['menuaction'] = 'tc.tc.int_update';
 							$link_data['companionship'] = $companionship;
 							$link_data['interviewer'] = $this->db2->f('interviewer');
-							$link_data['indiv'] = $individual;
+							$link_data['individual'] = $individual;
 							$link_data['name'] = $name;
 							$link_data['interview'] = $this->db2->f('interview');
 							$link_data['action'] = 'view';
+							$link_data['interview_type'] = 'hti';
 							$date = $this->db2->f('date');
 							$date_array = explode("-",$date);
 							$month = $date_array[1];
@@ -2771,14 +2774,14 @@ class tc
 		$this->t->set_var('done_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_view'));
 		$this->t->set_var('readonly','');
 		$this->t->set_var('disabled','');
-		$this->t->set_var('interview_type_checked','');
+		$this->t->set_var('eqpresppi','');
 
 		$action = get_var('action',array('GET','POST'));
 		$companionship = get_var('companionship',array('GET','POST'));
 		$interviewer = get_var('interviewer',array('GET','POST'));      
 		$name = get_var('name',array('GET','POST'));
 		$interview = get_var('interview',array('GET','POST'));
-		$indiv = get_var('indiv',array('GET','POST'));
+		$individual = get_var('individual',array('GET','POST'));
 		$date = get_var('date',array('GET','POST'));
 		$notes = get_var('notes',array('GET','POST'));
 		$interview_type = get_var('interview_type',array('GET','POST'));
@@ -2802,7 +2805,7 @@ class tc
 			$this->db->query("UPDATE tc_interview set " .
 			                 "   interview='" . $interview . "'" .
 			                 ", interviewer='" . $interviewer . "'" .
-			                 ", individual='" . $indiv . "'" .
+			                 ", individual='" . $individual . "'" .
 			                 ", date='" . $date . "'" .
 			                 ", notes='" . $notes . "'" .
 			                 ", interview_type='" . $interview_type . "'" .
@@ -2814,7 +2817,7 @@ class tc
 		if($action == 'insert') {
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
-			                 "VALUES ('" . $interviewer . "','" . $indiv . "','" .
+			                 "VALUES ('" . $interviewer . "','" . $individual . "','" .
 			                 $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
 			$this->int_view();
 			return false;
@@ -2825,9 +2828,10 @@ class tc
 			$this->t->set_var('interview', '');
 			$this->t->set_var('interviewer', $interviewer);
 			$this->t->set_var('name',$name);
-			$this->t->set_var('indiv',$indiv);
+			$this->t->set_var('individual',$individual);
 			$this->t->set_var('date','');
 			$this->t->set_var('notes','');
+			$this->t->set_var('interview_type',$interview_type);
 			$this->t->set_var('lang_done','Cancel');
 			$this->t->set_var('lang_action','Adding New Interview');
 			$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_update&interview=' .
@@ -2841,10 +2845,11 @@ class tc
 			$this->t->set_var('interview',$interview);
 			$this->t->set_var('name',$name);
 			$this->t->set_var('interviewer', $this->db->f('interviewer'));
-			$this->t->set_var('indiv',$this->db->f('individual'));
+			$this->t->set_var('individual',$this->db->f('individual'));
 			$this->t->set_var('date',$this->db->f('date'));
 			$this->t->set_var('notes',$this->db->f('notes'));
-			if($this->db->f('interview_type') == 1) { $this->t->set_var('interview_type_checked','checked'); }
+			$this->t->set_var('interview_type',$this->db->f('interview_type'));
+			if($this->db->f('interview_type') == 'ppi') { $this->t->set_var('eqpresppi_checked','checked'); }
 		}
 
 		if($action == 'edit') {

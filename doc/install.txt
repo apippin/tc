@@ -63,6 +63,8 @@ Installing
       The most important thing at this point is to get your district leaders added 
       for each district you have in your quorum.
   10) I highly recommend installing phpmyadmin to view/edit/debug mysql tables related to this tool.
+  11) If you need to start with a clean slate and drop all the tc_ tables, you can do it this way:
+      mysql -u phpgroupware -pphpgroupware phpgroupware -e "show tables" | grep "tc_" | gawk '{print "drop table " $1 ";"}' | mysql -u phpgroupware -pphpgroupware phpgroupware
 
 Requirements
 

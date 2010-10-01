@@ -5,6 +5,7 @@
 	<input type=hidden name=interviewer value={interviewer}>
 	<input type=hidden name=individual value={individual}>
 	<input type=hidden name=companionship value={companionship}>
+        <input type=hidden name=interview_type value={interview_type}>
 	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{lang_action}:&nbsp;{name}</b></font></td>
@@ -20,7 +21,7 @@
 			<option value={interviewer}>{interviewer_name}</option>
 <!-- END interviewer_list -->
 			</select>
-			&nbsp; <input type="checkbox" name="eqpresppi" value="1" {eqpresppi_checked} {disabled}>
+			&nbsp; <input type="checkbox" name="eqpresppi" value="1" {eqpresppi_checked} DISABLED {disabled}>
 			Yearly PPI
 		</tr>
 		<tr>
