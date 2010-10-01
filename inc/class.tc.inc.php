@@ -3573,6 +3573,10 @@ class tc
 					$time = $hour.':'.$minute.':'.'00';
 					$uid = 0;
 
+					// Zero out family or individual if they are invalid
+					if($indiv == "") { $indiv=0; }
+					if($family == "") { $family=0; }
+
 					// Update our location
 					if($location == "") {
 						if($family > 0) {
