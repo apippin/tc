@@ -3522,7 +3522,7 @@ class tc
 		$this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
 		$this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
 
-		$date_width=150; $time_width=220; $indiv_width=170; $family_width=180; $location_width=100;
+		$date_width=160; $time_width=220; $indiv_width=170; $family_width=180; $location_width=100;
 		$table_width=$date_width + $time_width + $indiv_width + $family_width + $location_width;
 		$header_row = "<th width=$date_width><font size=-2>Date</th>";
 		$header_row.= "<th width=$time_width><font size=-2>Time</th>";      
