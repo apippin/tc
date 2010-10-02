@@ -1,6 +1,6 @@
 %define packagename tc
 %define phpgwdirname tc
-%define version 0.0.1.000
+%define version 1.0.0
 
 # This is for Mandrake RPMS 
 # (move these below the RedHat ones for Mandrake RPMs)

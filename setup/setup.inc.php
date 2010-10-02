@@ -14,7 +14,7 @@
 	/* Basic information about this app */
 	$setup_info['tc']['name']      = 'tc';
 	$setup_info['tc']['title']     = '3rd Counselor';
-	$setup_info['tc']['version']   = '0.5.0';
+	$setup_info['tc']['version']   = '1.0.0';
 	$setup_info['tc']['app_order'] = 8;
 	$setup_info['tc']['enable']    = 1;
 	
@@ -22,9 +22,9 @@
 	$setup_info['tc']['author']    = 'Alan J. Pippin';
 	$setup_info['tc']['license']   = 'GPL';
 	$setup_info['tc']['description'] =
-		'This app provides tools to help manage a Priesthood Elders Quorum or High Priest Group';
+		'Module for managing the administrative tasks of a Mormon Elders Quorum or High Priest Group';
 	$setup_info['tc']['note'] =
-		'This was created for the Miramont Ward.';
+		'Originally developed by Alan Pippin; Recent contributions and maintenance done by Owen Leonard';
 	$setup_info['tc']['maintainer'] = 'Alan J. Pippin';
 	$setup_info['tc']['maintainer_email'] = 'apippin@pippins.net';
 	
