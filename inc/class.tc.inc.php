@@ -1537,7 +1537,7 @@ class tc
 			// If this individual has had a yearly PPI this year, don't show him on the schedule list
 			$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 			$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-			       "AND individual=" . $id . " AND interview_type='ppi'";
+			       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 			$this->db2->query($sql,__LINE__,__FILE__);
 
 			if(!$this->db2->next_record()) {
@@ -1907,11 +1907,11 @@ class tc
 					}
 
 					// If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id'";
+					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id' AND interview_type='hti'";
 					$this->db2->query($sql,__LINE__,__FILE__);
 
 					if(!$this->db2->next_record()) {
-						$sql = "SELECT * FROM tc_interview WHERE individual='$id' ORDER BY date DESC";
+						$sql = "SELECT * FROM tc_interview WHERE individual='$id' AND interview_type='hti' ORDER BY date DESC";
 						$this->db3->query($sql,__LINE__,__FILE__);
 						if($this->db3->next_record()) { 
 							$date = $this->db3->f('date'); 
@@ -2387,7 +2387,7 @@ class tc
 				$year = date('Y') - $m;
 				$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 				$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-				       "AND individual=" . $id . " AND interview_type='ppi'";
+				       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 				$this->db2->query($sql,__LINE__,__FILE__);
 
 				if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2506,7 +2506,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=".$interview;
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . "AND interview_type='ppi'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
@@ -2669,7 +2669,7 @@ class tc
 						$month_end = "$year"."-"."$month"."-"."31";
 						$month = "$month"."/"."$year";
 						$sql = "SELECT * FROM tc_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
-						       "AND individual=" . $individual;
+						       "AND individual=" . $individual . " AND interview_type='hti' ORDER BY date DESC";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						$header_row .= "<th width=$int_width><font size=-2>$month</th>";
 
@@ -2829,7 +2829,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=".$interview;
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND interview_type='hti'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
