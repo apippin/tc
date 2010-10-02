@@ -2506,7 +2506,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . "AND interview_type='ppi'";
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND interview_type='ppi'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
