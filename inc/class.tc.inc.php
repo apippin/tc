@@ -2457,15 +2457,16 @@ class tc
 			$indiv = $this->db2->f('individual');
 			$interviewer_name = $this->db2->f('name');
 			if($indiv == $interviewer) {
-				$this->t->set_var('interviewer',$interviewer . ' selected');
+				$this->t->set_var('interviewer',$indiv . ' selected');
 			} else {
-				$this->t->set_var('interviewer',$interviewer);
+				$this->t->set_var('interviewer',$indiv);
 			}
+			#print "indiv: $indiv interviewer: $interviewer<br>";
 			$this->t->set_var('interviewer_name',$interviewer_name);
 			$this->t->set_var('eqpresppi_checked','checked');
 			$this->t->fp('int_list','interviewer_list',True);
 		}
-
+		#print "selected interviewer: $interviewer<br>";
 		if($action == 'save') {
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("UPDATE tc_interview set " .
@@ -2782,9 +2783,9 @@ class tc
 			$indiv = $this->db2->f('individual');
 			$interviewer_name = $this->db2->f('name');
 			if($indiv == $interviewer) {
-				$this->t->set_var('interviewer',$interviewer . ' selected');
+				$this->t->set_var('interviewer',$indiv . ' selected');
 			} else {
-				$this->t->set_var('interviewer',$interviewer);
+				$this->t->set_var('interviewer',$indiv);
 			}
 			$this->t->set_var('interviewer_name',$interviewer_name);
 			$this->t->fp('int_list','interviewer_list',True);
