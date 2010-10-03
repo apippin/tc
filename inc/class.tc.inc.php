@@ -725,7 +725,7 @@ class tc
 			$this->db->query("UPDATE tc_activity set " .
 			                 "   assignment='" . $activity['assignment'] .
 			                 "', date='" . $activity['date'] . "'" .
-			                 ", notes='" . $activity['notes'] . "'" .
+			                 ", notes=\"" . $activity['notes'] . "\"" .
 			                 " WHERE activity=" . $activity['activity'],__LINE__,__FILE__);
 
 			// Delete all the individuals who have particiapted in this activity
@@ -750,10 +750,10 @@ class tc
 			$activity['notes']= get_var('notes',array('POST'));
 			$this->db->query("INSERT INTO tc_activity (assignment,date,notes) " .
 			                 "VALUES ('" . $activity['assignment'] . "','" .
-			                 $activity['date'] . "','" . $activity['notes'] . "')",__LINE__,__FILE__);
+			                 $activity['date'] . "',\"" . $activity['notes'] . "\")",__LINE__,__FILE__);
 
 			$sql = "SELECT * FROM tc_activity WHERE assignment='".$activity['assignment']."' " .
-			       " AND date='".$activity['date']."' AND notes='".$activity['notes']."'";
+			       " AND date='".$activity['date']."' AND notes=\"".$activity['notes']."\"";
 			$this->db->query($sql,__LINE__,__FILE__);
 			if($this->db->next_record()) {
 				//print "activity: " . $this->db->f('activity') . "<br>";
@@ -1537,7 +1537,7 @@ class tc
 			// If this individual has had a yearly PPI this year, don't show him on the schedule list
 			$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 			$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-			       "AND individual=" . $id . " AND interview_type='ppi'";
+			       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 			$this->db2->query($sql,__LINE__,__FILE__);
 
 			if(!$this->db2->next_record()) {
@@ -1907,11 +1907,11 @@ class tc
 					}
 
 					// If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id'";
+					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id' AND interview_type='hti'";
 					$this->db2->query($sql,__LINE__,__FILE__);
 
 					if(!$this->db2->next_record()) {
-						$sql = "SELECT * FROM tc_interview WHERE individual='$id' ORDER BY date DESC";
+						$sql = "SELECT * FROM tc_interview WHERE individual='$id' AND interview_type='hti' ORDER BY date DESC";
 						$this->db3->query($sql,__LINE__,__FILE__);
 						if($this->db3->next_record()) { 
 							$date = $this->db3->f('date'); 
@@ -2387,7 +2387,7 @@ class tc
 				$year = date('Y') - $m;
 				$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 				$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-				       "AND individual=" . $id . " AND interview_type='ppi'";
+				       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 				$this->db2->query($sql,__LINE__,__FILE__);
 
 				if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2474,7 +2474,7 @@ class tc
 			                 ", interviewer='" . $interviewer . "'" .
 			                 ", individual='" . $individual . "'" .
 			                 ", date='" . $date . "'" .
-			                 ", notes='" . $notes . "'" .
+			                 ", notes=\"" . $notes . "\"" .
 			                 ", interview_type='" . $interview_type . "'" .
 			                 " WHERE interview=" . $interview,__LINE__,__FILE__);
 			$this->ppi_view();
@@ -2485,7 +2485,7 @@ class tc
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
 			                 "VALUES ('" . $interviewer . "','" . $individual . "','" .
-			                 $date . "','" . $notes . "','" . $interview_type  ."')",__LINE__,__FILE__);
+			                 $date . "',\"" . $notes . "\",'" . $interview_type  ."')",__LINE__,__FILE__);
 			$this->ppi_view();
 			return false;
 		}
@@ -2507,7 +2507,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=".$interview;
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND interview_type='ppi'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
@@ -2670,7 +2670,7 @@ class tc
 						$month_end = "$year"."-"."$month"."-"."31";
 						$month = "$month"."/"."$year";
 						$sql = "SELECT * FROM tc_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
-						       "AND individual=" . $individual;
+						       "AND individual=" . $individual . " AND interview_type='hti' ORDER BY date DESC";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						$header_row .= "<th width=$int_width><font size=-2>$month</th>";
 
@@ -2798,7 +2798,7 @@ class tc
 			                 ", interviewer='" . $interviewer . "'" .
 			                 ", individual='" . $individual . "'" .
 			                 ", date='" . $date . "'" .
-			                 ", notes='" . $notes . "'" .
+			                 ", notes=\"" . $notes . "\"" .
 			                 ", interview_type='" . $interview_type . "'" .
 			                 " WHERE interview=" . $interview,__LINE__,__FILE__);
 			$this->int_view();
@@ -2809,7 +2809,7 @@ class tc
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
 			                 "VALUES ('" . $interviewer . "','" . $individual . "','" .
-			                 $date . "','" . $notes ."','" . $interview_type . "')",__LINE__,__FILE__);
+			                 $date . "',\"" . $notes ."\",'" . $interview_type . "')",__LINE__,__FILE__);
 			$this->int_view();
 			return false;
 		}
@@ -2830,7 +2830,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=".$interview;
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND interview_type='hti'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
@@ -3005,7 +3005,7 @@ class tc
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("UPDATE tc_visit set " .
 			                 "  date='" . $date . "'" .
-			                 ", notes='" . $notes . "'" .
+			                 ", notes=\"" . $notes . "\"" .
 			                 " WHERE visit=" . $visit,__LINE__,__FILE__);
 			$this->vis_view();
 			return false;
@@ -3015,7 +3015,7 @@ class tc
 			$notes = get_var('notes',array('POST'));
 			$this->db->query("INSERT INTO tc_visit (family,companionship,date,notes) " .
 			                 "VALUES ('" . $family . "','" . $companionship . "','" .
-			                 $date . "','" . $notes . "')",__LINE__,__FILE__);
+			                 $date . "',\"" . $notes . "\")",__LINE__,__FILE__);
 			$this->vis_view();
 			return false;
 		}
