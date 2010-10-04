@@ -3582,7 +3582,7 @@ class tc
 						} else if($indiv > 0) {
 							$supervisor_name_array = explode(",",$presidency2name[$presidency]);
 							$supervisor_last_name = $supervisor_name_array[0];
-							print "presidency2indiv: $presidency $presidency2indiv[$presidency]<br>";
+							#print "presidency2indiv: $presidency $presidency2indiv[$presidency]<br>";
 							$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
