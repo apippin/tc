@@ -12,8 +12,9 @@
 	<br><br>
 
 
-<!-- BEGIN individual_list -->
+<!-- BEGIN appt_list -->
 	<form action="{actionurl}" method="POST">
+		<input type=hidden name=presidency_location value={presidency_location}>
         <hr>
         <table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
@@ -37,7 +38,9 @@
 		</td>
 		</tr>
 	</table>
+<!-- END appt_list -->
 
+<!-- BEGIN individual_list -->
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>

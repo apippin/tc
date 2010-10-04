@@ -33,6 +33,12 @@ $this->time_drop_down_lists = 1;
 // Examples: Monthly=1 Quarterly=3 Yearly=12
 $this->monthly_hometeaching_interview_stats = 3;
 
+// Specify who can hold yearly PPIs
+// 1 = EQ President 
+// 2 = EQ President + Counselors 
+// 3 = EQ President + Counselors + Secretary
+$this->yearly_ppi_interviewer = 2;
+
 // Specify the minute interval increment to use in the time drop down lists
 $this->time_drop_down_list_inc = 15;
 

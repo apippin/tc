@@ -1338,7 +1338,7 @@ class tc
 		$this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
 		$this->t->set_block('ppi_sched_t','individual_list','indivlist');
 		$this->t->set_block('ppi_sched_t','appt_list','apptlist');
-		$action = get_var('action',array('GET','POST'));
+	    $action = get_var('action',array('GET','POST'));
 
 		$this->t->set_var('lang_save','Save Appt / Pri / Notes');
 		$this->t->set_var('lang_reset','Clear Changes');
@@ -1363,24 +1363,6 @@ class tc
 
 		$year = date('Y');
 
-		// Get the President
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti where tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
-		$this->db->query($sql,__LINE__,__FILE__);
-		if($this->db->next_record()) {
-			$president_name = $this->db->f('name');
-			$president_name_array = explode(",",$president_name);
-			$president_last_name = $president_name_array[0];
-			$president_id = $this->db->f('individual');
-			$presidency_id = $this->db->f('presidency');
-			$interviewer = $this->db->f('individual');
-			$district_number = '*';
-			$district_name = $president_name;
-			$president_address = $this->db->f('address');
-		} else {
-			print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
-			return;
-		}
-
 		if($action == 'save') {
 			// Save any changes made to the appointment table
 			$new_data = get_var('appt_notes',array('POST'));
@@ -1389,7 +1371,8 @@ class tc
 					$indiv = $entry['individual'];
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
-					if($location == "") { $location = "$president_last_name"." home ($president_address)"; }
+				    $presidency_location = $entry['presidency_location'];
+  				    if($location == "") { $location = $presidency_location; }
 					if($indiv == 0) { $location = ""; }
 
 					//Only perform a database update if we have made a change to this appointment
@@ -1446,35 +1429,52 @@ class tc
 		$appt_table_width=$date_width + $time_width + $indiv_width + $location_width;
 		$appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
 		$appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-		$appt_header_row.= "<th width=$indiv_width><font size=-2>indiv</th>";
+		$appt_header_row.= "<th width=$indiv_width><font size=-2>Individual</th>";
 		$appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
-		$appt_table_data = ""; 
+		$appt_table_data = "";
+		$table_data="";
 
 		$total_indivs=0; $indivs_with_yearly_ppi=0;
 
-		// Display a scheduling table for the President
-		$table_data=""; $appt_table_data="";
-		$table_title = "District ".$district_number.": ".$district_name.": All indivs with Yearly PPI Not Completed";
-		$appt_table_title = "District ".$district_number.": ".$district_name.": Yearly PPI Appointment Slots";
-		$this->t->set_var('table_title',$table_title);
-		$this->t->set_var('appt_table_title',$appt_table_title);
-
-		// query the database for all the appointments
-		$sql = "SELECT * FROM tc_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
+		// Get the President
+		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti where tp.individual=ti.individual AND tp.valid=1 AND ";
+		if($this->yearly_ppi_interviewer == 1) { $sql .= " (tp.president=1)"; }
+		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tp.president=1 OR tp.counselor=1)"; }
+		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tp.president=1 OR tp.counselor=1 OR tp.secretary=1)"; }
 		$this->db->query($sql,__LINE__,__FILE__);
-
 		while ($this->db->next_record()) {
-			$appointment = $this->db->f('appointment');
-			$indiv = $this->db->f('individual');
-			$location = $this->db->f('location');
-			if(($location == "") && ($indiv > 0)) { $location = "$president_last_name"." home ($president_address)"; }
+		  $presidency_name = $this->db->f('name');
+		  $presidency_name_array = explode(",",$presidency_name);
+		  $presidency_last_name = $presidency_name_array[0];
+		  $presidency_id = $this->db->f('presidency');
+		  $presidency_address = $this->db->f('address');
+		  $presidency_location = "$presidency_last_name"." home ($presidency_address)";
+		  $appt_table_data = "";
 
-			$date = $this->db->f('date');
+		  // Display a scheduling table for this presidency member
+		  $district_number = '*';
+		  $district_name = $presidency_name;
+		  $table_title = "District ".$district_number.": ".$district_name.": All indivs with Yearly PPI Not Completed";
+		  $appt_table_title = "District ".$district_number.": ".$district_name.": Yearly PPI Appointment Slots";
+		  $this->t->set_var('table_title',$table_title);
+		  $this->t->set_var('appt_table_title',$appt_table_title);
+
+		  // query the database for all the appointments
+		  $sql = "SELECT * FROM tc_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
+		  $this->db2->query($sql,__LINE__,__FILE__);
+
+		  while ($this->db2->next_record()) {
+			$appointment = $this->db2->f('appointment');
+			$indiv = $this->db2->f('individual');
+			$location = $this->db2->f('location');
+			if(($location == "") && ($indiv > 0)) { $location = $presidency_location; }
+
+			$date = $this->db2->f('date');
 			$date_array = explode("-",$date);
 			$year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
 			$day_string = date("l d-M-Y", mktime(0,0,0,$month,$day,$year));
 
-			$time = $this->db->f('time');
+			$time = $this->db2->f('time');
 			$time_array = explode(":",$time);
 			$time_string = date("g:i a", mktime($time_array[0], $time_array[1], $time_array[2]));
 
@@ -1485,14 +1485,14 @@ class tc
 			$appt_table_data.= '<td align=center><select name=appt_notes['.$appointment.'][individual]>';
 			$appt_table_data.= '<option value=0></option>';
 			for ($i=0; $i < count($individual); $i++) {
-				$id = $individual[$i];
-				$name = $indiv_name[$i];
-				if($individual[$i] == $indiv) { 
-					$selected[$id] = 'selected="selected"'; 
-				} else { 
-					$selected[$id] = ''; 
-				}
-				$appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
+			  $id = $individual[$i];
+			  $name = $indiv_name[$i];
+			  if($individual[$i] == $indiv) { 
+				$selected[$id] = 'selected="selected"'; 
+			  } else { 
+				$selected[$id] = ''; 
+			  }
+			  $appt_table_data.= '<option value='.$id.' '.$selected[$id].'>'.$name.'</option>';
 			}
 			$appt_table_data.='</select></td>';
 
@@ -1503,12 +1503,13 @@ class tc
 
 			$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 			$this->t->set_var('tr_color',$tr_color);
+		  }
+		  $this->t->set_var('appt_table_data',$appt_table_data);
+		  $this->t->set_var('appt_header_row',$appt_header_row);
+		  $this->t->set_var('appt_table_width',$appt_table_width);
+		  $this->t->fp('apptlist','appt_list',True);
 		}
-
-		$this->t->set_var('appt_table_data',$appt_table_data);
-		$this->t->set_var('appt_header_row',$appt_header_row);
-		$this->t->set_var('appt_table_width',$appt_table_width);
-
+		
 		// PPI SCHEDULING TABLE
 		$sql = "SELECT * FROM tc_individual AS ti JOIN tc_scheduling_priority AS tsp WHERE ti.scheduling_priority=tsp.scheduling_priority AND steward='$this->default_stewardship' AND valid=1 ORDER BY tsp.priority ASC, ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
@@ -1604,7 +1605,7 @@ class tc
 
 		$name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
 		$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-		$completed_header_row = "<th width=$name_width><font size=-2>Individual Name</th>";
+		$completed_header_row = "<th width=$name_width><font size=-2>Individual</th>";
 		$completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
 		$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
 		$completed_header_row.= "<th width=$notes_width><font size=-2>PPI Notes</th>";
@@ -1662,7 +1663,7 @@ class tc
 
 		$indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $int_date_width=20;
 		$table_width=$indiv_width + $phone_width + $pri_width + $notes_width + $int_date_width;
-		$header_row = "<th width=$indiv_width><font size=-2>individual Name</th>";
+		$header_row = "<th width=$indiv_width><font size=-2>Individual</th>";
 		$header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
 		$header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
 		$header_row.= "<th width=$int_date_width><font size=-2>Last Interview</th>";
@@ -1972,7 +1973,7 @@ class tc
 
 			$name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
 			$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-			$completed_header_row = "<th width=$name_width><font size=-2>Individual Name</th>";
+			$completed_header_row = "<th width=$name_width><font size=-2>Individual</th>";
 			$completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
 			$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
 			$completed_header_row.= "<th width=$notes_width><font size=-2>Interview Notes</th>";
@@ -2356,7 +2357,7 @@ class tc
 		array_multisort($indiv_name, $individual);
 		//var_dump($indiv_name); print "<br><br>"; var_dump($individual);
 
-		$header_row="<th width=$comp_width><font size=-2>Individual Name</th>";
+		$header_row="<th width=$comp_width><font size=-2>Individual</th>";
 
 		$indiv_width=400; $ppi_width=75; $table_width=$indiv_width + $num_months*$ppi_width;
 		$table_data="";
@@ -2451,7 +2452,10 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$interview_type = get_var('interview_type',array('GET','POST'));
 
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1)";
+	    $sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND ";
+	    if($this->yearly_ppi_interviewer == 1) { $sql .= " (tp.president=1)"; }
+		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tp.president=1 OR tp.counselor=1)"; }
+		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tp.president=1 OR tp.counselor=1 OR tp.secretary=1)"; }
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -3517,7 +3521,7 @@ class tc
 		$table_width=$date_width + $time_width + $indiv_width + $family_width + $location_width;
 		$header_row = "<th width=$date_width><font size=-2>Date</th>";
 		$header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-		$header_row.= "<th width=$indiv_width><font size=-2>individual</th>";
+		$header_row.= "<th width=$indiv_width><font size=-2>Individual</th>";
 		$header_row.= "<th width=$family_width><font size=-2>Family</th>";
 		$header_row.= "<th width=$location_width><font size=-2>Location</th>";
 		$table_data = "";
