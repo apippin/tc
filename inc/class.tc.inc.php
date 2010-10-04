@@ -825,7 +825,7 @@ class tc
 		$this->t->set_var('assignment_data',$assignment_data);
 
 		// Create individual selection boxes
-		$sql = "SELECT * FROM tc_individual WHERE steward='$this->default_stewardship'";
+		$sql = "SELECT * FROM tc_individual";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
