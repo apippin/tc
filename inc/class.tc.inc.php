@@ -1471,9 +1471,9 @@ class tc
 		  // Display a scheduling table for this presidency member
 		  $district_number = '*';
 		  $district_name = $presidency_name;
-		  $table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Not Completed";
+		  $not_completed_table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Not Completed";
 		  $appt_table_title = "District ".$district_number.": ".$district_name.": ".$this->ppi_frequency_label." PPI Appointment Slots";
-		  $this->t->set_var('table_title',$table_title);
+		  $this->t->set_var('not_completed_table_title',$not_completed_table_title);
 		  $this->t->set_var('appt_table_title',$appt_table_title);
 
 		  // query the database for all the appointments
@@ -1621,6 +1621,7 @@ class tc
 			}
 		} // End for individuals Loop
 
+		$completed_table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Completed";
 		$name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
 		$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
 		$completed_header_row = "<th width=$name_width><font size=-2>Individual</th>";
@@ -1628,6 +1629,7 @@ class tc
 		$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
 		$completed_header_row.= "<th width=$notes_width><font size=-2>PPI Notes</th>";
 
+		$this->t->set_var('completed_table_title',$completed_table_title);
 		$this->t->set_var('table_width',$table_width);
 		$this->t->set_var('header_row',$header_row);
 		$this->t->set_var('table_data',$table_data);
