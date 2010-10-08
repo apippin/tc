@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
-using System.IO;
-using FolderBrowserDialog = System.Windows.Forms.FolderBrowserDialog;
-using System.Xml.Serialization;
-using System.Xml;
-using Ionic.Zip;
 using System.ComponentModel;
+using System.IO;
+using System.Text;
 using System.Threading;
+using System.Windows;
+using System.Xml;
+using System.Xml.Serialization;
+using Ionic.Zip;
+using FolderBrowserDialog = System.Windows.Forms.FolderBrowserDialog;
 
 namespace MLSFileTrimmer
 {
@@ -62,7 +51,7 @@ namespace MLSFileTrimmer
             openFolderDialog.RootFolder = Environment.SpecialFolder.MyDocuments;
             if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                outputDirtextBox.Text = openFolderDialog.SelectedPath;
+                outputDirTextBox.Text = openFolderDialog.SelectedPath;
                 currentDirectory = openFolderDialog.SelectedPath;
             }
         }
@@ -70,14 +59,14 @@ namespace MLSFileTrimmer
         private void parseButton_Click(object sender, RoutedEventArgs e)
         {
             // make sure the directory exists
-            if (outputDirtextBox.Text.Equals(String.Empty))
+            if (outputDirTextBox.Text.Equals(String.Empty))
             {
                 MessageBox.Show("Please select the correct output directory.");
                 return;
             }
-            else if (!Directory.Exists(outputDirtextBox.Text))
+            else if (!Directory.Exists(outputDirTextBox.Text))
             {
-                MessageBox.Show(outputDirtextBox.Text + " does not exist. Please select the correct output directory.");
+                MessageBox.Show(outputDirTextBox.Text + " does not exist. Please select the correct output directory.");
             }
 
             // make sure the original files exist
@@ -146,6 +135,11 @@ namespace MLSFileTrimmer
         {
             this.trimmingLabel.Visibility = Visibility.Hidden;
             this.finishedLabel.Visibility = Visibility.Visible;
+        }
+
+        private void exitButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

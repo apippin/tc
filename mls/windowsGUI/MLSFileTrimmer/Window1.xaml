@@ -1,13 +1,25 @@
 ﻿<Window x:Class="MLSFileTrimmer.Window1"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="MLS File Trimmer" Height="200" Width="600" MaxHeight="Infinity" MaxWidth="Infinity" MinHeight="0" MinWidth="0" ResizeMode="CanMinimize">
+    Title="MLS File Trimmer" Height="200" Width="600" MaxHeight="Infinity" MaxWidth="Infinity" MinHeight="0" MinWidth="0" ResizeMode="CanResize">
     <Grid Background="Silver">
-        <Label Margin="20,30,30,0" Name="label4" VerticalAlignment="Top" Height="30">Please specify the directory where the MLS csv files are.</Label>
-        <TextBox Margin="20,70,130,60" Name="outputDirtextBox" FlowDirection="LeftToRight" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextWrapping="NoWrap" Height="30" />
-        <Button Margin="0,70,20,61" Name="outDirButton" HorizontalAlignment="Right" Width="100" Height="30" Click="outDirButton_Click">Browse</Button>
-        <Button Margin="0,0,20,20" Name="parseButton" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Height="30" Click="parseButton_Click">OK</Button>
-        <Label Height="28" HorizontalAlignment="Right" Margin="0,27.233,20,0" Name="finishedLabel" VerticalAlignment="Top" Width="100" FontSize="16" Foreground="Red" HorizontalContentAlignment="Center" Visibility="Hidden">Finished!</Label>
-        <Label Height="28" HorizontalAlignment="Right" Margin="0,27.233,20,0" Name="trimmingLabel" VerticalAlignment="Top" Width="100" FontSize="16" Foreground="Green" HorizontalContentAlignment="Center" Visibility="Hidden" >Trimming...</Label>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions> 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80*"/>
+            <ColumnDefinition Width="20*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Label Grid.Row="0" Grid.Column="0" Margin="5,5" Name="label4" VerticalAlignment="Center" >Please specify the directory where the MLS csv files are.</Label>
+        <TextBox Grid.Row="1" Grid.Column="0" Margin="5,5" Name="outputDirTextBox" FlowDirection="LeftToRight" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextWrapping="NoWrap"/>
+        <Button Grid.Row="1" Grid.Column="1" Margin="5,5" Name="outDirButton" Click="outDirButton_Click">Browse</Button>
+        <Button Grid.Row="2" Grid.Column="1" Margin="5,5" Name="parseButton" Click="parseButton_Click">OK</Button>
+        <Button Grid.Row="3" Grid.Column="1" Margin="5,5" Name="exitButton" Click="exitButton_Click">Exit</Button>
+        <Label Grid.Row="0" Grid.Column="1" Margin="5,5" Name="finishedLabel" FontSize="16" Foreground="Red" Visibility="Hidden">Finished!</Label>
+        <Label Grid.Row="0" Grid.Column="1" Margin="5,5" Name="trimmingLabel" FontSize="16" Foreground="Green" Visibility="Hidden" >Trimming...</Label>
     </Grid>
 </Window>
