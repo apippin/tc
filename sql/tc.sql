@@ -14,7 +14,7 @@ USE `phpgroupware`;
 --
 -- Table structure for table `tc_activity`
 --
-CREATE TABLE `tc_activity` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_activity` (
   `activity` int(16) unsigned NOT NULL auto_increment,
   `assignment` int(16) unsigned NOT NULL,
   `date` date default NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `tc_activity` (
 --
 -- Table structure for table `tc_appointment`
 --
-CREATE TABLE `tc_appointment` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_appointment` (
   `appointment` int(16) unsigned NOT NULL auto_increment,
   `presidency` int(16) unsigned NOT NULL default '0',
   `family` int(16) unsigned default '0',
@@ -41,7 +41,7 @@ CREATE TABLE `tc_appointment` (
 --
 -- Table structure for table `tc_assignment`
 --
-CREATE TABLE `tc_assignment` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_assignment` (
   `assignment` int(12) unsigned NOT NULL auto_increment,
   `name` varchar(60) NOT NULL,
   `abbreviation` varchar(12) default NULL,
@@ -60,7 +60,7 @@ UNLOCK TABLES;
 --
 -- Table structure for table `tc_attendance`
 --
-CREATE TABLE `tc_attendance` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_attendance` (
   `individual` int(16) unsigned NOT NULL default '0',
   `date` date default NULL,
   KEY `individual` (`individual`)
@@ -69,7 +69,7 @@ CREATE TABLE `tc_attendance` (
 --
 -- Table structure for table `tc_calling`
 --
-CREATE TABLE `tc_calling` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_calling` (
   `individual` int(16) unsigned default '0',
   `organization` varchar(30) default NULL,
   `position` varchar(30) default NULL,
@@ -80,7 +80,7 @@ CREATE TABLE `tc_calling` (
 --
 -- Table structure for table `tc_companion`
 --
-CREATE TABLE `phpgroupware`.`tc_companion` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companion` (
   `companion` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `individual` INT( 16 ) UNSIGNED NOT NULL ,
   `companionship` INT( 16 ) UNSIGNED NOT NULL ,
@@ -91,7 +91,7 @@ CREATE TABLE `phpgroupware`.`tc_companion` (
 --
 -- Table structure for table `tc_companionship`
 --
-CREATE TABLE `phpgroupware`.`tc_companionship` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companionship` (
   `companionship` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `mls_id` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
   `district` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
@@ -101,7 +101,7 @@ CREATE TABLE `phpgroupware`.`tc_companionship` (
 --
 -- Table structure for table `tc_district`
 --
-CREATE TABLE `tc_district` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_district` (
   `district` int(16) unsigned NOT NULL default '0',
   `supervisor` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
@@ -111,7 +111,7 @@ CREATE TABLE `tc_district` (
 --
 -- Table structure for table `tc_individual`
 --
-CREATE TABLE `tc_individual` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_individual` (
   `individual` int(16) unsigned NOT NULL auto_increment,
   `mls_id` int(16) unsigned NOT NULL,
   `name` varchar(60) default NULL,
@@ -131,7 +131,7 @@ CREATE TABLE `tc_individual` (
 --
 -- Table structure for table `tc_family`
 --
-CREATE TABLE `tc_family` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_family` (
   `family` int(16) unsigned NOT NULL auto_increment,
   `individual` int(16) unsigned default '0',
   `companionship` int(16) unsigned default NULL,
@@ -143,7 +143,7 @@ CREATE TABLE `tc_family` (
 --
 -- Table structure for table `tc_participation`
 --
-CREATE TABLE `tc_participation` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_participation` (
   `individual` int(16) unsigned NOT NULL default '0',
   `activity` int(16) unsigned default NULL,
   UNIQUE KEY `activity_ndx` (`individual`,`activity`)
@@ -152,7 +152,7 @@ CREATE TABLE `tc_participation` (
 --
 -- Table structure for table `tc_interview`
 --
-CREATE TABLE `tc_interview` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_interview` (
   `interview` int(16) unsigned NOT NULL auto_increment,
   `interviewer` int(16) unsigned default NULL,
   `individual` int(16) unsigned default NULL,
@@ -166,7 +166,7 @@ CREATE TABLE `tc_interview` (
 --
 -- Table structure for table `tc_presidency`
 --
-CREATE TABLE `tc_presidency` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_presidency` (
   `presidency` int(16) unsigned NOT NULL auto_increment,
   `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
@@ -182,7 +182,7 @@ CREATE TABLE `tc_presidency` (
 --
 -- Table structure for table `tc_visit`
 --
-CREATE TABLE `tc_visit` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_visit` (
   `visit` int(16) unsigned NOT NULL auto_increment,
   `family` int(16) unsigned default NULL,
   `companionship` int(16) unsigned default NULL,
@@ -198,7 +198,7 @@ CREATE TABLE `tc_visit` (
 --
 -- Table structure for table `tc_willingness`
 --
-CREATE TABLE `tc_willingness` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_willingness` (
   `individual` int(16) unsigned NOT NULL,
   `assignment` int(16) unsigned NOT NULL,
   `willing` enum('y','n','') NOT NULL,
@@ -208,7 +208,7 @@ CREATE TABLE `tc_willingness` (
 --
 -- Table structure for table `tc_scheduling_priority`
 --
-CREATE TABLE `tc_scheduling_priority` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_scheduling_priority` (
   `scheduling_priority` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `priority` INT( 10 ) UNSIGNED NOT NULL DEFAULT '30',
   `notes` VARCHAR( 128 ) NOT NULL DEFAULT ''
@@ -217,7 +217,7 @@ CREATE TABLE `tc_scheduling_priority` (
 --
 -- Table structure for table `tc_email_list`
 --
-CREATE TABLE `tc_email_list` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_email_list` (
   `email_list` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `name` VARCHAR( 128 ) NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
@@ -225,7 +225,7 @@ CREATE TABLE `tc_email_list` (
 --
 -- Table structure for table `tc_email_list_membership`
 --
-CREATE TABLE `tc_email_list_membership` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_email_list_membership` (
   `individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
   `email_list` INT( 16 ) UNSIGNED NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
@@ -233,7 +233,7 @@ CREATE TABLE `tc_email_list_membership` (
 --
 -- Table structure for table `tc_accomplishment`
 --
-CREATE TABLE `tc_accomplishment` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_accomplishment` (
   `accomplishment` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
   `date` DATE NULL DEFAULT NULL ,
@@ -244,8 +244,44 @@ CREATE TABLE `tc_accomplishment` (
 --
 -- Table structure for table `tc_task`
 --
-CREATE TABLE `tc_task` (
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_task` (
   `task` INT( 16 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `name` VARCHAR( 128 ) NOT NULL ,
   `description` VARCHAR( 128 ) NOT NULL
 ) ENGINE = MYISAM ;
+
+--
+-- Table structure for table `tc_district_sandbox`
+--
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_district_sandbox` (
+`district` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`supervisor` INT( 16 ) UNSIGNED NULL DEFAULT NULL
+) ENGINE = MYISAM ;
+
+--
+-- Table structure for table `tc_companion_sandbox`
+--
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companion_sandbox` (
+`companion` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`individual` INT( 16 ) UNSIGNED NOT NULL ,
+`companionship` INT( 16 ) UNSIGNED NOT NULL
+) ENGINE = MYISAM ;
+
+--
+-- Table structure for table `tc_companionship_sandbox`
+--
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companionship_sandbox` (
+  `companionship` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `district` INT( 16 ) UNSIGNED NULL DEFAULT NULL
+) ENGINE = MYISAM ;
+
+--
+-- Table structure for table `tc_family_sandbox`
+--
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_family_sandbox` (
+  `family` int(16) unsigned NOT NULL auto_increment,
+  `tc_family` int(16) unsigned default '0',
+  `companionship` int(16) unsigned default NULL,
+  PRIMARY KEY  (`family`)
+) ENGINE = MyISAM ;
+

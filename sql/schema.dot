@@ -82,6 +82,22 @@ digraph schema {
     label = "task||<t> task|<n> name|<d> description"
     shape = "record"
   ];
+  district_sandbox   [
+    label = "district_sandbox||<d> district|<s> supervisor"
+    shape = "record"
+  ];
+  companion_sandbox   [
+    label = "companion_sandbox||<c> companion|<i> individual|<cp> companionship"
+    shape = "record"
+  ];
+  companionship_sandbox   [
+    label = "companionship_sandbox||<cp> companionship|<d> district"
+    shape = "record"
+  ];
+  family_sandbox   [
+    label = "family_sandbox||<f> family|<tcf> tc_family|<cp> companionship"
+    shape = "record"
+  ];
 
   activity:s      -> assignment:a
 
@@ -129,5 +145,12 @@ digraph schema {
   
   accomplishment:i   -> individual:i
   accomplishment:t   -> task:t
+ 
+  district_sandbox:s      -> individual:i
+  companion_sandbox:i     -> individual:i
+  companion_sandbox:cp    -> companionship_sandbox:cp
+  companionship_sandbox:d -> district_sandbox:d
+  family_sandbox:tcf      -> family:f
+  family_sandbox:cp       -> companionship_sandbox:cp
   
 }
