@@ -68,6 +68,7 @@ class tc
 		'assign_view'    => True,
 		'assign_update'  => True,
 		'get_time_selection_form' => True,
+		'ht_sandbox' => True,
 	);
  
 	function tc()
@@ -215,6 +216,9 @@ class tc
 
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_view'));
 		$this->t->set_var('title','Hometeaching'); 
+
+		$this->t->set_var('ht_sandbox_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
+		$this->t->set_var('ht_sandbox_link_title','Hometeaching Sandbox'); 
 
 		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
@@ -390,6 +394,23 @@ class tc
 		$this->t->set_var('totals',$totals);
 
 		$this->t->pfp('out','ht_view_t');
+		$this->save_sessiondata();
+	}
+      
+
+	function ht_sandbox()
+	{
+		$this->t->set_file(array('ht_sandbox_t' => 'ht_sandbox.tpl'));
+		$this->t->set_block('ht_sandbox_t','district_list','list');
+
+		$this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
+
+		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
+		$this->t->set_var('title','Hometeaching Sandbox'); 
+
+		// content
+
+		$this->t->pfp('out','ht_sandbox_t');
 		$this->save_sessiondata();
 	}
       

@@ -5,7 +5,9 @@
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{title}</b></font></td>
 		</tr>
 	</table>
-	<br>
+
+	<a href="{ht_sandbox_link}">{ht_sandbox_link_title}</a>
+	<br><br>
 
 	<form action="{linkurl}" method="POST">
 	<table width="40%" border="0" cellspacing="2" cellpadding="2" align=center>
