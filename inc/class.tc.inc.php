@@ -1507,6 +1507,8 @@ class tc
 		  $this->t->set_var('appt_table_data',$appt_table_data);
 		  $this->t->set_var('appt_header_row',$appt_header_row);
 		  $this->t->set_var('appt_table_width',$appt_table_width);
+       		  $this->t->set_var('lang_save','Save Appts for ' . $presidency_name);
+
 		  $this->t->fp('apptlist','appt_list',True);
 		}
 		
@@ -1616,6 +1618,7 @@ class tc
 		$this->t->set_var('completed_header_row',$completed_header_row);
 		$this->t->set_var('completed_table_width',$completed_table_width);
 		$this->t->set_var('completed',$completed_data);
+		$this->t->set_var('lang_save','Save Pri / Notes'); 
 		$this->t->fp('indivlist','individual_list',True); 
 
 		$indivs_width=300; $totals_width=100;

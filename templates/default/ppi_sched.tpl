@@ -1,5 +1,4 @@
 <center>
-	<form action="{actionurl}" method="POST">
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{title}</b></font></td>
@@ -11,11 +10,10 @@
 	<a href="{schedule_ppi_link}">{schedule_ppi_link_title}</a>
 	<br><br>
 
-
+<hr>
 <!-- BEGIN appt_list -->
 	<form action="{actionurl}" method="POST">
 		<input type=hidden name=presidency_location value={presidency_location}>
-        <hr>
         <table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
@@ -34,14 +32,22 @@
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
 			&nbsp; &nbsp;
 			<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
-			</form>
 		</td>
 		</tr>
 	</table>
+	</form>
 <!-- END appt_list -->
-
+<hr>
 <!-- BEGIN individual_list -->
+        <form action="{actionurl}" method="POST">
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
+              	<tr>
+                	<td colspan=5 height="50" align="right">
+                        	<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
+                        	&nbsp; &nbsp;
+                        	<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
+                	</td>
+		</tr>
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 				<font face="{font}"><b>{table_title}</b></font>
@@ -56,10 +62,10 @@
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
 			&nbsp; &nbsp;
 			<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
-			</form>
 		</td>
 		</tr>
 	</table>
+        </form>
 <!-- END individual_list -->
 	<hr>
 	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
