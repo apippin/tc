@@ -401,14 +401,122 @@ class tc
 	function ht_sandbox()
 	{
 		$this->t->set_file(array('ht_sandbox_t' => 'ht_sandbox.tpl'));
-		$this->t->set_block('ht_sandbox_t','district_list','list');
+		$this->t->set_block('ht_sandbox_t','comp_list','c_list');
+		$this->t->set_block('ht_sandbox_t','district_list','d_list');
+		$this->t->set_block('ht_sandbox_t','unassigned_ht_list','uht_list');
+		$this->t->set_block('ht_sandbox_t','assigned_ht_list','aht_list');
+		$this->t->set_block('ht_sandbox_t','unassigned_family_list','uf_list');
+		$this->t->set_block('ht_sandbox_t','assigned_family_list','af_list');
+		$this->t->set_block('ht_sandbox_t','district_table_list','dt_list');
+		$this->t->set_block('ht_sandbox_t','companionship_table_list','ct_list');
 
 		$this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
 
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
 		$this->t->set_var('title','Hometeaching Sandbox'); 
 
-		// content
+		// get list of companionships
+		$sql = "SELECT DISTINCT companionship FROM tc_companionship where valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		$unique_companionships = '';
+		$unique_companionships[0]['companionship'] = 0;
+		$this->t->set_var('companionship_list','<option value="0">New</option>');
+		$this->t->fp('list','comp_list',True);
+		$j=1;
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$unique_companionships[$j]['companionship'] = $companionship;
+			$combined_companionship = "";
+			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship AND tc.valid=1";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($combined_companionship == "") {
+					$combined_companionship .= $this->db2->f('name');
+				} else {
+					$combined_companionship .= " / " . $this->db2->f('name');
+				}
+			}
+			$this->t->set_var('companionship_list','<option value="'.$j.'">'.$combined_companionship.'</option>');
+			$this->t->fp('c_list','comp_list',True);
+			$j++;
+		}
+
+		# get list of districts
+		$sql = "SELECT DISTINCT district FROM tc_district WHERE valid=1 ORDER BY district ASC";
+		$this->db->query($sql,__LINE__,__FILE__);
+		$districts = '';
+		$num_districts=0;
+		while ($this->db->next_record()) {
+			$districts[$num_districts] = $this->db->f('district');
+			$this->t->set_var('district','<option value="'.$num_districts.'">'.$districts[$num_districts].'</option>');
+			$this->t->fp('d_list','district_list',True);
+			$num_districts++;
+		}
+
+		# get list of individuals who are and are not home teachers
+		$sql = "SELECT * FROM tc_individual WHERE steward='$this->default_stewardship' AND valid=1 ORDER BY name ASC";
+		$this->db->query($sql,__LINE__,__FILE__);
+		$unassigned_ht = '';
+		$assigned_ht = '';
+		$num_ht_assigned=0; $num_ht_unassigned=0;
+		while ($this->db->next_record()) {
+			$individual = $this->db->f('individual');
+			$name = $this->db->f('name');
+			$sql = "SELECT DISTINCT * FROM tc_companion WHERE individual=$individual AND valid=1";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			if ($this->db2->next_record()) {
+				$assigned_ht[$num_ht_assigned]['individual'] = $individual;
+				$assigned_ht[$num_ht_assigned]['name'] = $name;
+				$this->t->set_var('assigned_ht','<option value="'.$num_ht_assigned.'">'.$name.'</option>');
+				$this->t->fp('aht_list','assigned_ht_list',True);
+				$num_ht_assigned++;
+			} else {
+				$unassigned_ht[$num_ht_unassigned]['individual'] = $individual;
+				$unassigned_ht[$num_ht_unassigned]['name'] = $name;
+				$this->t->set_var('unassigned_ht','<option value="'.$num_ht_unassigned.'">'.$name.'</option>');
+				$this->t->fp('uht_list','unassigned_ht_list',True);
+				$num_ht_unassigned++;
+			}
+		}
+		
+		# get list of families who are and are not assigned home teachers
+		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 ORDER BY ti.name ASC";
+		$this->db->query($sql,__LINE__,__FILE__);
+		$unassigned_families = '';
+		$assigned_families = '';
+		$num_families_assigned=0; $num_families_unassigned=0;
+		while ($this->db->next_record()) {
+			$individual = $this->db->f('individual');
+			$family = $this->db->f('family');
+			$name = $this->db->f('name');
+			if ($this->db->f('companionship') != 0) {
+				$assigned_families[$num_families_assigned]['family'] = $family;
+				$assigned_families[$num_families_assigned]['name'] = $name;
+				$this->t->set_var('assigned_family','<option value="'.$num_families_assigned.'">'.$name.' Family</option>');
+				$this->t->fp('af_list','assigned_family_list',True);
+				$num_families_assigned++;
+			} else {
+				$unassigned_families[$num_families_unassigned]['family'] = $family;
+				$unassigned_families[$num_families_unassigned]['name'] = $name;
+				$this->t->set_var('unassigned_family','<option value="'.$num_families_assigned.'">'.$name.' Family</option>');
+				$this->t->fp('uf_list','unassigned_family_list',True);
+				$num_families_unassigned++;
+			}
+		}
+		
+		# populate ht districts table
+		for ($d = 0; $d < $num_districts; $d++) {
+			$this->t->set_var('district_number',$districts[$d]);
+			
+			$sql = "SELECT * FROM tc_companionship AS tcp JOIN (tc_family AS tf, tc_individual AS ti) WHERE tcp.companionship=tf.companionship AND tf.individual=ti.individual AND tcp.valid=1";
+			$this->db->query($sql,__LINE__,__FILE__);
+			while ($this->db->next_record()) {
+				$name = $this->db->f('name');
+				$this->t->set_var('name',$name);
+			}
+			
+			$this->t->fp('dt_list','district_table_list',True);
+		}
 
 		$this->t->pfp('out','ht_sandbox_t');
 		$this->save_sessiondata();
