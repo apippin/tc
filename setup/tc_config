@@ -33,6 +33,11 @@ $this->time_drop_down_lists = 1;
 // Examples: Monthly=1 Quarterly=3 Yearly=12
 $this->monthly_hometeaching_interview_stats = 3;
 
+// Frequency of PPIs in months
+// This number must evenly divide 12.
+// Examples: Monthly=1 Quarterly=3 Yearly=12
+$this->ppi_frequency = 12;
+
 // Specify who can hold yearly PPIs
 // 1 = EQ President 
 // 2 = EQ President + Counselors 

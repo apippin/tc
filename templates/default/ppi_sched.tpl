@@ -50,7 +50,7 @@
 		</tr>
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-				<font face="{font}"><b>{table_title}</b></font>
+				<font face="{font}"><b>{not_completed_table_title}</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
@@ -71,7 +71,7 @@
 	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>All Individuals with Yearly PPI Completed</b></font>
+			<font face="{font}"><b>{completed_table_title}</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{completed_header_row}</tr>

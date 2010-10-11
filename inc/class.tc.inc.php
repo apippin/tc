@@ -35,6 +35,7 @@ class tc
 	var $script_path;
 	var $max_appointments;
 	var $max_presidency_members;
+	var $ppi_frequency_label;
 
 	var $public_functions = array
 	(
@@ -105,6 +106,18 @@ class tc
 		$this->current_month = $this->current_month-0; // Make it numeric
 		$this->current_year = `date '+%Y'`;
 		$this->current_year = $this->current_year-0; // Make it numeric
+		
+		if ($this->ppi_frequency == 12) {
+			$this->ppi_frequency_label = "Annual";
+		} else if ($this->ppi_frequency == 6) {
+			$this->ppi_frequency_label = "Semi-Annual";
+		} else if ($this->ppi_frequency == 3) {
+			$this->ppi_frequency_label = "Quarterly";
+		} else if ($this->ppi_frequency == 1) {
+			$this->ppi_frequency_label = "Monthly";
+		} else {
+			$this->ppi_frequency_label = "Periodic";
+		}
 
 		echo parse_navbar();
 		$this->display_app_header();	
@@ -825,7 +838,7 @@ class tc
 		$this->t->set_var('assignment_data',$assignment_data);
 
 		// Create individual selection boxes
-		$sql = "SELECT * FROM tc_individual WHERE steward='$this->default_stewardship'";
+		$sql = "SELECT * FROM tc_individual";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -1344,13 +1357,13 @@ class tc
 		$this->t->set_var('lang_reset','Clear Changes');
 
 		$this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
-		$this->t->set_var('ppi_link_title','Yearly PPIs');
+		$this->t->set_var('ppi_link_title',$this->ppi_frequency_label . ' PPIs');
 
 		$this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
-		$this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
+		$this->t->set_var('schedule_ppi_link_title','Schedule ' . $this->ppi_frequency_label . ' PPIs');
 
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched&action=save'));
-		$this->t->set_var('title','Yearly PPI Scheduler');
+		$this->t->set_var('title',$this->ppi_frequency_label . ' PPI Scheduler');
 
 		$indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
 		$table_width=$indiv_width + $phone_width + $pri_width + $notes_width + $ppi_date_width;
@@ -1362,6 +1375,10 @@ class tc
 		$table_data=""; $completed_data=""; $totals_data="";
 
 		$year = date('Y');
+		$month = date('m');
+		$period = intval(($month-1)/$this->ppi_frequency) + 1;
+		$start_of_period = ($period-1)*$this->ppi_frequency + 1;
+		$end_of_period = $period * $this->ppi_frequency;
 
 		if($action == 'save') {
 			// Save any changes made to the appointment table
@@ -1454,9 +1471,9 @@ class tc
 		  // Display a scheduling table for this presidency member
 		  $district_number = '*';
 		  $district_name = $presidency_name;
-		  $table_title = "District ".$district_number.": ".$district_name.": All indivs with Yearly PPI Not Completed";
-		  $appt_table_title = "District ".$district_number.": ".$district_name.": Yearly PPI Appointment Slots";
-		  $this->t->set_var('table_title',$table_title);
+		  $not_completed_table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Not Completed";
+		  $appt_table_title = "District ".$district_number.": ".$district_name.": ".$this->ppi_frequency_label." PPI Appointment Slots";
+		  $this->t->set_var('not_completed_table_title',$not_completed_table_title);
 		  $this->t->set_var('appt_table_title',$appt_table_title);
 
 		  // query the database for all the appointments
@@ -1529,7 +1546,7 @@ class tc
 		}
 
 		$max = count($individual);
-
+		
 		for($i=0; $i < $max; $i++) {
 			$id = $individual[$i];
 			$name = $indiv_name[$i];
@@ -1537,9 +1554,10 @@ class tc
 			$priority = $indiv_priority[$id];
 			$notes = $indiv_notes[$id];
 
-			// If this individual has had a yearly PPI this year, don't show him on the schedule list
-			$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
-			$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
+			// If this individual has had a PPI this period, don't show him on the schedule list
+			$year_start = $year . "-" . $start_of_period . "-01";
+			$year_end = $year . "-" . $end_of_period . "-31";
+			$sql = "SELECT * FROM tc_interview WHERE date >= '$year_start' AND date <= '$year_end' ".
 			       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
 			$this->db2->query($sql,__LINE__,__FILE__);
 
@@ -1605,6 +1623,7 @@ class tc
 			}
 		} // End for individuals Loop
 
+		$completed_table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Completed";
 		$name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
 		$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
 		$completed_header_row = "<th width=$name_width><font size=-2>Individual</th>";
@@ -1612,6 +1631,7 @@ class tc
 		$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
 		$completed_header_row.= "<th width=$notes_width><font size=-2>PPI Notes</th>";
 
+		$this->t->set_var('completed_table_title',$completed_table_title);
 		$this->t->set_var('table_width',$table_width);
 		$this->t->set_var('header_row',$header_row);
 		$this->t->set_var('table_data',$table_data);
@@ -1626,7 +1646,7 @@ class tc
 		$totals_header_row = "<th width=$indivs_width><font size=-2>Individuals</th>";
 		$totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
 		$totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
-		$totals_data.= "<td align=left><font size=-2><b>Total Individuals with yearly PPIs completed:</b></font></td>";
+		$totals_data.= "<td align=left><font size=-2><b>Total Individuals with " . $this->ppi_frequency_label . " PPIs completed:</b></font></td>";
 		$totals_data.= "<td align=center><font size=-2><b>$indivs_with_yearly_ppi / $total_indivs</b></font></td>";
 		$percent = ceil(($indivs_with_yearly_ppi / $total_indivs)*100);
 		$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
@@ -2318,12 +2338,12 @@ class tc
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
 
 		$this->t->set_var('ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_view'));
-		$this->t->set_var('ppi_link_title','Yearly PPIs'); 
+		$this->t->set_var('ppi_link_title',$this->ppi_frequency_label . ' PPIs'); 
 
 		$this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
-		$this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
+		$this->t->set_var('schedule_ppi_link_title','Schedule ' . $this->ppi_frequency_label . ' PPIs');
 
-		$this->t->set_var('title','Yearly PPIs');
+		$this->t->set_var('title',$this->ppi_frequency_label . ' PPIs');
 		$num_months = get_var('num_months',array('GET','POST'));
 		if($num_months == '') { $num_months = $this->default_ppi_num_years; }
 		$this->t->set_var('num_months',$num_months);
@@ -3518,7 +3538,7 @@ class tc
 		$this->t->set_var('schedule_int_link_title','Schedule Hometeaching Interviews');
 
 		$this->t->set_var('schedule_ppi_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched'));
-		$this->t->set_var('schedule_ppi_link_title','Schedule Yearly PPIs');
+		$this->t->set_var('schedule_ppi_link_title','Schedule ' . $this->ppi_frequency_label . ' PPIs');
 
 		$date_width=160; $time_width=220; $indiv_width=170; $family_width=180; $location_width=100;
 		$table_width=$date_width + $time_width + $indiv_width + $family_width + $location_width;
