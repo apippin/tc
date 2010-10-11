@@ -1,5 +1,5 @@
 <center>
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{title}</b></font></td>
 		</tr>
@@ -14,7 +14,7 @@
 <!-- BEGIN appt_list -->
 	<form action="{actionurl}" method="POST">
 		<input type=hidden name=presidency_location value={presidency_location}>
-        <table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
+        <table border="0" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 				<font face="{font}"><b>{appt_table_title}</b></font>
@@ -26,7 +26,7 @@
 		<td></td><td></td><td></td><td></td>
 		</tr>
         </table>
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" cellspacing="2" cellpadding="2">
 		<tr>
                 <td height="50" align="right">
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
@@ -40,7 +40,7 @@
 <hr>
 <!-- BEGIN individual_list -->
         <form action="{actionurl}" method="POST">
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" cellspacing="2" cellpadding="2">
               	<tr>
                 	<td colspan=5 height="50" align="right">
                         	<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
@@ -68,7 +68,7 @@
         </form>
 <!-- END individual_list -->
 	<hr>
-	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 			<font face="{font}"><b>{completed_table_title}</b></font>
@@ -79,10 +79,10 @@
 	</table>
 	<br><br>
 
-	<table border="0" width="{totals_table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-			<font face="{font}"><b>Total Yearly PPIs</b></font>
+			<font face="{font}"><b>Total {ppi_frequency_label} PPIs</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{totals_header_row}</tr>
@@ -90,15 +90,5 @@
 	</table>
 	<hr>
 </center>
-
-
-
-
-
-
-
-
-
-
 
 
