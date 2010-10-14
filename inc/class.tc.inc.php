@@ -416,7 +416,7 @@ class tc
 		$this->t->set_var('title','Hometeaching Sandbox'); 
 
 		// get list of companionships
-		$sql = "SELECT DISTINCT companionship FROM tc_companionship where valid=1";
+		$sql = "SELECT DISTINCT companionship FROM tc_companionship where valid=1 ORDER BY companionship ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$unique_companionships = '';
 		$unique_companionships[0]['companionship'] = 0;
@@ -427,7 +427,7 @@ class tc
 			$companionship = $this->db->f('companionship');
 			$unique_companionships[$j]['companionship'] = $companionship;
 			$combined_companionship = "";
-			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship AND tc.valid=1";
+			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship AND tc.valid=1 ORDER BY ti.name ASC";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			while ($this->db2->next_record()) {
 				if ($combined_companionship == "") {
@@ -505,18 +505,85 @@ class tc
 		}
 		
 		# populate ht districts table
+		$sandbox_table_data = "<table border=\"0\" cellspacing=\"2\" cellpadding=\"2\">";
+		
+		# set up column headers
+		$sandbox_table_data .= "<tr>";
 		for ($d = 0; $d < $num_districts; $d++) {
-			$this->t->set_var('district_number',$districts[$d]);
-			
-			$sql = "SELECT * FROM tc_companionship AS tcp JOIN (tc_family AS tf, tc_individual AS ti) WHERE tcp.companionship=tf.companionship AND tf.individual=ti.individual AND tcp.valid=1";
+			$sandbox_table_data .= "<th align=\"center\" bgcolor=\"#c9c9c9\">District " . $districts[$d] . "</th>";
+		}
+
+		# get each companionship in each district
+		$sandbox_table_data .= "<tr>";
+		for ($d = 0; $d < $num_districts; $d++) {
+			$sandbox_table_data .= "<td valign=\"Top\">";
+			$sandbox_table_data .= "<table>";
+			$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE district=$districts[$d] AND valid=1 ORDER BY companionship ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
-				$name = $this->db->f('name');
-				$this->t->set_var('name',$name);
+				$sandbox_table_data .= "<tr><td><table>";
+				$companionship = $this->db->f('companionship');
+				# get names of companions in this companionship
+				$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship AND tc.valid=1 ORDER BY ti.name ASC";
+				$this->db2->query($sql,__LINE__,__FILE__);
+				$companion_names = "";
+				while ($this->db2->next_record()) {
+					if ($companion_names == "") {
+						$companion_names .= $this->db2->f('name');
+					} else {
+						$companion_names .= " / " . $this->db2->f('name');
+					}
+				}
+				$sandbox_table_data .= "<tr><th align=\"Left\" bgcolor=\"#c9c9c9\">$companion_names</th></tr>";
+				$sandbox_table_data .= "<tr><td><table>";
+				
+				# get families they visit
+				$sql = "SELECT * FROM tc_companionship AS tcp JOIN (tc_family AS tf, tc_individual AS ti) WHERE tcp.companionship=$companionship AND tcp.companionship=tf.companionship AND tf.individual=ti.individual AND tcp.valid=1";
+				$this->db2->query($sql,__LINE__,__FILE__);
+				while ($this->db2->next_record()) {
+					$family_name = $this->db2->f('name') . " Family";
+					$family_id = $this->db2->f('family');
+					$sandbox_table_data .= "<tr>";
+					$sandbox_table_data .= "<td>$family_name</td>";
+					
+					# get 12 months visit data for given family
+					for($m=12; $m >= 0; $m--) {
+						$month = $this->current_month - $m;
+						$year = $this->current_year;
+						if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
+						if($month < 10) { $month = "0"."$month"; }
+						$month_start = "$year"."-"."$month"."-"."01";
+						$month_end = "$year"."-"."$month"."-"."31";
+						$month = "$month"."/"."$year";
+
+						$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' AND companionship!=0 AND family=". $family_id;
+						$query_id = $this->db3->query($sql,__LINE__,__FILE__);
+
+						if($this->db3->next_record()) {
+							if($this->db3->f('visited') == 'y') {
+								$sandbox_table_data .= '<td align=center><img src="images/checkmark.gif"></td>';
+							} else if($this->db3->f('visited') == 'n') {
+								$sandbox_table_data .= '<td align=center><img src="images/x.gif"></td>';
+							} else {
+								$sandbox_table_data .= "<td>&nbsp;</td>";
+							}
+						} else {
+							$sandbox_table_data .= "<td>&nbsp;</td>";
+						}
+					}
+					$sandbox_table_data .= "</tr>";
+				}
+				$sandbox_table_data .= "</table></td></tr>";
+				$sandbox_table_data .= "</table></td></tr>";
 			}
 			
-			$this->t->fp('dt_list','district_table_list',True);
+			$sandbox_table_data .= "</table>";
+			$sandbox_table_data .= "</td>";
 		}
+		$sandbox_table_data .= "</tr>";
+		
+		$sandbox_table_data .= "</table>";
+		$this->t->set_var('district_table',$sandbox_table_data);
 
 		$this->t->pfp('out','ht_sandbox_t');
 		$this->save_sessiondata();

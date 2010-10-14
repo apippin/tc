@@ -100,15 +100,6 @@
 	</table>
 
 	<br>
-	<table border="0" cellspacing="2" cellpadding="2">
-		<tr>
-<!-- BEGIN district_table_list -->
-			<td align="center" bgcolor="#c9c9c9">
-				<font face="{font}"><b>District {district_number}</b></font>
-			</td>
-<!-- END district_table_list -->
-		</tr>
-		
-	</table>
+	{district_table}
 	<br><br>
 </center>
