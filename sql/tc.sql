@@ -49,15 +49,6 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_assignment` (
 ) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tc_assignment`
---
-LOCK TABLES `tc_assignment` WRITE;
-/*!40000 ALTER TABLE `tc_assignment` DISABLE KEYS */;
-INSERT INTO `tc_assignment` (`assignment`, `name`, `abbreviation`) VALUES (1,'Enrichment Night Babysitting','RS'),(2,'Building Lockup','LU'),(3,'Building Cleaning Coordinator','CC'),(4,'Missionary Splits','MS'),(5,'Stake Farm','SF'),(6,'Loveland Kitchen','LK'),(7,'Moves','MV'),(8,'Temple Kitchen & Laundary','TKL'),(9,'Temple Sealings','TS'),(10,'Temple Initatories','TI');
-/*!40000 ALTER TABLE `tc_assignment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `tc_attendance`
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_attendance` (
@@ -254,17 +245,17 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_task` (
 -- Table structure for table `tc_district_sandbox`
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_district_sandbox` (
-`district` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-`supervisor` INT( 16 ) UNSIGNED NULL DEFAULT NULL
+  `district` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `supervisor` INT( 16 ) UNSIGNED NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
 
 --
 -- Table structure for table `tc_companion_sandbox`
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companion_sandbox` (
-`companion` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`individual` INT( 16 ) UNSIGNED NOT NULL ,
-`companionship` INT( 16 ) UNSIGNED NOT NULL
+  `companion` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `individual` INT( 16 ) UNSIGNED NOT NULL ,
+  `companionship` INT( 16 ) UNSIGNED NOT NULL
 ) ENGINE = MYISAM ;
 
 --
@@ -281,6 +272,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companionship_sandbox` (
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_family_sandbox` (
   `family` int(16) unsigned NOT NULL auto_increment,
   `tc_family` int(16) unsigned default '0',
+  `individual` INT( 16 ) UNSIGNED NOT NULL ,
   `companionship` int(16) unsigned default NULL,
   PRIMARY KEY  (`family`)
 ) ENGINE = MyISAM ;

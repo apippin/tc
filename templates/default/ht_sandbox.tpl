@@ -1,5 +1,6 @@
 <center>
 
+	<form action="{submit_action}" method="POST">
 	<table border="0" width="100%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{title}</b></font></td>
@@ -7,12 +8,7 @@
 	</table>
 	<br>
 
-	<form action="{linkurl}" method="POST">
-	</form>
-
-	<form action="{actionurl}" method="POST">
-
-	<table border="0" cellspacing="2" cellpadding="2">
+ 	<table border="0" cellspacing="2" cellpadding="2">
 		<tr>
 			<th bgcolor="#c9c9c9">Companionship</th>
 			<th bgcolor="#c9c9c9">Unassigned HT</th>
@@ -40,28 +36,28 @@
 				</select>
 			</td>
 			<td>
-				<select name="unassignedHT" multiple size="9">
+				<select name="unassignedHT[]" multiple size="9">
 <!-- BEGIN unassigned_ht_list -->
 					{unassigned_ht}
 <!-- END unassigned_ht_list -->
 				</select>
 			</td>
 			<td>
-				<select name="AssignedHT&quot;" multiple size="9">
+				<select name="assignedHT[]" multiple size="9">
 <!-- BEGIN assigned_ht_list -->
 					{assigned_ht}
 <!-- END assigned_ht_list -->
 				</select>
 			</td>
 			<td>
-				<select name="unassignedFamilies&quot;" multiple size="9">
+				<select name="unassignedFamilies[]" multiple size="9">
 <!-- BEGIN unassigned_family_list -->
 					{unassigned_family}
 <!-- END unassigned_family_list -->
 				</select>
 			</td>
 			<td>
-				<select name="AssignedFamiles&quot;" multiple size="9">
+				<select name="assignedFamiles[]" multiple size="9">
 <!-- BEGIN assigned_family_list -->
 					{assigned_family}
 <!-- END assigned_family_list -->
@@ -71,33 +67,36 @@
 				<table>
 					<tr>
 						<td>
-							<button>Clear Selections</button>
+							<font face="{font}"><input type="reset" name="clear" value="Clear Selections"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<button>Add Companionship</button>
+							<font face="{font}"><input type="submit" name="add" value="Add Companionship"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<button>Delete Companionship</button>
+							<font face="{font}"><input type="submit" name="delete" value="Delete Companionship"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<button>Update Companionship</button>
+							<font face="{font}"><input type="submit" name="update" value="Update Companionship"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<button>Reset to MLS</button>
+							<font face="{font}"><input type="submit" name="reset" value="Reset to MLS"></font>
 						</td>
 					</tr>
 				</table>
 			</td>
 		</tr>
 	</table>
+	</form>
+
+	<font face="{font}" color=red><b>{debug_list}</b></font>
 
 	<br>
 	{district_table}

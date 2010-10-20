@@ -410,24 +410,172 @@ class tc
 		$this->t->set_block('ht_sandbox_t','district_table_list','dt_list');
 		$this->t->set_block('ht_sandbox_t','companionship_table_list','ct_list');
 
-		$this->t->set_var('linkurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
+		$this->t->set_var('submit_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox&action=add'));
+		
+	    $action = get_var('action',array('GET','POST'));
 
-		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
 		$this->t->set_var('title','Hometeaching Sandbox'); 
 
+		if ($_POST['add']) {
+			#$this->t->set_var('debug_list',$_POST['add']);
+			$companionship = get_var('companionship',array('POST'));
+			$district = get_var('district',array('POST'));
+			$assignedHT_list = get_var('assignedHT',array('POST'));
+			$unassignedHT_list = get_var('unassignedHT',array('POST'));
+			$assigned_family_list = get_var('assignedFamiles',array('POST'));
+			$unassigned_family_list = get_var('unassignedFamilies',array('POST'));
+			
+			if ($assignedHT_list || $unassignedHT_list) {
+				$sql = "INSERT INTO tc_companionship_sandbox (district) VALUES (\"$district\")";
+				$this->db2->query($sql,__LINE__,__FILE__);
+				$companionship_sandbox = mysql_insert_id();
+				
+				foreach ($assignedHT_list as $individual) {
+					$sql = "INSERT INTO tc_companion_sandbox (individual,companionship) VALUES (\"$individual\",\"$companionship_sandbox\")";
+					$this->db->query($sql,__LINE__,__FILE__);
+				}
+				foreach ($unassignedHT_list as $individual) {
+					$sql = "INSERT INTO tc_companion_sandbox (individual,companionship) VALUES (\"$individual\",\"$companionship_sandbox\")";
+					$this->db->query($sql,__LINE__,__FILE__);
+				}
+				foreach ($assigned_family_list as $family) {
+					$sql = "UPDATE tc_family_sandbox SET companionship=$companionship_sandbox WHERE family=$family";
+					$this->db->query($sql,__LINE__,__FILE__);
+				}
+				foreach ($unassigned_family_list as $family) {
+					$sql = "UPDATE tc_family_sandbox SET companionship=$companionship_sandbox WHERE family=$family";
+					$this->db->query($sql,__LINE__,__FILE__);
+				}
+			} else {
+				$this->t->set_var('debug_list','You must select at least one companion!');
+			}
+		} else if ($_POST['delete']) {
+			#$this->t->set_var('debug_list',$_POST['delete']);
+			$companionship = get_var('companionship',array('POST'));
+			#$this->t->set_var('debug_list',$companionship);
+			
+			if ($companionship > 0) {
+				# unassign families
+				$sql = "UPDATE tc_family_sandbox SET companionship=NULL WHERE companionship=$companionship";
+				$this->db->query($sql,__LINE__,__FILE__);
+				
+				# remove companions
+				$sql = "DELETE FROM tc_companion_sandbox WHERE companionship=$companionship";
+				$this->db->query($sql,__LINE__,__FILE__);
+				
+				# remove companionship
+				$sql = "DELETE FROM tc_companionship_sandbox WHERE companionship=$companionship";
+				$this->db->query($sql,__LINE__,__FILE__);
+			} else {
+				$this->t->set_var('debug_list','You must select a companionship to delete!');
+			}
+		} else if ($_POST['update']) {
+			#$this->t->set_var('debug_list',$_POST['update']);
+			$companionship = get_var('companionship',array('POST'));
+			$district = get_var('district',array('POST'));
+			$assignedHT_list = get_var('assignedHT',array('POST'));
+			$unassignedHT_list = get_var('unassignedHT',array('POST'));
+			$assigned_family_list = get_var('assignedFamiles',array('POST'));
+			$unassigned_family_list = get_var('unassignedFamilies',array('POST'));
+			#$this->t->set_var('debug_list',$district);
+			
+			if ($companionship > 0) {
+				if ($assignedHT_list || $unassignedHT_list) {
+					# clear out existing info about companionship
+					$sql = "UPDATE tc_family_sandbox SET companionship=NULL WHERE companionship=$companionship";
+					$this->db->query($sql,__LINE__,__FILE__);
+					$sql = "DELETE FROM tc_companion_sandbox WHERE companionship=$companionship";
+					$this->db->query($sql,__LINE__,__FILE__);
+					
+					# set new info about companionship
+					$sql = "UPDATE tc_companionship_sandbox SET district=$district WHERE companionship=$companionship";
+					$this->db->query($sql,__LINE__,__FILE__);
+					foreach ($assignedHT_list as $individual) {
+						$sql = "INSERT INTO tc_companion_sandbox (individual,companionship) VALUES (\"$individual\",\"$companionship\")";
+						$this->db->query($sql,__LINE__,__FILE__);
+					}
+					foreach ($unassignedHT_list as $individual) {
+						$sql = "INSERT INTO tc_companion_sandbox (individual,companionship) VALUES (\"$individual\",\"$companionship\")";
+						$this->db->query($sql,__LINE__,__FILE__);
+					}
+					foreach ($assigned_family_list as $family) {
+						$sql = "UPDATE tc_family_sandbox SET companionship=$companionship WHERE family=$family";
+						$this->db->query($sql,__LINE__,__FILE__);
+					}
+					foreach ($unassigned_family_list as $family) {
+						$sql = "UPDATE tc_family_sandbox SET companionship=$companionship WHERE family=$family";
+						$this->db->query($sql,__LINE__,__FILE__);
+					}
+				} else {
+					$this->t->set_var('debug_list','You must select at least one companion!');
+				}
+			} else {
+				$this->t->set_var('debug_list','You must select a companionship to update!');
+			}
+		} else if ($_POST['reset']) {
+			#$this->t->set_var('debug_list',$_POST['reset']);
+			
+			$sql = "TRUNCATE TABLE tc_district_sandbox";
+			$this->db->query($sql,__LINE__,__FILE__);
+			$sql = "TRUNCATE TABLE tc_family_sandbox";
+			$this->db->query($sql,__LINE__,__FILE__);
+			$sql = "TRUNCATE TABLE tc_companion_sandbox";
+			$this->db->query($sql,__LINE__,__FILE__);
+			$sql = "TRUNCATE TABLE tc_companionship_sandbox";
+			$this->db->query($sql,__LINE__,__FILE__);
+			
+			# populate tc_district_sandbox
+			$sql = "SELECT * FROM tc_district WHERE valid=1";
+			$this->db->query($sql,__LINE__,__FILE__);
+			while ($this->db->next_record()) {
+				$district = $this->db->f('district');
+				$supervisor = $this->db->f('supervisor');
+				$sql = "INSERT INTO tc_district_sandbox (district,supervisor) VALUES (\"$district\",\"$supervisor\")";
+				$this->db2->query($sql,__LINE__,__FILE__);
+			}
+			
+			# populate family, companion, and companionship tables
+			$sql = "SELECT * FROM tc_companionship WHERE valid=1";
+			$this->db->query($sql,__LINE__,__FILE__);
+			while ($this->db->next_record()) {
+				$companionship = $this->db->f('companionship');
+				$district = $this->db->f('district');
+				$sql = "INSERT INTO tc_companionship_sandbox (district) VALUES (\"$district\")";
+				$this->db2->query($sql,__LINE__,__FILE__);
+				$companionship_sandbox = mysql_insert_id();
+				
+				$sql = "SELECT * FROM tc_companion WHERE companionship=$companionship AND valid=1";
+				$this->db2->query($sql,__LINE__,__FILE__);
+				while ($this->db2->next_record()) {
+					$individual = $this->db2->f('individual');
+					$sql = "INSERT INTO tc_companion_sandbox (individual,companionship) VALUES (\"$individual\",\"$companionship_sandbox\")";
+					$this->db3->query($sql,__LINE__,__FILE__);
+				}
+				
+				$sql = "SELECT * FROM tc_family WHERE companionship=$companionship AND valid=1";
+				$this->db2->query($sql,__LINE__,__FILE__);
+				while ($this->db2->next_record()) {
+					$individual = $this->db2->f('individual');
+					$family = $this->db2->f('family');
+					$sql = "INSERT INTO tc_family_sandbox (tc_family,individual,companionship) VALUES (\"$family\",\"$individual\",\"$companionship_sandbox\")";
+					$this->db3->query($sql,__LINE__,__FILE__);
+				}
+			}
+		}
+		
 		// get list of companionships
-		$sql = "SELECT DISTINCT companionship FROM tc_companionship where valid=1 ORDER BY companionship ASC";
+		$sql = "SELECT DISTINCT companionship FROM tc_companionship_sandbox ORDER BY companionship ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$unique_companionships = '';
 		$unique_companionships[0]['companionship'] = 0;
-		$this->t->set_var('companionship_list','<option value="0">New</option>');
-		$this->t->fp('list','comp_list',True);
+		$this->t->set_var('companionship_list','<option value="0">New Companionship</option>');
+		$this->t->fp('c_list','comp_list',True);
 		$j=1;
 		while ($this->db->next_record()) {
 			$companionship = $this->db->f('companionship');
 			$unique_companionships[$j]['companionship'] = $companionship;
 			$combined_companionship = "";
-			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship AND tc.valid=1 ORDER BY ti.name ASC";
+			$sql = "SELECT * FROM tc_companion_sandbox AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND tc.companionship=$companionship ORDER BY ti.name ASC";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			while ($this->db2->next_record()) {
 				if ($combined_companionship == "") {
@@ -436,19 +584,19 @@ class tc
 					$combined_companionship .= " / " . $this->db2->f('name');
 				}
 			}
-			$this->t->set_var('companionship_list','<option value="'.$j.'">'.$combined_companionship.'</option>');
+			$this->t->set_var('companionship_list','<option value="'.$companionship.'">'.$combined_companionship.'</option>');
 			$this->t->fp('c_list','comp_list',True);
 			$j++;
 		}
 
 		# get list of districts
-		$sql = "SELECT DISTINCT district FROM tc_district WHERE valid=1 ORDER BY district ASC";
+		$sql = "SELECT DISTINCT district FROM tc_district_sandbox ORDER BY district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$districts = '';
 		$num_districts=0;
 		while ($this->db->next_record()) {
 			$districts[$num_districts] = $this->db->f('district');
-			$this->t->set_var('district','<option value="'.$num_districts.'">'.$districts[$num_districts].'</option>');
+			$this->t->set_var('district','<option value="'.$districts[$num_districts].'">'.$districts[$num_districts].'</option>');
 			$this->t->fp('d_list','district_list',True);
 			$num_districts++;
 		}
@@ -456,51 +604,33 @@ class tc
 		# get list of individuals who are and are not home teachers
 		$sql = "SELECT * FROM tc_individual WHERE steward='$this->default_stewardship' AND valid=1 ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
-		$unassigned_ht = '';
-		$assigned_ht = '';
-		$num_ht_assigned=0; $num_ht_unassigned=0;
 		while ($this->db->next_record()) {
 			$individual = $this->db->f('individual');
 			$name = $this->db->f('name');
-			$sql = "SELECT DISTINCT * FROM tc_companion WHERE individual=$individual AND valid=1";
+			$sql = "SELECT DISTINCT * FROM tc_companion_sandbox WHERE individual=$individual";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if ($this->db2->next_record()) {
-				$assigned_ht[$num_ht_assigned]['individual'] = $individual;
-				$assigned_ht[$num_ht_assigned]['name'] = $name;
-				$this->t->set_var('assigned_ht','<option value="'.$num_ht_assigned.'">'.$name.'</option>');
+				$this->t->set_var('assigned_ht','<option value="'.$individual.'">'.$name.'</option>');
 				$this->t->fp('aht_list','assigned_ht_list',True);
-				$num_ht_assigned++;
 			} else {
-				$unassigned_ht[$num_ht_unassigned]['individual'] = $individual;
-				$unassigned_ht[$num_ht_unassigned]['name'] = $name;
-				$this->t->set_var('unassigned_ht','<option value="'.$num_ht_unassigned.'">'.$name.'</option>');
+				$this->t->set_var('unassigned_ht','<option value="'.$individual.'">'.$name.'</option>');
 				$this->t->fp('uht_list','unassigned_ht_list',True);
-				$num_ht_unassigned++;
 			}
 		}
 		
 		# get list of families who are and are not assigned home teachers
-		$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.valid=1 ORDER BY ti.name ASC";
+		$sql = "SELECT * FROM tc_family_sandbox AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
-		$unassigned_families = '';
-		$assigned_families = '';
-		$num_families_assigned=0; $num_families_unassigned=0;
 		while ($this->db->next_record()) {
 			$individual = $this->db->f('individual');
 			$family = $this->db->f('family');
 			$name = $this->db->f('name');
 			if ($this->db->f('companionship') != 0) {
-				$assigned_families[$num_families_assigned]['family'] = $family;
-				$assigned_families[$num_families_assigned]['name'] = $name;
-				$this->t->set_var('assigned_family','<option value="'.$num_families_assigned.'">'.$name.' Family</option>');
+				$this->t->set_var('assigned_family','<option value="'.$family.'">'.$name.' Family</option>');
 				$this->t->fp('af_list','assigned_family_list',True);
-				$num_families_assigned++;
 			} else {
-				$unassigned_families[$num_families_unassigned]['family'] = $family;
-				$unassigned_families[$num_families_unassigned]['name'] = $name;
-				$this->t->set_var('unassigned_family','<option value="'.$num_families_assigned.'">'.$name.' Family</option>');
+				$this->t->set_var('unassigned_family','<option value="'.$family.'">'.$name.' Family</option>');
 				$this->t->fp('uf_list','unassigned_family_list',True);
-				$num_families_unassigned++;
 			}
 		}
 		
@@ -518,13 +648,13 @@ class tc
 		for ($d = 0; $d < $num_districts; $d++) {
 			$sandbox_table_data .= "<td valign=\"Top\">";
 			$sandbox_table_data .= "<table>";
-			$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE district=$districts[$d] AND valid=1 ORDER BY companionship ASC";
+			$sql = "SELECT DISTINCT companionship FROM tc_companionship_sandbox WHERE district=$districts[$d] ORDER BY companionship ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
 				$sandbox_table_data .= "<tr><td><table>";
 				$companionship = $this->db->f('companionship');
 				# get names of companions in this companionship
-				$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship AND tc.valid=1 ORDER BY ti.name ASC";
+				$sql = "SELECT * FROM tc_companion_sandbox AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship ORDER BY ti.name ASC";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				$companion_names = "";
 				while ($this->db2->next_record()) {
@@ -538,13 +668,13 @@ class tc
 				$sandbox_table_data .= "<tr><td><table>";
 				
 				# get families they visit
-				$sql = "SELECT * FROM tc_companionship AS tcp JOIN (tc_family AS tf, tc_individual AS ti) WHERE tcp.companionship=$companionship AND tcp.companionship=tf.companionship AND tf.individual=ti.individual AND tcp.valid=1";
+				$sql = "SELECT * FROM tc_companionship_sandbox AS tcp JOIN (tc_family_sandbox AS tf, tc_individual AS ti) WHERE tcp.companionship=$companionship AND tcp.companionship=tf.companionship AND tf.individual=ti.individual";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				while ($this->db2->next_record()) {
 					$family_name = $this->db2->f('name') . " Family";
-					$family_id = $this->db2->f('family');
+					$family_id = $this->db2->f('tc_family');
 					$sandbox_table_data .= "<tr>";
-					$sandbox_table_data .= "<td>$family_name</td>";
+					$sandbox_table_data .= "<td align=\"Left\">$family_name</td>";
 					
 					# get 12 months visit data for given family
 					for($m=12; $m >= 0; $m--) {
@@ -561,9 +691,9 @@ class tc
 
 						if($this->db3->next_record()) {
 							if($this->db3->f('visited') == 'y') {
-								$sandbox_table_data .= '<td align=center><img src="images/checkmark.gif"></td>';
+								$sandbox_table_data .= "<td align=\"Right\"><img src=\"images/checkmark.gif\"></td>";
 							} else if($this->db3->f('visited') == 'n') {
-								$sandbox_table_data .= '<td align=center><img src="images/x.gif"></td>';
+								$sandbox_table_data .= "<td align=\"Right\"><img src=\"images/x.gif\"></td>";
 							} else {
 								$sandbox_table_data .= "<td>&nbsp;</td>";
 							}
