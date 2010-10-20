@@ -1677,7 +1677,7 @@ class tc
 		$this->t->set_file(array('ppi_sched_t' => 'ppi_sched.tpl'));
 		$this->t->set_block('ppi_sched_t','individual_list','indivlist');
 		$this->t->set_block('ppi_sched_t','appt_list','apptlist');
-	    $action = get_var('action',array('GET','POST'));
+		$action = get_var('action',array('GET','POST'));
 
 		$this->t->set_var('lang_save','Save Appt / Pri / Notes');
 		$this->t->set_var('lang_reset','Clear Changes');
@@ -1691,13 +1691,11 @@ class tc
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ppi_sched&action=save'));
 		$this->t->set_var('title',$this->ppi_frequency_label . ' PPI Scheduler');
 
-		$indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $ppi_date_width=20;
-		$table_width=$indiv_width + $phone_width + $pri_width + $notes_width + $ppi_date_width;
-		$header_row = "<th width=$indiv_width><font size=-2>individual Name</th>";
-		$header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
-		$header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
-		$header_row.= "<th width=$ppi_date_width><font size=-2>Last PPI</th>";
-		$header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
+		$header_row = "<th ><font size=-2>Individual Name</th>";
+		$header_row.= "<th><font size=-2>Phone</th>";
+		$header_row.= "<th><font size=-2>Priority</th>";
+		$header_row.= "<th><font size=-2>Last PPI</th>";
+		$header_row.= "<th><font size=-2>Scheduling Notes</th>";
 		$table_data=""; $completed_data=""; $totals_data="";
 
 		$year = date('Y');
@@ -1768,12 +1766,10 @@ class tc
 		array_multisort($indiv_name, $individual);
 
 		// APPOINTMENT TABLE
-		$date_width=250; $time_width=100; $indiv_width=200; $location_width=100;
-		$appt_table_width=$date_width + $time_width + $indiv_width + $location_width;
-		$appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
-		$appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-		$appt_header_row.= "<th width=$indiv_width><font size=-2>Individual</th>";
-		$appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
+		$appt_header_row = "<th><font size=-2>Date</th>";
+		$appt_header_row.= "<th><font size=-2>Time</th>";      
+		$appt_header_row.= "<th><font size=-2>Individual</th>";
+		$appt_header_row.= "<th><font size=-2>Location</th>";
 		$appt_table_data = "";
 		$table_data="";
 
@@ -1795,10 +1791,8 @@ class tc
 		  $appt_table_data = "";
 
 		  // Display a scheduling table for this presidency member
-		  $district_number = '*';
-		  $district_name = $presidency_name;
-		  $not_completed_table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Not Completed";
-		  $appt_table_title = "District ".$district_number.": ".$district_name.": ".$this->ppi_frequency_label." PPI Appointment Slots";
+		  $not_completed_table_title = "All individuals with " . $this->ppi_frequency_label . " PPI Not Completed";
+		  $appt_table_title = $presidency_name . ": " . $this->ppi_frequency_label." PPI Appointment Slots";
 		  $this->t->set_var('not_completed_table_title',$not_completed_table_title);
 		  $this->t->set_var('appt_table_title',$appt_table_title);
 
@@ -1849,7 +1843,8 @@ class tc
 		  }
 		  $this->t->set_var('appt_table_data',$appt_table_data);
 		  $this->t->set_var('appt_header_row',$appt_header_row);
-		  $this->t->set_var('appt_table_width',$appt_table_width);
+       		  $this->t->set_var('lang_save','Save Appts for ' . $presidency_name);
+
 		  $this->t->fp('apptlist','appt_list',True);
 		}
 		
@@ -1947,27 +1942,22 @@ class tc
 			}
 		} // End for individuals Loop
 
-		$completed_table_title = "District ".$district_number.": ".$district_name.": All indivs with " . $this->ppi_frequency_label . " PPI Completed";
-		$name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
-		$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-		$completed_header_row = "<th width=$name_width><font size=-2>Individual</th>";
-		$completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
-		$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
-		$completed_header_row.= "<th width=$notes_width><font size=-2>PPI Notes</th>";
+		$completed_table_title = "All individuals with " . $this->ppi_frequency_label . " PPI Completed";
+		$completed_header_row = "<th><font size=-2>Individual</th>";
+		$completed_header_row.= "<th><font size=-2>Phone</th>";      
+		$completed_header_row.= "<th><font size=-2>Date</th>";
+		$completed_header_row.= "<th><font size=-2>PPI Notes</th>";
 
 		$this->t->set_var('completed_table_title',$completed_table_title);
-		$this->t->set_var('table_width',$table_width);
 		$this->t->set_var('header_row',$header_row);
 		$this->t->set_var('table_data',$table_data);
 		$this->t->set_var('completed_header_row',$completed_header_row);
-		$this->t->set_var('completed_table_width',$completed_table_width);
 		$this->t->set_var('completed',$completed_data);
+		$this->t->set_var('lang_save','Save Pri / Notes'); 
 		$this->t->fp('indivlist','individual_list',True); 
 
-		$indivs_width=300; $totals_width=100;
-		$totals_table_width=$indivs_width + $totals_width;
-		$totals_header_row = "<th width=$indivs_width><font size=-2>Individuals</th>";
-		$totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
+		$totals_header_row = "<th><font size=-2>Individuals</th>";
+		$totals_header_row.= "<th><font size=-2>$year</th>";
 		$totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 		$totals_data.= "<td align=left><font size=-2><b>Total Individuals with " . $this->ppi_frequency_label . " PPIs completed:</b></font></td>";
 		$totals_data.= "<td align=center><font size=-2><b>$indivs_with_yearly_ppi / $total_indivs</b></font></td>";
@@ -1981,7 +1971,7 @@ class tc
 
 		$this->t->set_var('totals',$totals_data);
 		$this->t->set_var('totals_header_row',$totals_header_row);
-		$this->t->set_var('totals_table_width',$totals_table_width);
+		$this->t->set_var('ppi_frequency_label',$this->ppi_frequency_label);
 
 		$this->t->pfp('out','ppi_sched_t');
 		$this->save_sessiondata(); 
@@ -1995,7 +1985,6 @@ class tc
 		$this->t->set_block('int_sched_t','appt_list','apptlist');
 		$action = get_var('action',array('GET','POST'));
 
-		$this->t->set_var('lang_save','Save Appt / Pri / Notes');
 		$this->t->set_var('lang_reset','Clear Changes');
 
 		$this->t->set_var('int_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_view'));
@@ -2007,13 +1996,11 @@ class tc
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_sched&action=save'));
 		$this->t->set_var('title','Hometeaching Interviews Scheduler');
 
-		$indiv_width=500; $phone_width=25; $pri_width=10; $notes_width=128; $int_date_width=20;
-		$table_width=$indiv_width + $phone_width + $pri_width + $notes_width + $int_date_width;
-		$header_row = "<th width=$indiv_width><font size=-2>Individual</th>";
-		$header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
-		$header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
-		$header_row.= "<th width=$int_date_width><font size=-2>Last Interview</th>";
-		$header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
+		$header_row = "<th><font size=-2>Individual</th>";
+		$header_row.= "<th><font size=-2>Phone</th>";
+		$header_row.= "<th><font size=-2>Priority</th>";
+		$header_row.= "<th><font size=-2>Last Interview</th>";
+		$header_row.= "<th><font size=-2>Scheduling Notes</th>";
 		$table_data=""; $completed_data=""; $totals_data="";
 
 		$year = date('Y');
@@ -2126,12 +2113,10 @@ class tc
 
 		// APPOINTMENT TABLE
 		$district = 1;
-		$date_width=250; $time_width=100; $indiv_width=200; $location_width=100;
-		$appt_table_width=$date_width + $time_width + $indiv_width + $location_width;
-		$appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
-		$appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-		$appt_header_row.= "<th width=$indiv_width><font size=-2>Individual</th>";
-		$appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
+		$appt_header_row = "<th><font size=-2>Date</th>";
+		$appt_header_row.= "<th><font size=-2>Time</th>";      
+		$appt_header_row.= "<th><font size=-2>Individual</th>";
+		$appt_header_row.= "<th><font size=-2>Location</th>";
 		$appt_table_data = ""; 
 
 		$total_comps=0; $comps_with_quarterly_int=0;
@@ -2204,7 +2189,6 @@ class tc
 
 			$this->t->set_var('appt_table_data',$appt_table_data);
 			$this->t->set_var('appt_header_row',$appt_header_row);
-			$this->t->set_var('appt_table_width',$appt_table_width);
 
 			// INTERVIEW SCHEDULING TABLE
 
@@ -2317,28 +2301,24 @@ class tc
 				}
 			}
 
-			$name_width=175; $phone_width=100; $date_width=100; $notes_width=300;
-			$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-			$completed_header_row = "<th width=$name_width><font size=-2>Individual</th>";
-			$completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
-			$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
-			$completed_header_row.= "<th width=$notes_width><font size=-2>Interview Notes</th>";
+			$completed_header_row = "<th><font size=-2>Individual</th>";
+			$completed_header_row.= "<th><font size=-2>Phone</th>";      
+			$completed_header_row.= "<th><font size=-2>Date</th>";
+			$completed_header_row.= "<th><font size=-2>Interview Notes</th>";
 
-			$this->t->set_var('table_width',$table_width);
 			$this->t->set_var('header_row',$header_row);
 			$this->t->set_var('table_data',$table_data);
 			$this->t->set_var('completed_header_row',$completed_header_row);
-			$this->t->set_var('completed_table_width',$completed_table_width);
 			$this->t->set_var('completed',$completed_data);
+			$this->t->set_var('lang_save_appt','Save Appts for ' . $districts[$d]['name']);
+			$this->t->set_var('lang_save_pri_notes','Save Pri / Notes for '. $districts[$d]['name']);
 			$this->t->fp('indivlist','individual_list',True);
 
 		} // End for each district loop
 
 
-		$indivs_width=300; $totals_width=100;
-		$totals_table_width=$indivs_width + $totals_width;
-		$totals_header_row = "<th width=$indivs_width><font size=-2>Individuals</th>";
-		$totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
+		$totals_header_row = "<th><font size=-2>Individuals</th>";
+		$totals_header_row.= "<th><font size=-2>$year</th>";
 		$totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 		$totals_data.= "<td align=left><font size=-2><b>Total Companionships with interviews completed:</b></font></td>";
 		$totals_data.= "<td align=center><font size=-2><b>$comps_with_quarterly_int / $total_comps</b></font></td>";
@@ -2352,7 +2332,6 @@ class tc
 
 		$this->t->set_var('totals',$totals_data);
 		$this->t->set_var('totals_header_row',$totals_header_row);
-		$this->t->set_var('totals_table_width',$totals_table_width);
 
 		$this->t->pfp('out','int_sched_t');
 		$this->save_sessiondata(); 
@@ -2366,7 +2345,6 @@ class tc
 		$this->t->set_block('vis_sched_t','appt_list','apptlist');
 		$action = get_var('action',array('GET','POST'));
 
-		$this->t->set_var('lang_save','Save Appt / Pri / Notes');
 		$this->t->set_var('lang_reset','Clear Changes');
 
 		$this->t->set_var('vis_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_view'));
@@ -2378,13 +2356,11 @@ class tc
 		$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.vis_sched&action=save'));
 		$this->t->set_var('title','Presidency Yearly Visit Scheduler');
 
-		$family_width=500; $phone_width=40; $pri_width=10; $notes_width=128; $visit_date_width=20;
-		$table_width=$family_width + $phone_width + $pri_width + $notes_width + $visit_date_width;
-		$header_row = "<th width=$family_width><font size=-2>Family Name</th>";
-		$header_row.= "<th width=$phone_width><font size=-2>Phone</th>";
-		$header_row.= "<th width=$pri_width><font size=-2>Priority</th>";
-		$header_row.= "<th width=$visit_date_width><font size=-2>Last Visit</th>";
-		$header_row.= "<th width=$notes_width><font size=-2>Scheduling Notes</th>";
+		$header_row = "<th><font size=-2>Family Name</th>";
+		$header_row.= "<th><font size=-2>Phone</th>";
+		$header_row.= "<th><font size=-2>Priority</th>";
+		$header_row.= "<th><font size=-2>Last Visit</th>";
+		$header_row.= "<th><font size=-2>Scheduling Notes</th>";
 		$table_data=""; $completed_data=""; $totals_data="";
 
 		$year = date('Y');
@@ -2454,12 +2430,10 @@ class tc
 		}
 
 		// APPOINTMENT TABLE
-		$date_width=250; $time_width=100; $family_width=250; $location_width=100;
-		$appt_table_width=$date_width + $time_width + $family_width + $location_width;
-		$appt_header_row = "<th width=$date_width><font size=-2>Date</th>";
-		$appt_header_row.= "<th width=$time_width><font size=-2>Time</th>";      
-		$appt_header_row.= "<th width=$family_width><font size=-2>Family</th>";
-		$appt_header_row.= "<th width=$location_width><font size=-2>Location</th>";
+		$appt_header_row = "<th><font size=-2>Date</th>";
+		$appt_header_row.= "<th><font size=-2>Time</th>";      
+		$appt_header_row.= "<th><font size=-2>Family</th>";
+		$appt_header_row.= "<th><font size=-2>Location</th>";
 		$appt_table_data = ""; 
 
 		// Find out what the President ID is
@@ -2524,7 +2498,6 @@ class tc
 
 		$this->t->set_var('appt_table_data',$appt_table_data);
 		$this->t->set_var('appt_header_row',$appt_header_row);
-		$this->t->set_var('appt_table_width',$appt_table_width);
 
 
 		// VISIT SCHEDULING TABLE
@@ -2605,17 +2578,13 @@ class tc
 			}
 		}
 
-		$name_width=190; $phone_width=100; $date_width=100; $notes_width=300;
-		$completed_table_width=$name_width + $phone_width + $date_width + $notes_width;
-		$completed_header_row = "<th width=$name_width><font size=-2>Family Name</th>";
-		$completed_header_row.= "<th width=$phone_width><font size=-2>Phone</th>";      
-		$completed_header_row.= "<th width=$date_width><font size=-2>Date</th>";
-		$completed_header_row.= "<th width=$notes_width><font size=-2>Visit Notes</th>";
+		$completed_header_row = "<th><font size=-2>Family Name</th>";
+		$completed_header_row.= "<th><font size=-2>Phone</th>";      
+		$completed_header_row.= "<th><font size=-2>Date</th>";
+		$completed_header_row.= "<th><font size=-2>Visit Notes</th>";
 
-		$family_width=300; $totals_width=100;
-		$totals_table_width=$family_width + $totals_width;
-		$totals_header_row = "<th width=$family_width><font size=-2>Families</th>";
-		$totals_header_row.= "<th width=$totals_width><font size=-2>$year</th>";
+		$totals_header_row = "<th><font size=-2>Families</th>";
+		$totals_header_row.= "<th><font size=-2>$year</th>";
 		$totals_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 		$totals_data.= "<td align=left><font size=-2><b>Total Families with yearly Visits completed:</b></font></td>";
 		$totals_data.= "<td align=center><font size=-2><b>$families_with_yearly_visit / $total_families</b></font></td>";
@@ -2627,16 +2596,15 @@ class tc
 		$totals_data.= "<td align=center><font size=-2><b>$percent%</b></font></td>";
 		$totals_data.= "</tr>";
 
-		$this->t->set_var('table_width',$table_width);
 		$this->t->set_var('header_row',$header_row);
 		$this->t->set_var('table_data',$table_data);
 		$this->t->set_var('totals_header_row',$totals_header_row);
-		$this->t->set_var('totals_table_width',$totals_table_width);
 		$this->t->set_var('completed_header_row',$completed_header_row);
-		$this->t->set_var('completed_table_width',$completed_table_width);
 		$this->t->set_var('completed',$completed_data);
 		$this->t->set_var('totals',$totals_data);
 		$this->t->fp('familylist','family_list',True);
+		$this->t->set_var('lang_save_appt','Save Appts');
+		$this->t->set_var('lang_save_pri_notes','Save Pri / Notes');
 		$this->t->fp('apptlist','appt_list',True);
 
 		$this->t->pfp('out','vis_sched_t');

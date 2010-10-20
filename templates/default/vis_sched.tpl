@@ -1,6 +1,5 @@
 <center>
-	<form action="{actionurl}" method="POST">
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{title}</b></font></td>
 		</tr>
@@ -11,10 +10,11 @@
 	<a href="{schedule_vis_link}">{schedule_vis_link_title}</a>
 	<br><br>
 
-	<form action="{actionurl}" method="POST">
+
 
 <!-- BEGIN appt_list -->
-	<table border="0" width="{appt_table_width}" cellspacing="2" cellpadding="2">
+	<form action="{actionurl}" method="POST">
+	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 				<font face="{font}"><b>Yearly Visits Appointment Slots</b></font>
@@ -25,11 +25,9 @@
 		<tr>
 			<td></td><td></td><td></td><td></td>
 		</tr>
-	</table>
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
-			<td height="50" align="right">
-				<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
+			<td height="50" colspan=4 align="right">
+				<font face="{font}"><input type="submit" name="save" value="{lang_save_appt}"></font>
 				&nbsp; &nbsp;
 				<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
 				</form>
@@ -39,7 +37,8 @@
 <!-- END appt_list -->
 
 <!-- BEGIN family_list -->
-	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
+	<form action="{actionurl}" method="POST">
+	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 				<font face="{font}"><b>All Families with Yearly Visit Not Completed</b></font>
@@ -49,9 +48,9 @@
 		{table_data}
 		<tr>
 		<tr><td colspan=5 align=center><i>Note: The highest priority is 1, the lowest priority is 30</i></td></tr>
-		<td></td><td></td><td></td><td></td>
-		<td height="50" align="right">
-			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
+		<tr>
+		<td height="50" colspan=5 align="right">
+			<font face="{font}"><input type="submit" name="save" value="{lang_save_pri_notes}"></font>
 			&nbsp; &nbsp;
 			<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
 			</form>
@@ -61,7 +60,7 @@
 <!-- END family_list -->
 
 
-	<table border="0" width="{completed_table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 			<font face="{font}"><b>All Families with Yearly Visit Completed</b></font>
@@ -72,7 +71,7 @@
 	</table>
 	<br><br>
 
-	<table border="0" width="{totals_table_width}" cellspacing="2" cellpadding="2">
+	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
 			<font face="{font}"><b>Total Presidency Yearly Visits</b></font>

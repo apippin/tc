@@ -8,7 +8,7 @@
 	<br><br>
 
 	<form action="{filterurl}" method="POST">
-	<table width="70%" border="0" cellspacing="2" cellpadding="2" align=center>
+	<table width="60%" border="0" cellspacing="2" cellpadding="2" align=center>
 	<tr>
 		<td align=center>
 		Showing <input type=text size="2" name="num_years" value="{num_years}">

@@ -24,8 +24,8 @@
 		{table_data}
 		<tr>
 		<tr><td colspan=5 align=center><i>Note: Choose an Individual or Family per slot. A blank Date will delete the slot. If the Location is left blank, it will be autofilled for you.</i></td></tr>
-		<td></td><td></td><td></td>
-		<td height="50" align="right">
+		<tr>		
+			<td height="50" colspan=5 align="right">
 			<font face="{font}"><input type="submit" name="save" value="{lang_save}"></font>
 			<font face="{font}"><input type="reset" name="reset" value="{lang_reset}"></font>
 		</td>
