@@ -596,7 +596,7 @@ sub update_tc_visit_table
 			my $importing_status = $visit_status{$history[$i]};
 			#print "importing_status = $importing_status\n";
 			#print "select * from tc_visit where family=$family_id and companionship=$comp_id and date='$visit_date'\n";
-			$sth = $dbh->prepare("select * from tc_visit where family=$family_id and companionship=$comp_id and date='$visit_date'");
+			$sth = $dbh->prepare("select * from tc_visit where family=$family_id and date='$visit_date'");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			my @visit_data = ();
 			while($sqlhashref = $sth->fetchrow_hashref) { push(@visit_data, $sqlhashref); }
