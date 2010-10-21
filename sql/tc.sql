@@ -263,6 +263,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companion_sandbox` (
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companionship_sandbox` (
   `companionship` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `tc_companionship` INT( 16 ) UNSIGNED NOT NULL ,
   `district` INT( 16 ) UNSIGNED NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
 

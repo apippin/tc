@@ -79,4 +79,10 @@ $this->max_num_districts = 4;
 
 // The number of months of home teaching stats to show in the hometeaching sandbox
 $this->sandbox_stats_num_months = 12;
+
+// Show visit stats only for the visits this companionship is accountable for
+// non-zero = true
+// 0 = false
+$this->sandbox_visits_comp_only = 1;
+
 ?>

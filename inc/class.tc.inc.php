@@ -426,7 +426,7 @@ class tc
 			$unassigned_family_list = get_var('unassignedFamilies',array('POST'));
 			
 			if ($assignedHT_list || $unassignedHT_list) {
-				$sql = "INSERT INTO tc_companionship_sandbox (district) VALUES (\"$district\")";
+				$sql = "INSERT INTO tc_companionship_sandbox (tc_companionship,district) VALUES (\"NULL\",\"$district\")";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				$companionship_sandbox = mysql_insert_id();
 				
@@ -540,7 +540,7 @@ class tc
 			while ($this->db->next_record()) {
 				$companionship = $this->db->f('companionship');
 				$district = $this->db->f('district');
-				$sql = "INSERT INTO tc_companionship_sandbox (district) VALUES (\"$district\")";
+				$sql = "INSERT INTO tc_companionship_sandbox (tc_companionship,district) VALUES (\"$companionship\",\"$district\")";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				$companionship_sandbox = mysql_insert_id();
 				
@@ -673,6 +673,7 @@ class tc
 				while ($this->db2->next_record()) {
 					$family_name = $this->db2->f('name') . " Family";
 					$family_id = $this->db2->f('tc_family');
+					$tc_companionship = $this->db2->f('tc_companionship');
 					$sandbox_table_data .= "<tr>";
 					$sandbox_table_data .= "<td align=\"Left\" width=\"1000\">$family_name</td>";
 					
@@ -686,7 +687,11 @@ class tc
 						$month_end = "$year"."-"."$month"."-"."31";
 						$month = "$month"."/"."$year";
 
-						$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' AND companionship!=0 AND family=". $family_id;
+						if ($this->sandbox_visits_comp_only == 0) {
+							$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' AND companionship!=0 AND family=". $family_id;
+						} else {
+							$sql = "SELECT * FROM tc_visit WHERE date >= '$month_start' AND date <= '$month_end' AND companionship=$tc_companionship AND family=". $family_id;
+						}
 						$query_id = $this->db3->query($sql,__LINE__,__FILE__);
 
 						if($this->db3->next_record()) {

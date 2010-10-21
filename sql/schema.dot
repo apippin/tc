@@ -91,7 +91,7 @@ digraph schema {
     shape = "record"
   ];
   companionship_sandbox   [
-    label = "companionship_sandbox||<cp> companionship|<d> district"
+    label = "companionship_sandbox||<cp> companionship|<tcp> tc_companionship|<d> district"
     shape = "record"
   ];
   family_sandbox   [
@@ -149,6 +149,7 @@ digraph schema {
   district_sandbox:s      -> individual:i
   companion_sandbox:i     -> individual:i
   companion_sandbox:cp    -> companionship_sandbox:cp
+  companionship_sandbox:tcp -> companionship:c
   companionship_sandbox:d -> district_sandbox:d
   family_sandbox:tcf      -> family:f
   family_sandbox:i        -> individual:i
