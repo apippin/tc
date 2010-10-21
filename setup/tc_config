@@ -77,4 +77,6 @@ $this->default_vis_num_years = 1;
 // The maximum number of districts you will ever need to create
 $this->max_num_districts = 4;
 
+// The number of months of home teaching stats to show in the hometeaching sandbox
+$this->sandbox_stats_num_months = 12;
 ?>

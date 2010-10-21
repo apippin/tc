@@ -674,10 +674,10 @@ class tc
 					$family_name = $this->db2->f('name') . " Family";
 					$family_id = $this->db2->f('tc_family');
 					$sandbox_table_data .= "<tr>";
-					$sandbox_table_data .= "<td align=\"Left\">$family_name</td>";
+					$sandbox_table_data .= "<td align=\"Left\" width=\"1000\">$family_name</td>";
 					
 					# get 12 months visit data for given family
-					for($m=12; $m >= 0; $m--) {
+					for($m=$this->sandbox_stats_num_months; $m >= 0; $m--) {
 						$month = $this->current_month - $m;
 						$year = $this->current_year;
 						if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
