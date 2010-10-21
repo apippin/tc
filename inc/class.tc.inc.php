@@ -544,7 +544,7 @@ class tc
 				$this->db2->query($sql,__LINE__,__FILE__);
 				$companionship_sandbox = mysql_insert_id();
 				
-				$sql = "SELECT * FROM tc_companion WHERE companionship=$companionship AND valid=1";
+				$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND tc.companionship=$companionship AND tc.valid=1 AND ti.valid=1";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				while ($this->db2->next_record()) {
 					$individual = $this->db2->f('individual');
