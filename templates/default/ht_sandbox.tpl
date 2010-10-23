@@ -67,27 +67,27 @@
 				<table>
 					<tr>
 						<td>
-							<font face="{font}"><input type="reset" name="clear" value="Clear Selections"></font>
+							<font face="{font}"><input style="width: 150px" type="reset" name="clear" value="Clear Selections"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<font face="{font}"><input type="submit" name="add" value="Add Companionship"></font>
+							<font face="{font}"><input style="width: 150px" type="submit" name="add" value="Add Companionship"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<font face="{font}"><input type="submit" name="delete" value="Delete Companionship"></font>
+							<font face="{font}"><input style="width: 150px" type="submit" name="delete" value="Delete Companionship"></font>
+						</td>
+					</tr>
+					<tr> 
+						<td>
+							<font face="{font}"><input style="width: 150px" type="submit" name="update" value="Update Companionship"></font>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<font face="{font}"><input type="submit" name="update" value="Update Companionship"></font>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<font face="{font}"><input type="submit" name="reset" value="Reset to MLS"></font>
+							<font face="{font}"><input style="width: 150px" type="submit" name="reset" value="Reset to MLS"></font>
 						</td>
 					</tr>
 				</table>
