@@ -401,6 +401,7 @@ class tc
 	function ht_sandbox()
 	{
 		$this->t->set_file(array('ht_sandbox_t' => 'ht_sandbox.tpl'));
+	    $this->t->set_block('ht_sandbox_t','switch_case_list','sc_list');
 		$this->t->set_block('ht_sandbox_t','comp_list','c_list');
 		$this->t->set_block('ht_sandbox_t','district_list','d_list');
 		$this->t->set_block('ht_sandbox_t','unassigned_ht_list','uht_list');
@@ -651,8 +652,16 @@ class tc
 			$sql = "SELECT DISTINCT companionship FROM tc_companionship_sandbox WHERE district=$districts[$d] ORDER BY companionship ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
+			    $switch_case_list = "";
 				$sandbox_table_data .= "<tr><td><table>";
 				$companionship = $this->db->f('companionship');
+
+			    $switch_case_list .= "case '". $companionship ."':\n";
+				$switch_case_list .= "  $(\"#district option:selected\").removeAttr(\"selected\");\n";
+				$switch_case_list .= "  $(\"#assignedHT option:selected\").removeAttr(\"selected\");\n";
+				$switch_case_list .= "  $(\"#assignedFamilies option:selected\").removeAttr(\"selected\");\n";
+				$switch_case_list .= "  $(\"#district option[value='".$districts[$d]."']\").attr(\"selected\",true);\n";
+
 				# get names of companions in this companionship
 				$sql = "SELECT * FROM tc_companion_sandbox AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship ORDER BY ti.name ASC";
 				$this->db2->query($sql,__LINE__,__FILE__);
@@ -663,10 +672,12 @@ class tc
 					} else {
 						$companion_names .= " / " . $this->db2->f('name');
 					}
+					$individual = $this->db2->f('individual');
+					$switch_case_list .= "  $(\"#assignedHT option[value='".$individual."']\").attr(\"selected\",true);\n";
 				}
 				$this->nextmatchs->template_alternate_row_color(&$this->t);
 				$sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
-				$sandbox_table_data .= "<th bgcolor=#d3dce3 align=\"Left\" bgcolor=\"#c9c9c9\">$companion_names</th></tr>";
+				$sandbox_table_data .= "<th bgcolor=#d3dce3 align=\"Left\">$companion_names</th></tr>";
 				$sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td><table>";
 				
 				# get families they visit
@@ -675,11 +686,13 @@ class tc
 				while ($this->db2->next_record()) {
 					$family_name = $this->db2->f('name') . " Family";
 					$family_id = $this->db2->f('tc_family');
+				    $family = $this->db2->f('family');
 					$tc_companionship = $this->db2->f('tc_companionship');
 				    $this->nextmatchs->template_alternate_row_color(&$this->t);
 				    $sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 					$sandbox_table_data .= "<td align=\"Left\" width=\"1000\">$family_name</td>";
-					
+				    $switch_case_list .= "  $(\"#assignedFamilies option[value='".$family."']\").attr(\"selected\",true);\n";
+				  
 					# get 12 months visit data for given family
 					for($m=$this->sandbox_stats_num_months; $m >= 0; $m--) {
 						$month = $this->current_month - $m;
@@ -713,8 +726,10 @@ class tc
 				}
 				$sandbox_table_data .= "</table></td></tr>";
 				$sandbox_table_data .= "</table></td></tr>";
+				$switch_case_list .= "break;\n";
+				$this->t->set_var('switch_case_list',$switch_case_list);
+				$this->t->fp('sc_list','switch_case_list',True);
 			}
-			
 			$sandbox_table_data .= "</table>";
 			$sandbox_table_data .= "</td>";
 		}
