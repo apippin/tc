@@ -561,6 +561,8 @@ class tc
 					$this->db3->query($sql,__LINE__,__FILE__);
 				}
 			}
+		} else if ($_POST['changes']) {
+			$this->ht_sandbox_changes();
 		}
 		
 		// get list of companionships
@@ -726,7 +728,10 @@ class tc
 		$this->t->pfp('out','ht_sandbox_t');
 		$this->save_sessiondata();
 	}
-      
+
+	function ht_sandbox_changes()
+	{
+	}
 
 	function ht_update()
 	{

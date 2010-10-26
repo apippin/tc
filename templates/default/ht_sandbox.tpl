@@ -90,6 +90,11 @@
 							<font face="{font}"><input style="width: 150px" type="submit" name="reset" value="Reset to MLS"></font>
 						</td>
 					</tr>
+					<tr>
+						<td>
+							<font face="{font}"><input style="width: 150px" type="submit" name="changes" value="Email Changes"></font>
+						</td>
+					</tr>
 				</table>
 			</td>
 		</tr>
