@@ -7,6 +7,11 @@
  {
    //alert($('#companionship :selected').attr('id')+' - '+$('#companionship :selected').val()+' - '+$('#companionship :selected').text());
    switch ($('#companionship :selected').val()) {
+    case '0':
+	  $("#district option:selected").removeAttr("selected");
+	  $("#assignedHT option:selected").removeAttr("selected");
+	  $("#assignedFamilies option:selected").removeAttr("selected");
+    break;
 <!-- BEGIN switch_case_list -->
 	 {switch_case_list}
 <!-- END switch_case_list -->
