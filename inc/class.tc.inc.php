@@ -664,8 +664,10 @@ class tc
 						$companion_names .= " / " . $this->db2->f('name');
 					}
 				}
-				$sandbox_table_data .= "<tr><th align=\"Left\" bgcolor=\"#c9c9c9\">$companion_names</th></tr>";
-				$sandbox_table_data .= "<tr><td><table>";
+				$this->nextmatchs->template_alternate_row_color(&$this->t);
+				$sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+				$sandbox_table_data .= "<th bgcolor=#d3dce3 align=\"Left\" bgcolor=\"#c9c9c9\">$companion_names</th></tr>";
+				$sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td><table>";
 				
 				# get families they visit
 				$sql = "SELECT * FROM tc_companionship_sandbox AS tcp JOIN (tc_family_sandbox AS tf, tc_individual AS ti) WHERE tcp.companionship=$companionship AND tcp.companionship=tf.companionship AND tf.individual=ti.individual";
@@ -674,7 +676,8 @@ class tc
 					$family_name = $this->db2->f('name') . " Family";
 					$family_id = $this->db2->f('tc_family');
 					$tc_companionship = $this->db2->f('tc_companionship');
-					$sandbox_table_data .= "<tr>";
+				    $this->nextmatchs->template_alternate_row_color(&$this->t);
+				    $sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 					$sandbox_table_data .= "<td align=\"Left\" width=\"1000\">$family_name</td>";
 					
 					# get 12 months visit data for given family
