@@ -731,6 +731,77 @@ class tc
 
 	function ht_sandbox_changes()
 	{
+		// list all companionships deleted
+		$email_contents = "Removed Companionships\n\n";
+		$sql = "SELECT * FROM tc_companionship WHERE companionship NOT IN (SELECT tc_companionship FROM tc_companionship_sandbox) AND valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND tc.companionship=$companionship";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			$companion_names = "";
+			while ($this->db2->next_record()) {
+				if ($companion_names == "") {
+					$companion_names .= $this->db2->f('name');
+				} else {
+					$companion_names .= " / " . $this->db2->f('name');
+				}
+			}
+			$email_contents .= "\t$companion_names\n";
+		}
+		$email_contents .= "\n\n\n";
+		
+		// list all companionships added
+		$email_contents .= "New Companionships\n\n";
+		$sql = "SELECT * FROM tc_companionship_sandbox WHERE tc_companionship=0";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$sql = "SELECT * FROM tc_companion_sandbox AS tcs JOIN tc_individual AS ti WHERE tcs.individual=ti.individual AND tcs.companionship=$companionship";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			$companion_names = "";
+			while ($this->db2->next_record()) {
+				if ($companion_names == "") {
+					$companion_names .= $this->db2->f('name');
+				} else {
+					$companion_names .= " / " . $this->db2->f('name');
+				}
+			}
+			$email_contents .= "\t$companion_names\n";
+			$sql = "SELECT * FROM tc_family_sandbox AS tfs JOIN tc_individual AS ti WHERE tfs.individual=ti.individual AND companionship=$companionship";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				$family_name = $this->db2->f('name') . " Family";
+				$email_contents .= "\t\t$family_name\n";
+			}
+		}
+		$email_contents .= "\n\n\n";
+		
+		// list all companionships with changes
+		$email_contents .= "Modified Companionships\n\n";
+		$sql = "SELECT tcps.* FROM tc_companionship AS tc JOIN tc_companionship_sandbox AS tcps WHERE tc.companionship=tcps.tc_companionship";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$tc_companionship = $this->db->f('tc_companionship');
+			$changed = 0;
+			// compare companion list
+			
+			// list removed families
+			// list added families
+		}
+		$email_contents .= "\n\n\n";
+		
+		// email changes to presidency
+		$to = "owenleonard@gmail.com";
+		$subject = "HomeTeaching Changes";
+		$message .= "$email_contents";
+		$headers = 'From: webmaster@example.com' . "\r\n" .
+		           'Reply-To: webmaster@example.com' . "\r\n" .
+		           'X-Mailer: PHP/' . phpversion();
+
+
+		mail($to, $subject, $message, $headers);
 	}
 
 	function ht_update()
