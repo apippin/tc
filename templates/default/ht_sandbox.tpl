@@ -1,5 +1,25 @@
 <center>
 
+<script type="text/javascript" src="{jquery_url}"></script>
+<script type="text/javascript">                                         
+
+ function updateSelections()
+ {
+   //alert($('#companionship :selected').attr('id')+' - '+$('#companionship :selected').val()+' - '+$('#companionship :selected').text());
+   switch ($('#companionship :selected').val()) {
+    case '0':
+	  $("#district option:selected").removeAttr("selected");
+	  $("#assignedHT option:selected").removeAttr("selected");
+	  $("#assignedFamilies option:selected").removeAttr("selected");
+    break;
+<!-- BEGIN switch_case_list -->
+	 {switch_case_list}
+<!-- END switch_case_list -->
+   }
+ };
+
+</script>     
+
 	<form action="{submit_action}" method="POST">
 	<table border="0" width="100%" cellspacing="2" cellpadding="2">
 		<tr>
@@ -21,7 +41,7 @@
 			<td align="center">
 				Companionship
 				<br>
-				<select name="companionship">
+				<select id="companionship" name="companionship" onchange="javascript:updateSelections();">
 <!-- BEGIN comp_list -->
 					{companionship_list}
 <!-- END comp_list -->
@@ -29,35 +49,35 @@
 				<br><br>
 				District
 				<br>
-				<select name="district">
+				<select id="district" name="district">
 <!-- BEGIN district_list -->
 					{district}
 <!-- END district_list -->
 				</select>
 			</td>
 			<td>
-				<select name="unassignedHT[]" multiple size="9">
+				<select id="unassignedHT" name="unassignedHT[]" multiple size="9">
 <!-- BEGIN unassigned_ht_list -->
 					{unassigned_ht}
 <!-- END unassigned_ht_list -->
 				</select>
 			</td>
 			<td>
-				<select name="assignedHT[]" multiple size="9">
+				<select id="assignedHT" name="assignedHT[]" multiple size="9">
 <!-- BEGIN assigned_ht_list -->
 					{assigned_ht}
 <!-- END assigned_ht_list -->
 				</select>
 			</td>
 			<td>
-				<select name="unassignedFamilies[]" multiple size="9">
+				<select id="unassignedFamilies" name="unassignedFamilies[]" multiple size="9">
 <!-- BEGIN unassigned_family_list -->
 					{unassigned_family}
 <!-- END unassigned_family_list -->
 				</select>
 			</td>
 			<td>
-				<select name="assignedFamiles[]" multiple size="9">
+				<select id="assignedFamilies" name="assignedFamiles[]" multiple size="9">
 <!-- BEGIN assigned_family_list -->
 					{assigned_family}
 <!-- END assigned_family_list -->
