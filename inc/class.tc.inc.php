@@ -412,7 +412,7 @@ class tc
 		$this->t->set_block('ht_sandbox_t','companionship_table_list','ct_list');
 
 		$this->t->set_var('submit_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox&action=add'));
-	    $this->t->set_var('jquery_url',$GLOBALS['phpgw']->link('inc/jquery.js'));
+	    $this->t->set_var('jquery_url',$GLOBALS['phpgw']->link('inc/jquery/jquery.js'));
 		 
 	    $action = get_var('action',array('GET','POST'));
 
