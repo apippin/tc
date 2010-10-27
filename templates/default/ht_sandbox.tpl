@@ -1,6 +1,6 @@
 <center>
 
-<script type="text/javascript" src="/tc/inc/jquery.js"></script>
+<script type="text/javascript" src="{jquery_url}"></script>
 <script type="text/javascript">                                         
 
  function updateSelections()
