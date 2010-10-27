@@ -694,7 +694,7 @@ class tc
 				    $switch_case_list .= "  $(\"#assignedFamilies option[value='".$family."']\").attr(\"selected\",true);\n";
 				  
 					# get 12 months visit data for given family
-					for($m=$this->sandbox_stats_num_months; $m >= 0; $m--) {
+					for($m=$this->sandbox_stats_num_months; $m > 0; $m--) {
 						$month = $this->current_month - $m;
 						$year = $this->current_year;
 						if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
