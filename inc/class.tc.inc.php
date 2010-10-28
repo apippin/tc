@@ -79,6 +79,9 @@ class tc
 			include("setup/tc_config");
 		}
 
+		$this->jquery_url = $GLOBALS['phpgw']->link('inc/jquery/jquery.js');
+		$this->jquery_tablesorter_url = $GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.js');
+		
 		$this->script_path = "$this->application_path"."/bin";
 		$this->max_presidency_members = 99;
 		$this->max_appointments = 32768;
@@ -417,7 +420,7 @@ class tc
 		$this->t->set_block('ht_sandbox_t','companionship_table_list','ct_list');
 
 		$this->t->set_var('submit_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox&action=add'));
-	    $this->t->set_var('jquery_url',$GLOBALS['phpgw']->link('inc/jquery/jquery.js'));
+	    $this->t->set_var('jquery_url',$this->jquery_url);
 		 
 	    $action = get_var('action',array('GET','POST'));
 
@@ -3782,8 +3785,8 @@ class tc
 	{
 		$this->t->set_file(array('org_view_t' => 'org_view.tpl'));
 		$this->t->set_block('org_view_t','calling_list','list');
-	    $this->t->set_var('jquery_url',$GLOBALS['phpgw']->link('inc/jquery/jquery.js'));
-	    $this->t->set_var('jquery_tablesorter_url',$GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.js'));
+	    $this->t->set_var('jquery_url',$this->jquery_url);
+	    $this->t->set_var('jquery_tablesorter_url',$this->jquery_tablesorter_url);
 
 		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti where tc.individual=ti.individual ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
