@@ -3923,6 +3923,35 @@ class tc
 					// Update an existing appointment
 					if($appointment < $this->max_appointments)
 					{
+					    // If we deleted the appointment, we still need to send a cancellation to the right people
+					    // Make a note of the old email now in case we need it later
+					    $old_indiv_email = "";
+					    $sql = "SELECT * FROM tc_appointment where appointment='$appointment'";
+					    $this->db->query($sql,__LINE__,__FILE__);
+					    if($this->db->next_record()) {
+						  $old_individual = $this->db->f('individual');
+						  $old_family = $this->db->f('family');
+						  if($old_individual > 0) {
+							$sql = "SELECT * FROM tc_individual where individual='$old_individual'";
+							$this->db2->query($sql,__LINE__,__FILE__);
+							if($this->db2->next_record()) {
+							  $old_indiv_email = $this->db2->f('email');
+							}
+						  }
+						  if($old_family > 0) {
+							$sql = "SELECT * FROM tc_family WHERE family='$old_family'";
+							$this->db2->query($sql,__LINE__,__FILE__);
+							if($this->db2->next_record()) {
+							  $old_individual = $this->db2->f('individual');
+							  $sql = "SELECT * FROM tc_individual where individual='$old_individual'";
+							  $this->db3->query($sql,__LINE__,__FILE__);
+							  if($this->db3->next_record()) {
+								$old_indiv_email = $this->db3->f('email');
+							  }
+							}
+						  }
+						}
+						
 						//Only perform a database update if we have made a change to this appointment
 						$sql = "SELECT * FROM tc_appointment where " .
 						       "appointment='$appointment'" .
@@ -3946,7 +3975,7 @@ class tc
 							                  " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
 							// Email the appointment
-							$this->email_appt($appointment);
+						    $this->email_appt($appointment, $old_indiv_email);
 						}
 					}
 
@@ -4547,7 +4576,7 @@ class tc
 		$this->save_sessiondata();   
 	}
 
-	function email_appt($appointment)
+	function email_appt($appointment, $old_indiv_email)
 	{
 		//print "Emailing notification of appointment: $appointment <br>";
 
@@ -4567,7 +4596,7 @@ class tc
 			$appt_name = "";
 			$phone = "";
 			$uid = $this->db->f('uid');
-
+		  		  
 			// Extract the year, month, day, hours, minutes, seconds from the appointment time
 			$appt_date = $this->db->f('date');
 			$date_array = explode("-",$appt_date);
@@ -4601,6 +4630,10 @@ class tc
 				if($this->db2->next_record()) {
 					$indiv_name = $this->db2->f('name');
 					$phone = $this->db2->f('phone');
+  				    $indiv_email = $this->db2->f('email');
+				    if(($this->email_individual_appt == 1) && ($indiv_email != "")) {
+					  $email .= ", $indiv_email";
+					}
 					$appt_name = $indiv_name . " Interview";
 					$duration = $this->default_ppi_appt_duration * 60;
 				}
@@ -4617,6 +4650,10 @@ class tc
 						$phone = $this->db3->f('phone');
 						$family_name = $this->db3->f('name');
 						$phone = $this->db3->f('phone');
+					    $indiv_email = $this->db3->f('email');
+					    if(($this->email_individual_appt == 1) && ($indiv_email != "")) {
+						  $email .= ", $indiv_email";
+						}
 					}
 					$appt_name = $family_name . " Family Visit";
 					$duration = $this->default_visit_appt_duration * 60;
@@ -4631,7 +4668,7 @@ class tc
 			if(($uid == 0) && ($appt_name != "")) {
 				// Create a new calendar item for this appointment, since this must be the first time we
 				// are sending it out.
-				print "Sent new appointment to " . $interviewer . " at " . $email . " for " . $appt_name . "<br>";
+				print "Sent new appointment for " . $interviewer . " to '" . $email . "' for " . $appt_name . "<br>";
 				$uid = rand() . rand(); // Generate a random identifier for this appointment
 				$subject = "Created: $appt_name";
 
@@ -4645,7 +4682,10 @@ class tc
 			} else if(($uid != 0) && ($appt_name == "")) {
 				// Remove the calendar item for this appointment since it has already been sent
 				// and there is no name we have changed it to.
-				print "Sent deleted appointment to " . $interviewer . " at " . $email . " for " . $appt_date . " " . $appt_time . "<br>";
+			    if(($this->email_individual_appt == 1) && ($old_indiv_email != "")) {
+				  $email .= ", $old_indiv_email";
+				}
+				print "Sent deleted appointment for " . $interviewer . " to '" . $email . "' for " . $appt_date . " " . $appt_time . "<br>";
 				$subject = "Canceled: $appt_date $appt_time";
 
 				$this->db->query("UPDATE tc_appointment set" .
@@ -4657,7 +4697,7 @@ class tc
 				                      $dtend, $date, $location, $subject, $subject, $uid);
 			} else if($uid != 0) {
 				// Update the existing appointment since we have changed it
-				print "Sent updated appointment to " . $interviewer . " at " . $email . " for " . $appt_name . "<br>";
+				print "Sent updated appointment for " . $interviewer . " to '" . $email . "' for " . $appt_name . "<br>";
 
 				$subject = "Canceled: $appt_date $appt_time";
 				$action = "CANCEL";

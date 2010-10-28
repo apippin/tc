@@ -44,6 +44,12 @@ $this->ppi_frequency = 12;
 // 3 = EQ President + Counselors + Secretary
 $this->yearly_ppi_interviewer = 2;
 
+// Specify if the individual should be emailed the appointment too
+// By default, the interviewer is always emailed the appointment.
+// 0 = The interviewer will be emailed the appointment
+// 1 = The interviewer & individual will be emailed the appointment
+$this->email_individual_appt = 1;
+
 // Specify the minute interval increment to use in the time drop down lists
 $this->time_drop_down_list_inc = 15;
 
