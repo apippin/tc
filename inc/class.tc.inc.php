@@ -747,8 +747,9 @@ class tc
 
 	function ht_sandbox_changes()
 	{
+		$email_contents = "Please review the following changes to home teaching.\r\n\r\n";
 		// list all companionships deleted
-		$email_contents = "Removed Companionships\n\n";
+		$email_contents .= "Removed Companionships\r\n\r\n";
 		$sql = "SELECT * FROM tc_companionship WHERE companionship NOT IN (SELECT tc_companionship FROM tc_companionship_sandbox) AND valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
@@ -763,12 +764,12 @@ class tc
 					$companion_names .= " / " . $this->db2->f('name');
 				}
 			}
-			$email_contents .= "\t$companion_names\n";
+			$email_contents .= "\t$companion_names\r\n";
 		}
-		$email_contents .= "\n\n\n";
+		$email_contents .= "\r\n";
 		
 		// list all companionships added
-		$email_contents .= "New Companionships\n\n";
+		$email_contents .= "New Companionships\r\n\r\n";
 		$sql = "SELECT * FROM tc_companionship_sandbox WHERE tc_companionship=0";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
@@ -783,39 +784,119 @@ class tc
 					$companion_names .= " / " . $this->db2->f('name');
 				}
 			}
-			$email_contents .= "\t$companion_names\n";
+			$email_contents .= "\t$companion_names\r\n";
 			$sql = "SELECT * FROM tc_family_sandbox AS tfs JOIN tc_individual AS ti WHERE tfs.individual=ti.individual AND companionship=$companionship";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			while ($this->db2->next_record()) {
 				$family_name = $this->db2->f('name') . " Family";
-				$email_contents .= "\t\t$family_name\n";
+				$email_contents .= "\t\t$family_name\r\n";
 			}
 		}
-		$email_contents .= "\n\n\n";
+		$email_contents .= "\r\n";
 		
 		// list all companionships with changes
-		$email_contents .= "Modified Companionships\n\n";
-		$sql = "SELECT tcps.* FROM tc_companionship AS tc JOIN tc_companionship_sandbox AS tcps WHERE tc.companionship=tcps.tc_companionship";
+		$email_contents .= "Modified Companionships\r\n\r\n";
+		$sql = "SELECT tcps.* FROM tc_companionship AS tc JOIN tc_companionship_sandbox AS tcps WHERE tc.companionship=tcps.tc_companionship AND tc.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$companionship = $this->db->f('companionship');
 			$tc_companionship = $this->db->f('tc_companionship');
-			$changed = 0;
-			// compare companion list
+			$companionship_changed = 0;
+			
+			// get current companion list
+			$sql = "SELECT * FROM tc_companion_sandbox AS tc JOIN tc_individual AS ti WHERE tc.companionship=$companionship AND tc.individual=ti.individual";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			$companion_names = "";
+			while ($this->db2->next_record()) {
+				if ($companion_names == "") {
+					$companion_names .= $this->db2->f('name');
+				} else {
+					$companion_names .= " / " . $this->db2->f('name');
+				}
+			}
+			
+			// list removed companions
+			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.companionship=$tc_companionship AND tc.individual=ti.individual AND tc.individual NOT IN (SELECT individual FROM tc_companion_sandbox WHERE companionship=$companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tremoved $name as a companion\r\n";
+			}
+			
+			// list added companions
+			$sql = "SELECT * FROM tc_companion_sandbox AS tcs JOIN tc_individual AS ti WHERE tcs.companionship=$companionship AND tcs.individual=ti.individual AND tcs.individual NOT IN (SELECT individual FROM tc_companion WHERE companionship=$tc_companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tadded $name as a companion\r\n";
+			}
 			
 			// list removed families
+			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.companionship=$tc_companionship AND tf.family NOT IN (SELECT tc_family FROM tc_family_sandbox WHERE companionship=$companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tremoved $name Family\r\n";
+			}
+			
 			// list added families
+			$sql = "SELECT * FROM tc_family_sandbox AS tfs JOIN tc_individual AS ti WHERE tfs.individual=ti.individual AND tfs.companionship=$companionship AND tfs.individual NOT IN (SELECT individual FROM tc_family WHERE companionship=$tc_companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tadded $name Family\r\n";
+			}
 		}
-		$email_contents .= "\n\n\n";
+		$email_contents .= "\r\n";
 		
 		// email changes to presidency
-		$to = "owenleonard@gmail.com";
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1) AND tp.valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$email = "";
+			if ($this->db->f('email1') != "") {
+				$email = $this->db->f('email1');
+			} else { 
+				$email = $this->db->f('email2');
+			}
+			if ($to == "") {
+				$to .= $email;
+			} else {
+				$to .= ", $email";
+			}
+		}
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if ($this->db->next_record()) {
+			if ($this->db->f('email1') != "") {
+				$from = $this->db->f('email1');
+			} else { 
+				$from = $this->db->f('email2');
+			}
+		} else {
+			$from = "president@3rdcounselor";
+		}
 		$subject = "HomeTeaching Changes";
 		$message .= "$email_contents";
-		$headers = 'From: webmaster@example.com' . "\r\n" .
-		           'Reply-To: webmaster@example.com' . "\r\n" .
-		           'X-Mailer: PHP/' . phpversion();
-
+		$headers = "From: $from\r\n" .
+		           "Reply-To: $from\r\n" .
+		           "X-Mailer: PHP/" . phpversion();
 
 		mail($to, $subject, $message, $headers);
 	}
