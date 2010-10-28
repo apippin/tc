@@ -92,6 +92,11 @@ class tc
 		$this->grants     = $GLOBALS['phpgw']->acl->get_grants('tc');
 		$this->grants[$this->account] = PHPGW_ACL_READ + PHPGW_ACL_ADD + PHPGW_ACL_EDIT + PHPGW_ACL_DELETE;
 
+		$GLOBALS['phpgw_info']['flags']['css'] .= "-->\n</style>\n"
+		   . '<link rel="stylesheet" type="text/css" media="all" href="'
+		   . $GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.css').'"/>'
+		   . "\n<style type=\"text/css\">\n<!--\n";
+
 		$this->jscal = CreateObject('tc.jscalendar');   // before phpgw_header() !!!
 		$this->cal_options = 'daFormat    : "%Y-%m-%d",
 		                      ifFormat    : "%Y-%m-%d",
@@ -3776,11 +3781,11 @@ class tc
 	function org_view()
 	{
 		$this->t->set_file(array('org_view_t' => 'org_view.tpl'));
-		$this->t->set_block('org_view_t','calling_list','list1');
-		$this->t->set_block('org_view_t','org_list','list2');
+		$this->t->set_block('org_view_t','calling_list','list');
+	    $this->t->set_var('jquery_url',$GLOBALS['phpgw']->link('inc/jquery/jquery.js'));
+	    $this->t->set_var('jquery_tablesorter_url',$GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.js'));
 
-		# Display a list ordered alphabetically
-		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti where tc.individual=ti.individual ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3801,32 +3806,7 @@ class tc
 			$this->t->set_var('organization', $organization);
 			$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 			$this->t->set_var('tr_color',$tr_color);
-			$this->t->fp('list1','calling_list',True);
-		}
-
-		# Display a list ordered by organization
-		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti where tc.individual=ti.individual ORDER BY organization ASC";
-		$this->db->query($sql,__LINE__,__FILE__);
-		$i=0;
-		while ($this->db->next_record()) {
-			$calling[$i]['name'] = $this->db->f('name');
-			$calling[$i]['position'] = $this->db->f('position');
-			$calling[$i]['sustained'] = $this->db->f('sustained');
-			$calling[$i]['organization'] = $this->db->f('organization');
-			$i++;
-		}   
-		for ($i=0; $i < count($calling); $i++) {
-			$name = $calling[$i]['name'];
-			$position = $calling[$i]['position'];
-			$sustained = $calling[$i]['sustained'];
-			$organization = $calling[$i]['organization'];
-			$this->t->set_var('name', $name);
-			$this->t->set_var('position', $position);
-			$this->t->set_var('sustained', $sustained);
-			$this->t->set_var('organization', $organization);
-			$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
-			$this->t->set_var('tr_color',$tr_color);
-			$this->t->fp('list2','org_list',True);
+			$this->t->fp('list','calling_list',True);
 		}
 
 		$this->t->pfp('out','org_view_t');
