@@ -79,6 +79,9 @@ class tc
 			include("setup/tc_config");
 		}
 
+		$this->jquery_url = $GLOBALS['phpgw']->link('inc/jquery/jquery.js');
+		$this->jquery_tablesorter_url = $GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.js');
+		
 		$this->script_path = "$this->application_path"."/bin";
 		$this->max_presidency_members = 99;
 		$this->max_appointments = 32768;
@@ -91,6 +94,11 @@ class tc
 		$this->account    = $GLOBALS['phpgw_info']['user']['account_id'];
 		$this->grants     = $GLOBALS['phpgw']->acl->get_grants('tc');
 		$this->grants[$this->account] = PHPGW_ACL_READ + PHPGW_ACL_ADD + PHPGW_ACL_EDIT + PHPGW_ACL_DELETE;
+
+		$GLOBALS['phpgw_info']['flags']['css'] .= "-->\n</style>\n"
+		   . '<link rel="stylesheet" type="text/css" media="all" href="'
+		   . $GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.css').'"/>'
+		   . "\n<style type=\"text/css\">\n<!--\n";
 
 		$this->jscal = CreateObject('tc.jscalendar');   // before phpgw_header() !!!
 		$this->cal_options = 'daFormat    : "%Y-%m-%d",
@@ -401,6 +409,7 @@ class tc
 	function ht_sandbox()
 	{
 		$this->t->set_file(array('ht_sandbox_t' => 'ht_sandbox.tpl'));
+	    $this->t->set_block('ht_sandbox_t','switch_case_list','sc_list');
 		$this->t->set_block('ht_sandbox_t','comp_list','c_list');
 		$this->t->set_block('ht_sandbox_t','district_list','d_list');
 		$this->t->set_block('ht_sandbox_t','unassigned_ht_list','uht_list');
@@ -411,7 +420,8 @@ class tc
 		$this->t->set_block('ht_sandbox_t','companionship_table_list','ct_list');
 
 		$this->t->set_var('submit_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox&action=add'));
-		
+	    $this->t->set_var('jquery_url',$this->jquery_url);
+		 
 	    $action = get_var('action',array('GET','POST'));
 
 		$this->t->set_var('title','Hometeaching Sandbox'); 
@@ -561,6 +571,8 @@ class tc
 					$this->db3->query($sql,__LINE__,__FILE__);
 				}
 			}
+		} else if ($_POST['changes']) {
+			$this->ht_sandbox_changes();
 		}
 		
 		// get list of companionships
@@ -651,8 +663,16 @@ class tc
 			$sql = "SELECT DISTINCT companionship FROM tc_companionship_sandbox WHERE district=$districts[$d] ORDER BY companionship ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
+			    $switch_case_list = "";
 				$sandbox_table_data .= "<tr><td><table>";
 				$companionship = $this->db->f('companionship');
+
+			    $switch_case_list .= "case '". $companionship ."':\n";
+				$switch_case_list .= "  $(\"#district option:selected\").removeAttr(\"selected\");\n";
+				$switch_case_list .= "  $(\"#assignedHT option:selected\").removeAttr(\"selected\");\n";
+				$switch_case_list .= "  $(\"#assignedFamilies option:selected\").removeAttr(\"selected\");\n";
+				$switch_case_list .= "  $(\"#district option[value='".$districts[$d]."']\").attr(\"selected\",true);\n";
+
 				# get names of companions in this companionship
 				$sql = "SELECT * FROM tc_companion_sandbox AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND companionship=$companionship ORDER BY ti.name ASC";
 				$this->db2->query($sql,__LINE__,__FILE__);
@@ -663,9 +683,13 @@ class tc
 					} else {
 						$companion_names .= " / " . $this->db2->f('name');
 					}
+					$individual = $this->db2->f('individual');
+					$switch_case_list .= "  $(\"#assignedHT option[value='".$individual."']\").attr(\"selected\",true);\n";
 				}
-				$sandbox_table_data .= "<tr><th align=\"Left\" bgcolor=\"#c9c9c9\">$companion_names</th></tr>";
-				$sandbox_table_data .= "<tr><td><table>";
+				$this->nextmatchs->template_alternate_row_color(&$this->t);
+				$sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
+				$sandbox_table_data .= "<th bgcolor=#d3dce3 align=\"Left\">$companion_names</th></tr>";
+				$sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td><table>";
 				
 				# get families they visit
 				$sql = "SELECT * FROM tc_companionship_sandbox AS tcp JOIN (tc_family_sandbox AS tf, tc_individual AS ti) WHERE tcp.companionship=$companionship AND tcp.companionship=tf.companionship AND tf.individual=ti.individual";
@@ -673,12 +697,15 @@ class tc
 				while ($this->db2->next_record()) {
 					$family_name = $this->db2->f('name') . " Family";
 					$family_id = $this->db2->f('tc_family');
+				    $family = $this->db2->f('family');
 					$tc_companionship = $this->db2->f('tc_companionship');
-					$sandbox_table_data .= "<tr>";
+				    $this->nextmatchs->template_alternate_row_color(&$this->t);
+				    $sandbox_table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 					$sandbox_table_data .= "<td align=\"Left\" width=\"1000\">$family_name</td>";
-					
+				    $switch_case_list .= "  $(\"#assignedFamilies option[value='".$family."']\").attr(\"selected\",true);\n";
+				  
 					# get 12 months visit data for given family
-					for($m=$this->sandbox_stats_num_months; $m >= 0; $m--) {
+					for($m=$this->sandbox_stats_num_months; $m > 0; $m--) {
 						$month = $this->current_month - $m;
 						$year = $this->current_year;
 						if($month <= 0) { $remainder = $month; $month = 12 + $remainder; $year=$year-1; }
@@ -710,8 +737,10 @@ class tc
 				}
 				$sandbox_table_data .= "</table></td></tr>";
 				$sandbox_table_data .= "</table></td></tr>";
+				$switch_case_list .= "break;\n";
+				$this->t->set_var('switch_case_list',$switch_case_list);
+				$this->t->fp('sc_list','switch_case_list',True);
 			}
-			
 			$sandbox_table_data .= "</table>";
 			$sandbox_table_data .= "</td>";
 		}
@@ -723,7 +752,162 @@ class tc
 		$this->t->pfp('out','ht_sandbox_t');
 		$this->save_sessiondata();
 	}
-      
+
+	function ht_sandbox_changes()
+	{
+		$email_contents = "Please review the following changes to home teaching.\r\n\r\n";
+		// list all companionships deleted
+		$email_contents .= "Removed Companionships\r\n\r\n";
+		$sql = "SELECT * FROM tc_companionship WHERE companionship NOT IN (SELECT tc_companionship FROM tc_companionship_sandbox) AND valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual AND tc.companionship=$companionship";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			$companion_names = "";
+			while ($this->db2->next_record()) {
+				if ($companion_names == "") {
+					$companion_names .= $this->db2->f('name');
+				} else {
+					$companion_names .= " / " . $this->db2->f('name');
+				}
+			}
+			$email_contents .= "\t$companion_names\r\n";
+		}
+		$email_contents .= "\r\n";
+		
+		// list all companionships added
+		$email_contents .= "New Companionships\r\n\r\n";
+		$sql = "SELECT * FROM tc_companionship_sandbox WHERE tc_companionship=0";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$sql = "SELECT * FROM tc_companion_sandbox AS tcs JOIN tc_individual AS ti WHERE tcs.individual=ti.individual AND tcs.companionship=$companionship";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			$companion_names = "";
+			while ($this->db2->next_record()) {
+				if ($companion_names == "") {
+					$companion_names .= $this->db2->f('name');
+				} else {
+					$companion_names .= " / " . $this->db2->f('name');
+				}
+			}
+			$email_contents .= "\t$companion_names\r\n";
+			$sql = "SELECT * FROM tc_family_sandbox AS tfs JOIN tc_individual AS ti WHERE tfs.individual=ti.individual AND companionship=$companionship";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				$family_name = $this->db2->f('name') . " Family";
+				$email_contents .= "\t\t$family_name\r\n";
+			}
+		}
+		$email_contents .= "\r\n";
+		
+		// list all companionships with changes
+		$email_contents .= "Modified Companionships\r\n\r\n";
+		$sql = "SELECT tcps.* FROM tc_companionship AS tc JOIN tc_companionship_sandbox AS tcps WHERE tc.companionship=tcps.tc_companionship AND tc.valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$companionship = $this->db->f('companionship');
+			$tc_companionship = $this->db->f('tc_companionship');
+			$companionship_changed = 0;
+			
+			// get current companion list
+			$sql = "SELECT * FROM tc_companion_sandbox AS tc JOIN tc_individual AS ti WHERE tc.companionship=$companionship AND tc.individual=ti.individual";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			$companion_names = "";
+			while ($this->db2->next_record()) {
+				if ($companion_names == "") {
+					$companion_names .= $this->db2->f('name');
+				} else {
+					$companion_names .= " / " . $this->db2->f('name');
+				}
+			}
+			
+			// list removed companions
+			$sql = "SELECT * FROM tc_companion AS tc JOIN tc_individual AS ti WHERE tc.companionship=$tc_companionship AND tc.individual=ti.individual AND tc.individual NOT IN (SELECT individual FROM tc_companion_sandbox WHERE companionship=$companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tremoved $name as a companion\r\n";
+			}
+			
+			// list added companions
+			$sql = "SELECT * FROM tc_companion_sandbox AS tcs JOIN tc_individual AS ti WHERE tcs.companionship=$companionship AND tcs.individual=ti.individual AND tcs.individual NOT IN (SELECT individual FROM tc_companion WHERE companionship=$tc_companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tadded $name as a companion\r\n";
+			}
+			
+			// list removed families
+			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.companionship=$tc_companionship AND tf.family NOT IN (SELECT tc_family FROM tc_family_sandbox WHERE companionship=$companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tremoved $name Family\r\n";
+			}
+			
+			// list added families
+			$sql = "SELECT * FROM tc_family_sandbox AS tfs JOIN tc_individual AS ti WHERE tfs.individual=ti.individual AND tfs.companionship=$companionship AND tfs.individual NOT IN (SELECT individual FROM tc_family WHERE companionship=$tc_companionship)";
+			$this->db2->query($sql,__LINE__,__FILE__);
+			while ($this->db2->next_record()) {
+				if ($companionship_changed == 0) {
+					$companionship_changed = 1;
+					$email_contents .= "\t$companion_names\r\n";
+				}
+				$name = $this->db2->f('name');
+				$email_contents .= "\t\tadded $name Family\r\n";
+			}
+		}
+		$email_contents .= "\r\n";
+		
+		// email changes to presidency
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1) AND tp.valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		while ($this->db->next_record()) {
+			$email = "";
+			if ($this->db->f('email1') != "") {
+				$email = $this->db->f('email1');
+			} else { 
+				$email = $this->db->f('email2');
+			}
+			if ($to == "") {
+				$to .= $email;
+			} else {
+				$to .= ", $email";
+			}
+		}
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
+		$this->db->query($sql,__LINE__,__FILE__);
+		if ($this->db->next_record()) {
+			if ($this->db->f('email1') != "") {
+				$from = $this->db->f('email1');
+			} else { 
+				$from = $this->db->f('email2');
+			}
+		} else {
+			$from = "president@3rdcounselor";
+		}
+		$subject = "HomeTeaching Changes";
+		$message .= "$email_contents";
+		$headers = "From: $from\r\n" .
+		           "Reply-To: $from\r\n" .
+		           "X-Mailer: PHP/" . phpversion();
+
+		mail($to, $subject, $message, $headers);
+	}
 
 	function ht_update()
 	{
@@ -3757,11 +3941,11 @@ class tc
 	function org_view()
 	{
 		$this->t->set_file(array('org_view_t' => 'org_view.tpl'));
-		$this->t->set_block('org_view_t','calling_list','list1');
-		$this->t->set_block('org_view_t','org_list','list2');
+		$this->t->set_block('org_view_t','calling_list','list');
+	    $this->t->set_var('jquery_url',$this->jquery_url);
+	    $this->t->set_var('jquery_tablesorter_url',$this->jquery_tablesorter_url);
 
-		# Display a list ordered alphabetically
-		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti WHERE tc.individual=ti.individual ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti where tc.individual=ti.individual ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3782,32 +3966,7 @@ class tc
 			$this->t->set_var('organization', $organization);
 			$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 			$this->t->set_var('tr_color',$tr_color);
-			$this->t->fp('list1','calling_list',True);
-		}
-
-		# Display a list ordered by organization
-		$sql = "SELECT * FROM tc_calling AS tc JOIN tc_individual AS ti where tc.individual=ti.individual ORDER BY organization ASC";
-		$this->db->query($sql,__LINE__,__FILE__);
-		$i=0;
-		while ($this->db->next_record()) {
-			$calling[$i]['name'] = $this->db->f('name');
-			$calling[$i]['position'] = $this->db->f('position');
-			$calling[$i]['sustained'] = $this->db->f('sustained');
-			$calling[$i]['organization'] = $this->db->f('organization');
-			$i++;
-		}   
-		for ($i=0; $i < count($calling); $i++) {
-			$name = $calling[$i]['name'];
-			$position = $calling[$i]['position'];
-			$sustained = $calling[$i]['sustained'];
-			$organization = $calling[$i]['organization'];
-			$this->t->set_var('name', $name);
-			$this->t->set_var('position', $position);
-			$this->t->set_var('sustained', $sustained);
-			$this->t->set_var('organization', $organization);
-			$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
-			$this->t->set_var('tr_color',$tr_color);
-			$this->t->fp('list2','org_list',True);
+			$this->t->fp('list','calling_list',True);
 		}
 
 		$this->t->pfp('out','org_view_t');
