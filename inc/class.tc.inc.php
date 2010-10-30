@@ -34,7 +34,7 @@ class tc
 	var $upload_target_path;
 	var $script_path;
 	var $max_appointments;
-	var $max_presidency_members;
+	var $max_leader_members;
 	var $ppi_frequency_label;
 
 	var $public_functions = array
@@ -83,7 +83,7 @@ class tc
 		$this->jquery_tablesorter_url = $GLOBALS['phpgw']->link('inc/jquery/jquery.tablesorter.js');
 		
 		$this->script_path = "$this->application_path"."/bin";
-		$this->max_presidency_members = 99;
+		$this->max_leader_members = 99;
 		$this->max_appointments = 32768;
 
 		$this->db		= $GLOBALS['phpgw']->db;
@@ -873,8 +873,8 @@ class tc
 		}
 		$email_contents .= "\r\n";
 		
-		// email changes to presidency
-		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1) AND tp.valid=1";
+		// email changes to leader
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND (tl.president=1 OR tl.counselor=1 OR tl.secretary=1) AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$email = "";
@@ -889,7 +889,7 @@ class tc
 				$to .= ", $email";
 			}
 		}
-		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.president=1 AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if ($this->db->next_record()) {
 			if ($this->db->f('email1') != "") {
@@ -1900,8 +1900,8 @@ class tc
 					$indiv = $entry['individual'];
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
-				    $presidency_location = $entry['presidency_location'];
-  				    if($location == "") { $location = $presidency_location; }
+				    $leader_location = $entry['leader_location'];
+  				    if($location == "") { $location = $leader_location; }
 					if($indiv == 0) { $location = ""; }
 
 					//Only perform a database update if we have made a change to this appointment
@@ -1964,35 +1964,35 @@ class tc
 		$total_indivs=0; $indivs_with_yearly_ppi=0;
 
 		// Get the President
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti where tp.individual=ti.individual AND tp.valid=1 AND ";
-		if($this->yearly_ppi_interviewer == 1) { $sql .= " (tp.president=1)"; }
-		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tp.president=1 OR tp.counselor=1)"; }
-		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tp.president=1 OR tp.counselor=1 OR tp.secretary=1)"; }
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti where tl.individual=ti.individual AND tl.valid=1 AND ";
+		if($this->yearly_ppi_interviewer == 1) { $sql .= " (tl.president=1)"; }
+		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tl.president=1 OR tl.counselor=1)"; }
+		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.president=1 OR tl.counselor=1 OR tl.secretary=1)"; }
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
-		  $presidency_name = $this->db->f('name');
-		  $presidency_name_array = explode(",",$presidency_name);
-		  $presidency_last_name = $presidency_name_array[0];
-		  $presidency_id = $this->db->f('presidency');
-		  $presidency_address = $this->db->f('address');
-		  $presidency_location = "$presidency_last_name"." home ($presidency_address)";
+		  $leader_name = $this->db->f('name');
+		  $leader_name_array = explode(",",$leader_name);
+		  $leader_last_name = $leader_name_array[0];
+		  $leader_id = $this->db->f('leader');
+		  $leader_address = $this->db->f('address');
+		  $leader_location = "$leader_last_name"." home ($leader_address)";
 		  $appt_table_data = "";
 
-		  // Display a scheduling table for this presidency member
+		  // Display a scheduling table for this leader member
 		  $not_completed_table_title = "All individuals with " . $this->ppi_frequency_label . " PPI Not Completed";
-		  $appt_table_title = $presidency_name . ": " . $this->ppi_frequency_label." PPI Appointment Slots";
+		  $appt_table_title = $leader_name . ": " . $this->ppi_frequency_label." PPI Appointment Slots";
 		  $this->t->set_var('not_completed_table_title',$not_completed_table_title);
 		  $this->t->set_var('appt_table_title',$appt_table_title);
 
 		  // query the database for all the appointments
-		  $sql = "SELECT * FROM tc_appointment where presidency=".$presidency_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
+		  $sql = "SELECT * FROM tc_appointment where leader=".$leader_id." and date>=CURDATE() ORDER BY date ASC, time ASC";
 		  $this->db2->query($sql,__LINE__,__FILE__);
 
 		  while ($this->db2->next_record()) {
 			$appointment = $this->db2->f('appointment');
 			$indiv = $this->db2->f('individual');
 			$location = $this->db2->f('location');
-			if(($location == "") && ($indiv > 0)) { $location = $presidency_location; }
+			if(($location == "") && ($indiv > 0)) { $location = $leader_location; }
 
 			$date = $this->db2->f('date');
 			$date_array = explode("-",$date);
@@ -2031,7 +2031,7 @@ class tc
 		  }
 		  $this->t->set_var('appt_table_data',$appt_table_data);
 		  $this->t->set_var('appt_header_row',$appt_header_row);
-       		  $this->t->set_var('lang_save','Save Appts for ' . $presidency_name);
+       		  $this->t->set_var('lang_save','Save Appts for ' . $leader_name);
 
 		  $this->t->fp('apptlist','appt_list',True);
 		}
@@ -2287,7 +2287,7 @@ class tc
 		}
 
 		// Get the Districts
-		$sql = "SELECT * FROM tc_district AS td JOIN (tc_presidency AS tp, tc_individual AS ti) WHERE td.district=tp.district AND td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN (tc_leader AS tl, tc_individual AS ti) WHERE td.district=tl.district AND td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -2295,7 +2295,7 @@ class tc
 			$districts[$i]['district'] = $this->db->f('district');
 			$districts[$i]['name'] = $this->db->f('name');
 			$districts[$i]['leader'] = $this->db->f('leader');
-			$districts[$i]['presidency'] = $this->db->f('presidency');
+			$districts[$i]['leader'] = $this->db->f('leader');
 			$i++;
 		}
 
@@ -2329,7 +2329,7 @@ class tc
 			$this->t->set_var('appt_table_title',$appt_table_title);
 
 			// query the database for all the appointments
-			$sql = "SELECT * FROM tc_appointment where presidency=".$districts[$d]['presidency']." and date>=CURDATE() ORDER BY date ASC, time ASC";
+			$sql = "SELECT * FROM tc_appointment where leader=".$districts[$d]['leader']." and date>=CURDATE() ORDER BY date ASC, time ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 
 			while ($this->db->next_record()) {
@@ -2625,18 +2625,18 @@ class tc
 		$appt_table_data = ""; 
 
 		// Find out what the President ID is
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.president=1 AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
-			$presidency_name = $this->db->f('name');
-			$presidency_id = $this->db->f('presidency');
+			$leader_name = $this->db->f('name');
+			$leader_id = $this->db->f('leader');
 		} else {
-			print "<hr><font color=red><h3>-E- Unable to locate Presidency in tc_presidency table</h3></font></hr>";
+			print "<hr><font color=red><h3>-E- Unable to locate Presidency in tc_leader table</h3></font></hr>";
 			return;
 		}
 
 		// query the database for all the appointments
-		$sql = "SELECT * FROM tc_appointment where presidency=$presidency_id and date>=CURDATE() ORDER BY date ASC, time ASC";
+		$sql = "SELECT * FROM tc_appointment where leader=$leader_id and date>=CURDATE() ORDER BY date ASC, time ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 
 		while ($this->db->next_record()) {
@@ -2832,13 +2832,13 @@ class tc
 			$this->t->set_var('lang_num_months','Years of History');
 		}
 
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.president=1 AND tp.valid=1";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.president=1 AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$president_name = $this->db->f('name');
 			$interviewer = $this->db->f('individual');
 		} else {
-			print "<hr><font color=red><h3>-E- Unable to locate President in tc_presidency table</h3></font></hr>";
+			print "<hr><font color=red><h3>-E- Unable to locate President in tc_leader table</h3></font></hr>";
 			return;
 		}
 		$this->t->set_var('district_number','*');
@@ -2954,10 +2954,10 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$type = get_var('type',array('GET','POST'));
 
-	    $sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND ";
-	    if($this->yearly_ppi_interviewer == 1) { $sql .= " (tp.president=1)"; }
-		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tp.president=1 OR tp.counselor=1)"; }
-		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tp.president=1 OR tp.counselor=1 OR tp.secretary=1)"; }
+	    $sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 AND ";
+	    if($this->yearly_ppi_interviewer == 1) { $sql .= " (tl.president=1)"; }
+		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tl.president=1 OR tl.counselor=1)"; }
+		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.president=1 OR tl.counselor=1 OR tl.secretary=1)"; }
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -3283,7 +3283,7 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$type = get_var('type',array('GET','POST'));
 
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1 OR tp.district!=0)";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 AND (tl.president=1 OR tl.counselor=1 OR tl.secretary=1 OR tl.district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -3975,7 +3975,7 @@ class tc
 	function schedule()
 	{
 		$this->t->set_file(array('sched_t' => 'schedule.tpl'));
-		$this->t->set_block('sched_t','presidency_list','list');
+		$this->t->set_block('sched_t','leader_list','list');
 
 		$action = get_var('action',array('GET','POST'));
 
@@ -4003,15 +4003,15 @@ class tc
 		$header_row.= "<th width=$location_width><font size=-2>Location</th>";
 		$table_data = "";
 
-		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 GROUP BY tp.individual ORDER BY ti.name ASC";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 GROUP BY tl.individual ORDER BY ti.name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
-			$presidency_data[$i]['id'] = $this->db->f('presidency');
-			$presidency_data[$i]['name'] = $this->db->f('name');
-			$presidency_data[$i]['indiv'] = $this->db->f('individual');
-			$presidency2name[$presidency_data[$i]['id']] = $presidency_data[$i]['name'];
-			$presidency2indiv[$presidency_data[$i]['id']] = $presidency_data[$i]['indiv'];
+			$leader_data[$i]['id'] = $this->db->f('leader');
+			$leader_data[$i]['name'] = $this->db->f('name');
+			$leader_data[$i]['indiv'] = $this->db->f('individual');
+			$leader2name[$leader_data[$i]['id']] = $leader_data[$i]['name'];
+			$leader2indiv[$leader_data[$i]['id']] = $leader_data[$i]['indiv'];
 			$i++;
 		}
 
@@ -4029,9 +4029,9 @@ class tc
 
 		if($action == 'save') {
 			$new_data = get_var('sched',array('POST'));
-			foreach ($new_data as $presidency_array) {
-				foreach ($presidency_array as $entry) {
-					$presidency = $entry['presidency'];
+			foreach ($new_data as $leader_array) {
+				foreach ($leader_array as $entry) {
+					$leader = $entry['leader'];
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
 					$date = $entry['date'];
@@ -4057,10 +4057,10 @@ class tc
 							$family_address = $familyid2address[$family];
 							$location = "$family_last_name"." home ($family_address)";
 						} else if($indiv > 0) {
-							$leader_name_array = explode(",",$presidency2name[$presidency]);
+							$leader_name_array = explode(",",$leader2name[$leader]);
 							$leader_last_name = $leader_name_array[0];
-							#print "presidency2indiv: $presidency $presidency2indiv[$presidency]<br>";
-							$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
+							#print "leader2indiv: $leader $leader2indiv[$leader]<br>";
+							$sql = "SELECT * FROM tc_individual where individual='$leader2indiv[$leader]'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
 								$leader_address = $this->db2->f('address');
@@ -4113,7 +4113,7 @@ class tc
 						//Only perform a database update if we have made a change to this appointment
 						$sql = "SELECT * FROM tc_appointment where " .
 						       "appointment='$appointment'" .
-						       " and presidency='$presidency'" .
+						       " and leader='$leader'" .
 						       " and individual='$indiv'" .
 						       " and family='$family'" .
 						       " and date='$date'" .
@@ -4129,7 +4129,7 @@ class tc
 							                  " ,date='" . $date . "'" .
 							                  " ,time='" . $time . "'" .
 							                  " ,location='" . $location . "'" .
-							                  " ,presidency='" . $presidency . "'" .
+							                  " ,leader='" . $leader . "'" .
 							                  " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
 							// Email the appointment
@@ -4141,8 +4141,8 @@ class tc
 					else if(($appointment >= $this->max_appointments) && ($date != "") && ($time != ""))
 					{
 						//print "adding entry: appt=$appointment date: $date time: $time individual: $indiv family: $family<br>";
-						$this->db2->query("INSERT INTO tc_appointment (appointment,presidency,family,individual,date,time,location,uid) " .
-						                  "VALUES (NULL,'" . $presidency . "','" . $family . "','" . $indiv . "','" .
+						$this->db2->query("INSERT INTO tc_appointment (appointment,leader,family,individual,date,time,location,uid) " .
+						                  "VALUES (NULL,'" . $leader . "','" . $family . "','" . $indiv . "','" .
 						                  $date . "','" . $time  . "','" . $location . "','" . $uid ."')",__LINE__,__FILE__);
 
 						// Now reselect this entry from the database to see if we need
@@ -4150,7 +4150,7 @@ class tc
 						$sql = "SELECT * FROM tc_appointment where " .
 						       "individual='$indiv'" .
 						       " and family='$family'" .
-						       " and presidency='$presidency'" .
+						       " and leader='$leader'" .
 						       " and date='$date'" .
 						       " and time='$time'" .
 						       " and uid='$uid'" .
@@ -4181,15 +4181,15 @@ class tc
 		}
 		array_multisort($indiv_name, $individual);
 
-		for ($i=0; $i < count($presidency_data); $i++) {
-			$presidency = $presidency_data[$i]['id'];
-			$interviewer = $presidency_data[$i]['individual'];
-			$name = $presidency_data[$i]['name'];
-			$this->t->set_var('presidency_name',$name);
+		for ($i=0; $i < count($leader_data); $i++) {
+			$leader = $leader_data[$i]['id'];
+			$interviewer = $leader_data[$i]['individual'];
+			$name = $leader_data[$i]['name'];
+			$this->t->set_var('leader_name',$name);
 			$table_data="";
 
 			// query the database for all the appointments
-			$sql = "SELECT * FROM tc_appointment where presidency=$presidency and date>=CURDATE() ORDER BY date ASC, time ASC";
+			$sql = "SELECT * FROM tc_appointment where leader=$leader and date>=CURDATE() ORDER BY date ASC, time ASC";
 			$this->db->query($sql,__LINE__,__FILE__);
 
 			// Prefill any existing appointment slots
@@ -4206,9 +4206,9 @@ class tc
 						$family_address = $familyid2address[$family];
 						$location = "$family_last_name"." home ($family_address)";
 					} else if($indiv > 0) {
-						$leader_name_array = explode(",",$presidency2name[$presidency]);
+						$leader_name_array = explode(",",$leader2name[$leader]);
 						$leader_last_name = $leader_name_array[0];
-						$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
+						$sql = "SELECT * FROM tc_individual where individual='$leader2indiv[$leader]'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
 							$leader_address = $this->db2->f('address');
@@ -4234,16 +4234,16 @@ class tc
 
 				// Date selection
 				$table_data.= '<td align=left>';
-				$table_data.= $this->jscal->input('sched['.$presidency.']['.$appointment.'][date]',$date,'','','','','',$this->cal_options);
+				$table_data.= $this->jscal->input('sched['.$leader.']['.$appointment.'][date]',$date,'','','','','',$this->cal_options);
 				$table_data.= '</td>';
 
 				// Hour & Minutes selection
 				$table_data.= "<td align=center>";
-				$table_data .= $this->get_time_selection_form($hour, $minute, $pm, $presidency, $appointment);
+				$table_data .= $this->get_time_selection_form($hour, $minute, $pm, $leader, $appointment);
 				$table_data.= "</td>";
 
 				// individual drop down list (for PPIs)
-				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][individual] STYLE="font-size : 8pt">';
+				$table_data.= '<td align=center><select name=sched['.$leader.']['.$appointment.'][individual] STYLE="font-size : 8pt">';
 				$table_data.= '<option value=0></option>';  
 				for ($j=0; $j < count($individual); $j++) {
 					$id = $individual[$j];
@@ -4258,7 +4258,7 @@ class tc
 				$table_data.='</select></td>';
 
 				// Family drop down list (for Visits)
-				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family] STYLE="font-size : 8pt">';
+				$table_data.= '<td align=center><select name=sched['.$leader.']['.$appointment.'][family] STYLE="font-size : 8pt">';
 				$table_data.= '<option value=0></option>';  	    
 				for ($j=0; $j < count($individual); $j++) {
 					$id = $family_id[$j];
@@ -4274,10 +4274,10 @@ class tc
 
 				// Location text box
 				$table_data.= '<td align=center><input type=text size="25" maxlength="120" ';
-				$table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="'.$location.'" STYLE="font-size : 8pt">';
+				$table_data.= 'name="sched['.$leader.']['.$appointment.'][location]" value="'.$location.'" STYLE="font-size : 8pt">';
 
-				$table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
-				$table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
+				$table_data.= '<input type=hidden name="sched['.$leader.']['.$appointment.'][appointment]" value="'.$appointment.'">';
+				$table_data.= '<input type=hidden name="sched['.$leader.']['.$appointment.'][leader]" value="'.$leader.'">';
 
 				$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 				$this->t->set_var('tr_color',$tr_color);
@@ -4290,16 +4290,16 @@ class tc
 
 				// Date selection
 				$table_data.= '<td align=left>';
-				$table_data.= $this->jscal->input('sched['.$presidency.']['.$appointment.'][date]','','','','','','',$this->cal_options);
+				$table_data.= $this->jscal->input('sched['.$leader.']['.$appointment.'][date]','','','','','','',$this->cal_options);
 				$table_data.= '</td>';
 
 				// Time selection
 				$table_data.= "<td align=center>";
-				$table_data .= $this->get_time_selection_form(0, 0, 0, $presidency, $appointment);
+				$table_data .= $this->get_time_selection_form(0, 0, 0, $leader, $appointment);
 				$table_data.= "</td>";
 
 				// individual drop down list
-				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][individual] STYLE="font-size : 8pt">';
+				$table_data.= '<td align=center><select name=sched['.$leader.']['.$appointment.'][individual] STYLE="font-size : 8pt">';
 				$table_data.= '<option value=0></option>';  
 				for ($j=0; $j < count($individual); $j++) {
 					$id = $individual[$j];
@@ -4309,7 +4309,7 @@ class tc
 				$table_data.='</select></td>';
 
 				// Family drop down list
-				$table_data.= '<td align=center><select name=sched['.$presidency.']['.$appointment.'][family] STYLE="font-size : 8pt">';
+				$table_data.= '<td align=center><select name=sched['.$leader.']['.$appointment.'][family] STYLE="font-size : 8pt">';
 				$table_data.= '<option value=0></option>';  	    
 				for ($j=0; $j < count($individual); $j++) {
 					$id = $family_id[$j];
@@ -4320,10 +4320,10 @@ class tc
 
 				// Location text box
 				$table_data.= '<td align=center><input type=text size="25" maxlength="120" ';
-				$table_data.= 'name="sched['.$presidency.']['.$appointment.'][location]" value="" STYLE="font-size : 8pt">';
+				$table_data.= 'name="sched['.$leader.']['.$appointment.'][location]" value="" STYLE="font-size : 8pt">';
 
-				$table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][appointment]" value="'.$appointment.'">';
-				$table_data.= '<input type=hidden name="sched['.$presidency.']['.$appointment.'][presidency]" value="'.$presidency.'">';
+				$table_data.= '<input type=hidden name="sched['.$leader.']['.$appointment.'][appointment]" value="'.$appointment.'">';
+				$table_data.= '<input type=hidden name="sched['.$leader.']['.$appointment.'][leader]" value="'.$leader.'">';
 
 				$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 				$this->t->set_var('tr_color',$tr_color);
@@ -4332,7 +4332,7 @@ class tc
 			$this->t->set_var('table_data',$table_data);
 			$this->t->set_var('header_row',$header_row);
 			$this->t->set_var('table_width',$table_width);
-			$this->t->fp('list','presidency_list',True);
+			$this->t->fp('list','leader_list',True);
 		}
 
 		$this->t->pfp('out','sched_t');
@@ -4377,10 +4377,10 @@ class tc
 		$this->t->set_block('admin_t','upload','uploadhandle');
 		$this->t->set_block('admin_t','admin','adminhandle');
 		$this->t->set_block('admin_t','cmd','cmdhandle');
-		$this->t->set_block('admin_t','presidency','presidencyhandle');
+		$this->t->set_block('admin_t','leader','leaderhandle');
 
 		$this->t->set_var('upload_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.admin&action=upload'));
-		$this->t->set_var('presidency_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.admin&action=presidency'));
+		$this->t->set_var('leader_action',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.admin&action=leader'));
 
 		$action = get_var('action',array('GET','POST'));
 
@@ -4510,7 +4510,7 @@ class tc
 				$this->t->set_var('uploadstatus',$uploadstatus);
 				$this->t->pfp('uploadhandle','upload',True);
 			}
-		} else if($action == "presidency") {
+		} else if($action == "leader") {
 			$new_data = get_var('eqpres',array('POST'));
 			foreach ($new_data as $entry) {
 				$id = $entry['id'];
@@ -4527,19 +4527,19 @@ class tc
 				//print "counselor=$counselor secretary=$secretary<br>";
 
 				if(($indiv > 0) || ($name != "")) {
-					if($id < $this->max_presidency_members) {
+					if($id < $this->max_leader_members) {
 						//print "Updating Existing Entry<br>";
-						$this->db2->query("UPDATE tc_presidency set" .
+						$this->db2->query("UPDATE tc_leader set" .
 						                  " individual=" . $indiv . 
 						                  " ,district=" . $district . 
 						                  " ,email='" . $email . "'" .
 						                  " ,president='" . $president . "'" .
 						                  " ,counselor='" . $counselor . "'" .
 						                  " ,secretary='" . $secretary . "'" .
-						                  " WHERE presidency=" . $id,__LINE__,__FILE__);
+						                  " WHERE leader=" . $id,__LINE__,__FILE__);
 					} else {
 						//print "Adding New Entry<br>";
-						$this->db2->query("INSERT INTO tc_presidency (presidency,individual,district," .
+						$this->db2->query("INSERT INTO tc_leader (leader,individual,district," .
 						                  "email,president,counselor,secretary,valid) " .
 						                  "VALUES (NULL,'" . $indiv . "','" . $district . "','" .
 						                  $email . "','" . $president  . "','" .
@@ -4567,12 +4567,12 @@ class tc
 			                  $indiv . "','" . $valid . "'" .
 			                  ")",__LINE__,__FILE__);
 
-			// Requery the tc_presidency table
-			$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1";
+			// Requery the tc_leader table
+			$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
-				// Extract the data for each presidency record
-				$id = $this->db->f('presidency');
+				// Extract the data for each leader record
+				$id = $this->db->f('leader');
 				$indiv = $this->db->f('individual');
 				$name = $this->db->f('name');
 				$district = $this->db->f('district');
@@ -4596,15 +4596,15 @@ class tc
 			$this->t->pfp('adminhandle','admin'); 
 		}
 
-		// Now save off the data needed for a Presidency Table Update
+		// Now save off the data needed for a Leader Table Update
 
-		$sql = "SELECT tp.*, ti.name FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1";
+		$sql = "SELECT tl.*, ti.name FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$table_data = "";
 		$header_row = "<th>Individual</th><th>Email</th><th>District</th><th>President</th><th>Counselor</th><th>Secretary</th>";
 		while ($this->db->next_record()) {
-			// Extract the data for each presidency record
-			$id = $this->db->f('presidency');
+			// Extract the data for each leader record
+			$id = $this->db->f('leader');
 			$indiv = $this->db->f('individual');
 			$district = $this->db->f('district');
 			$name = $this->db->f('name');
@@ -4616,11 +4616,11 @@ class tc
 			// Create the forms needed in the table
 			$table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
 
-			// Presidency ID
+			// Leader ID
 			$table_data .= '<input type=hidden name="eqpres['.$id.'][id]" value="'.$id.'">';
 
 			// individual
-			if($eqpresidency == 0) {
+			if($eqleader == 0) {
 				$table_data.= '<td align=center><select name="eqpres['.$id.'][indiv]">';
 				$table_data.= '<option value=0></option>';  
 				for ($j=0; $j < count($individual); $j++) {
@@ -4637,8 +4637,8 @@ class tc
 				$table_data.='</select></td>';
 				$table_data.='<input type=hidden name="eqpres['.$id.'][name]" value="'.$indivname.'">';
 			} else {
-				$table_data.= '<td align=left><input type=text size="20" name="eqpresname" value="Presidency"></td>';
-				$table_data.= '<input type=hidden name="eqpres['.$id.'][name]" value="Presidency">';
+				$table_data.= '<td align=left><input type=text size="20" name="eqpresname" value="Leader"></td>';
+				$table_data.= '<input type=hidden name="eqpres['.$id.'][name]" value="Leader">';
 			}
 
 			// Email Address
@@ -4682,9 +4682,9 @@ class tc
 		}
 
 		// Now create 1 blank row to always have a line available to add a new individual with
-		$id = $this->max_presidency_members;
+		$id = $this->max_leader_members;
 		$table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
-		// Presidency ID
+		// Leader ID
 		$table_data .= '<input type=hidden name="eqpres['.$id.'][id]" value="'.$id.'">';
 		// individual
 		$table_data.= '<td align=center><select name="eqpres['.$id.'][indiv]">';
@@ -4729,7 +4729,7 @@ class tc
 
 		$this->t->set_var('header_row',$header_row);
 		$this->t->set_var('table_data',$table_data);
-		$this->t->pfp('presidencyhandle','presidency',True);
+		$this->t->pfp('leaderhandle','leader',True);
 
 		$this->save_sessiondata();   
 	}
@@ -4743,7 +4743,7 @@ class tc
 
 		while ($this->db->next_record()) {
 			$appointment = $this->db->f('appointment');
-			$presidency = $this->db->f('presidency');
+			$leader = $this->db->f('leader');
 			$location = $this->db->f('location');
 			$interviewer = "";
 			$email = "";
@@ -4768,7 +4768,7 @@ class tc
 			$dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
 			$dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 
-			$sql = "SELECT tp.email AS email1, ti.email AS email2, ti.name AS name FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.presidency='$presidency'";
+			$sql = "SELECT tl.email AS email1, ti.email AS email2, ti.name AS name FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.leader='$leader'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
 				if ($this->db2->f('email1') != "") {
@@ -4932,7 +4932,7 @@ class tc
 		mail($to, $subject, $message, $headers);
 	}
 
-	function get_time_selection_form($hour, $minute, $pm, $presidency, $appointment)
+	function get_time_selection_form($hour, $minute, $pm, $leader, $appointment)
 	{
 		$form_data = "";
 		$blank = 0;
@@ -4941,7 +4941,7 @@ class tc
 
 		if($this->time_drop_down_lists == 1) {
 			// Create drop down lists to get the time
-			$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][hour]>';
+			$form_data.= '<select name=sched['.$leader.']['.$appointment.'][hour]>';
 			if($blank == 1) { $form_data.= '<option value=""></option>'; }
 			foreach(range(1,12) as $num) {
 				if($hour == $num) { 
@@ -4953,7 +4953,7 @@ class tc
 			}
 			$form_data.= '</select>';
 			$form_data.= '&nbsp;:&nbsp;';
-			$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][minute]>';
+			$form_data.= '<select name=sched['.$leader.']['.$appointment.'][minute]>';
 			if($blank == 1) { $form_data.= '<option value=""></option>'; }
 			$num = 0;
 			while($num < 60) {
@@ -4975,13 +4975,13 @@ class tc
 				$minute = ""; 
 				$ampm = ""; 
 			}
-			$form_data.= '<input type=text size=2 name=sched['.$presidency.']['.$appointment.'][hour] value='.$hour.'>';
+			$form_data.= '<input type=text size=2 name=sched['.$leader.']['.$appointment.'][hour] value='.$hour.'>';
 			$form_data.= ':';
-			$form_data.= '<input type=text size=2 name=sched['.$presidency.']['.$appointment.'][minute] value='.$minute.'>';
+			$form_data.= '<input type=text size=2 name=sched['.$leader.']['.$appointment.'][minute] value='.$minute.'>';
 			$form_data.= '&nbsp;';
 		}
 		// Always use a drop-down select form for am/pm
-		$form_data.= '<select name=sched['.$presidency.']['.$appointment.'][pm]>';
+		$form_data.= '<select name=sched['.$leader.']['.$appointment.'][pm]>';
 		if($blank == 0) {
 			if($pm == 0) { 
 				$form_data.= '<option value=0 selected>am</option>'; 

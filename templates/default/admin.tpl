@@ -41,15 +41,15 @@
 	</table>
 <!-- END upload -->
 
-<!-- BEGIN presidency -->
+<!-- BEGIN leader -->
 	<center>
         <table border="0" width="80%" cellspacing="2" cellpadding="2">
 	<tr>
           <td align="left">
 	    <hr>
-  	    <b>Update the Presidency Table</b>
+  	    <b>Update the Leadership Table</b>
 	    <br><br>
-	    <form enctype="multipart/form-data" action="{presidency_action}" method="POST">
+	    <form enctype="multipart/form-data" action="{leader_action}" method="POST">
             <table border="0" width="80%" cellspacing="2" cellpadding="2">
             <tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
             {table_data}
@@ -61,13 +61,13 @@
             <br>- If a district leader is not a member of the presidency, add them without setting any other flags except the district.
             <br>- You can only add 1 new presidency member at a time (1 per each update request to the table).
 	    <br><br>
-	    <input type="submit" value="Update Presidency Table">
+	    <input type="submit" value="Update Leadership Table">
 	    </form>
           </td>
         </tr>
         </table>
         </center>
-<!-- END presidency -->
+<!-- END leader -->
 
 <!-- BEGIN cmd -->
 

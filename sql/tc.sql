@@ -28,7 +28,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_activity` (
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_appointment` (
   `appointment` int(16) unsigned NOT NULL auto_increment,
-  `presidency` int(16) unsigned NOT NULL default '0',
+  `leader` int(16) unsigned NOT NULL default '0',
   `family` int(16) unsigned default '0',
   `individual` int(16) unsigned default '0',
   `date` date NOT NULL default '0000-00-00',
@@ -156,10 +156,10 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_interview` (
 
 
 --
--- Table structure for table `tc_presidency`
+-- Table structure for table `tc_leader`
 --
-CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_presidency` (
-  `presidency` int(16) unsigned NOT NULL auto_increment,
+CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_leader` (
+  `leader` int(16) unsigned NOT NULL auto_increment,
   `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
   `email` varchar(60) NOT NULL,
@@ -167,7 +167,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_presidency` (
   `counselor` tinyint(1) default '0',
   `secretary` tinyint(1) default '0',
   `valid` tinyint(1) default '1',
-  KEY `presidency` (`presidency`),
+  KEY `leader` (`leader`),
   KEY `individual` (`individual`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 

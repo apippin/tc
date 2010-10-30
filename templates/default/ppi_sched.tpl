@@ -13,7 +13,7 @@
 <hr>
 <!-- BEGIN appt_list -->
 	<form action="{actionurl}" method="POST">
-		<input type=hidden name=presidency_location value={presidency_location}>
+		<input type=hidden name=leader_location value={leader_location}>
         <table border="0" width="50%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>

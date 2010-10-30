@@ -13,11 +13,11 @@
 	<a href="{schedule_int_link}">{schedule_int_link_title}</a>
 	<br><br>
 
-<!-- BEGIN presidency_list -->
+<!-- BEGIN leader_list -->
 	<table border="0" width="{table_width}" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9" colspan=20>
-				<font face="{font}"><b>{presidency_name} : Appointment Slots</b></font>
+				<font face="{font}"><b>{leader_name} : Appointment Slots</b></font>
 			</td>
 		</tr>
 		<tr bgcolor="#c9c9c9"><font face="{font}">{header_row}</tr>
@@ -33,7 +33,7 @@
 	</table>
 	<br><br>
 
-<!-- END presidency_list -->	
+<!-- END leader_list -->	
 
 	</form>
 

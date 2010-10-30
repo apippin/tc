@@ -48,6 +48,18 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_district_sandbox` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# rename presidency field in tc_appointment to leader
+$sth = $dbh->prepare("ALTER TABLE `tc_appointment` CHANGE `presidency` `leader` INT( 16 ) UNSIGNED NOT NULL DEFAULT '0'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# rename presidency field in tc_leader to leader
+$sth = $dbh->prepare("ALTER TABLE `tc_presidency` CHANGE `presidency` `leader` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# rename tc_presidency to tc_leader
+$sth = $dbh->prepare("RENAME TABLE `tc_presidency` TO `tc_leader`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 print "-> Done!\n";
 
 ###################################################

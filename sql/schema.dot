@@ -7,7 +7,7 @@ digraph schema {
     shape = "record"
   ];
   appointment   [
-    label = "appointment||<a> appointment|<p> presidency|<f> family|<i> individual |<d> date|<t> time|<l> location|<u> uid"
+    label = "appointment||<a> appointment|<l> leader|<f> family|<i> individual |<d> date|<t> time|<l> location|<u> uid"
     shape = "record"
   ];
   assignment    [
@@ -50,8 +50,8 @@ digraph schema {
     label = "interview||<in> interview|<i> interviewer|<il> individual|<t> date|<n> notes|<t> type"
     shape = "record"
   ];
-  presidency    [
-    label = "presidency||<p> presidency|<i> individual|<d> district|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+  leader    [
+    label = "leader||<l> leader|<i> individual|<d> district|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
     shape = "record"
   ];
   visit   [
@@ -101,7 +101,7 @@ digraph schema {
 
   activity:s      -> assignment:a
 
-  appointment:p   -> presidency:p
+  appointment:l   -> leader:l
   appointment:f   -> family:f
   appointment:i   -> individual:i
 
@@ -129,13 +129,13 @@ digraph schema {
   interview:il    -> individual:i
   interview:i     -> individual:i
 
-  presidency:i    -> individual:i
-  presidency:d    -> district:d
+  leader:i    -> individual:i
+  leader:d    -> district:d
 
   visit:c         -> companionship:c
   visit:f         -> family:f
-  visit:c1        -> presidency:i
-  visit:c2        -> presidency:i
+  visit:c1        -> leader:i
+  visit:c2        -> leader:i
 
   willingness:i   -> individual:i
   willingness:a   -> assignment:a
