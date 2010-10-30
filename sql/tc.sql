@@ -182,7 +182,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_visit` (
   `date` date default NULL,
   `notes` text,
   `visited` enum('y','n','') default NULL,
-  `visit_type` enum('presidency','hometeaching') not null default 'hometeaching',
+  `type` enum('P','H') not null default 'H',
   PRIMARY KEY  (`visit`)
 ) ENGINE=MyISAM AUTO_INCREMENT=9513 DEFAULT CHARSET=latin1;
 

@@ -55,7 +55,7 @@ digraph schema {
     shape = "record"
   ];
   visit   [
-    label = "visit||<v> visit|<f> family|<c> companionship|<c1> companion1|<c2> companion2|<t> date|<n> notes|<v> visited|<vt> visit_type"
+    label = "visit||<v> visit|<f> family|<c> companionship|<c1> companion1|<c2> companion2|<t> date|<n> notes|<v> visited|<vt> type"
     shape = "record"
   ];
   willingness   [

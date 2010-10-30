@@ -26,6 +26,16 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_interview` DROP `interview_type` ");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# Change visit_type field in tc_visit table to type, change enum to use 'H','P'
+$sth = $dbh->prepare("ALTER TABLE `tc_visit` ADD `type` ENUM( 'H', 'P' ) NOT NULL AFTER `visit_type`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_visit SET type='H' WHERE visit_type='hometeaching'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_visit SET type='P' WHERE visit_type='presidency'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("ALTER TABLE `tc_visit` DROP `visit_type` ");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 print "-> Done!\n";
 
 ###################################################
