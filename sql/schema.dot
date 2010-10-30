@@ -27,11 +27,11 @@ digraph schema {
     shape = "record"
   ];
   companionship   [
-    label = "companionship||<c> companionship|<d> district|<v> valid"
+    label = "companionship||<c> companionship|<d> district|<t> type|<v> valid"
     shape = "record"
   ];
   district      [
-    label = "district||<d> district|<s> supervisor|<v> valid"
+    label = "district||<d> district|<l> leader|<v> valid"
     shape = "record"
   ];
   individual   [
@@ -83,7 +83,7 @@ digraph schema {
     shape = "record"
   ];
   district_sandbox   [
-    label = "district_sandbox||<d> district|<s> supervisor"
+    label = "district_sandbox||<d> district|<l> leader"
     shape = "record"
   ];
   companion_sandbox   [
@@ -115,7 +115,7 @@ digraph schema {
 
   companionship:d -> district:d
   
-  district:s      -> individual:i
+  district:l      -> individual:i
   
   individual:sp   -> scheduling_priority:sp
   
@@ -146,7 +146,7 @@ digraph schema {
   accomplishment:i   -> individual:i
   accomplishment:t   -> task:t
  
-  district_sandbox:s      -> individual:i
+  district_sandbox:l      -> individual:i
   companion_sandbox:i     -> individual:i
   companion_sandbox:cp    -> companionship_sandbox:cp
   companionship_sandbox:tcp -> companionship:c

@@ -310,7 +310,7 @@ sub update_tc_companionship_table
 		for my $companion (keys %{$companionships->{$companionship}->{'companions'}}) {
 			#print "companion = $companion\n";
 			# see if $companion is in tc_companion
-			$sth = $dbh->prepare("SELECT * FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name='$companion' COLLATE latin1_general_cs AND tc.valid=1");
+			$sth = $dbh->prepare("SELECT * FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name='$companion' COLLATE latin1_general_cs AND tp.type='H' AND tc.valid=1");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			my @data = ();
 			while($sqlhashref = $sth->fetchrow_hashref) { push(@data, $sqlhashref); }
@@ -357,7 +357,7 @@ sub update_tc_companionship_table
 			# loop through families from HomeTeaching.csv
 			for my $family (keys %{$companionships->{$companionship}->{'families'}}) {
 				#print "SELECT * FROM tc_family AS tf JOIN (tc_companionship AS tc, tc_individual AS ti) WHERE tf.companionship=tc.companionship AND tf.individual=ti.individual AND ti.name=\"$family\" COLLATE latin1_general_cs AND tf.valid=1\n";
-				$sth = $dbh->prepare("SELECT * FROM tc_family AS tf JOIN (tc_companionship AS tc, tc_individual AS ti) WHERE tf.companionship=tc.companionship AND tf.individual=ti.individual AND ti.name=\"$family\" COLLATE latin1_general_cs AND tf.valid=1");
+				$sth = $dbh->prepare("SELECT * FROM tc_family AS tf JOIN (tc_companionship AS tc, tc_individual AS ti) WHERE tf.companionship=tc.companionship AND tf.individual=ti.individual AND ti.name=\"$family\" COLLATE latin1_general_cs AND tc.type='H' AND tf.valid=1");
 				$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				# if family isn't in tc_family table, we have a change
 				# if family in tc_family has a different companionship assigned to it, we have a change
@@ -379,12 +379,12 @@ sub update_tc_companionship_table
 		if ($changed == 1) {
 			# invalidate existing companionship in database
 			print "   invalidating companionship:$tc_companionship_id\n";
-			$sth = $dbh->prepare("UPDATE tc_companionship SET valid=0 WHERE companionship='$tc_companionship_id'");
+			$sth = $dbh->prepare("UPDATE tc_companionship SET valid=0 WHERE companionship='$tc_companionship_id' AND type='H'");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			
 			# create new companionship in database
 			print "   creating a new companionship\n";
-			$sth = $dbh->prepare("INSERT INTO tc_companionship values (NULL,$companionship,$district,1)");
+			$sth = $dbh->prepare("INSERT INTO tc_companionship values (NULL,$companionship,$district,'H',1)");
 			$sth->execute or die "-E- DB error: $DBI::errstr\n";
 			$comp_id = $dbh->last_insert_id(NULL,NULL,'tc_companionship',NULL);
 			
@@ -393,7 +393,7 @@ sub update_tc_companionship_table
 				print "   companion=$companion\n";
 				# if companion exists, preserve scheduling_priority
 				#print "SELECT tc.* FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name=\"$companion\" AND tc.valid=1\n";
-				$sth = $dbh->prepare("SELECT tc.* FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name=\"$companion\" AND tc.valid=1");
+				$sth = $dbh->prepare("SELECT tc.* FROM tc_companion AS tc JOIN (tc_individual AS ti, tc_companionship AS tp) WHERE tc.individual=ti.individual AND tc.companionship=tp.companionship AND tp.mls_id=$companionship AND ti.name=\"$companion\" AND tp.type='H' AND tc.valid=1");
 				$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				if ($sqlhashref = $sth->fetchrow_hashref) {
 					my $individual = $sqlhashref->{'individual'};

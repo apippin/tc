@@ -86,6 +86,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companionship` (
   `companionship` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `mls_id` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
   `district` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
+  `type` ENUM( 'H', 'P' ) NOT NULL DEFAULT 'H' ,
   `valid` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1'
 ) ENGINE = MYISAM ;
 
@@ -94,7 +95,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companionship` (
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_district` (
   `district` int(16) unsigned NOT NULL default '0',
-  `supervisor` int(16) unsigned default NULL,
+  `leader` int(16) unsigned default NULL,
   `valid` tinyint(1) default NULL,
   PRIMARY KEY  (`district`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -246,7 +247,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_task` (
 --
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_district_sandbox` (
   `district` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `supervisor` INT( 16 ) UNSIGNED NULL DEFAULT NULL
+  `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL
 ) ENGINE = MYISAM ;
 
 --

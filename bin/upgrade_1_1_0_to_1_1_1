@@ -36,6 +36,18 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_visit` DROP `visit_type` ");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# add type field to tc_companionship
+$sth = $dbh->prepare("ALTER TABLE `tc_companionship` ADD `type` ENUM( 'H', 'P' ) NOT NULL DEFAULT 'H' AFTER `district`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# rename supervisor field in tc_district to leader
+$sth = $dbh->prepare("ALTER TABLE `tc_district` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# rename supervisor field in tc_district_sandbox to leader
+$sth = $dbh->prepare("ALTER TABLE `tc_district_sandbox` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 print "-> Done!\n";
 
 ###################################################

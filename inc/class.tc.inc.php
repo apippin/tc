@@ -228,13 +228,13 @@ class tc
 		$this->t->set_var('ht_sandbox_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
 		$this->t->set_var('ht_sandbox_link_title','Hometeaching Sandbox'); 
 
-		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$districts[$i]['district'] = $this->db->f('district');
 			$districts[$i]['name'] = $this->db->f('name');
-			$districts[$i]['supervisor'] = $this->db->f('supervisor');
+			$districts[$i]['leader'] = $this->db->f('leader');
 			$i++;
 		}
 
@@ -260,10 +260,10 @@ class tc
 		for ($i=0; $i < count($districts); $i++) {
 			$this->t->set_var('district_number',$districts[$i]['district']);
 			$this->t->set_var('district_name',$districts[$i]['name']);	
-			$supervisor = $districts[$i]['supervisor'];
+			$leader = $districts[$i]['leader'];
 
 			// Select all the unique companionship numbers for this district
-			$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $districts[$i]['district'];
+			$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE type='H' AND valid=1 AND district=". $districts[$i]['district'];
 			$this->db->query($sql,__LINE__,__FILE__);
 			$j=0; $unique_companionships = '';
 			while ($this->db->next_record()) {
@@ -539,13 +539,13 @@ class tc
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
 				$district = $this->db->f('district');
-				$supervisor = $this->db->f('supervisor');
-				$sql = "INSERT INTO tc_district_sandbox (district,supervisor) VALUES (\"$district\",\"$supervisor\")";
+				$leader = $this->db->f('leader');
+				$sql = "INSERT INTO tc_district_sandbox (district,leader) VALUES (\"$district\",\"$leader\")";
 				$this->db2->query($sql,__LINE__,__FILE__);
 			}
 			
 			# populate family, companion, and companionship tables
-			$sql = "SELECT * FROM tc_companionship WHERE valid=1";
+			$sql = "SELECT * FROM tc_companionship WHERE type='H' AND valid=1";
 			$this->db->query($sql,__LINE__,__FILE__);
 			while ($this->db->next_record()) {
 				$companionship = $this->db->f('companionship');
@@ -758,7 +758,7 @@ class tc
 		$email_contents = "Please review the following changes to home teaching.\r\n\r\n";
 		// list all companionships deleted
 		$email_contents .= "Removed Companionships\r\n\r\n";
-		$sql = "SELECT * FROM tc_companionship WHERE companionship NOT IN (SELECT tc_companionship FROM tc_companionship_sandbox) AND valid=1";
+		$sql = "SELECT * FROM tc_companionship WHERE companionship NOT IN (SELECT tc_companionship FROM tc_companionship_sandbox) AND type='H' AND valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$companionship = $this->db->f('companionship');
@@ -804,7 +804,7 @@ class tc
 		
 		// list all companionships with changes
 		$email_contents .= "Modified Companionships\r\n\r\n";
-		$sql = "SELECT tcps.* FROM tc_companionship AS tc JOIN tc_companionship_sandbox AS tcps WHERE tc.companionship=tcps.tc_companionship AND tc.valid=1";
+		$sql = "SELECT tcps.* FROM tc_companionship AS tc JOIN tc_companionship_sandbox AS tcps WHERE tc.companionship=tcps.tc_companionship AND tc.type='H' AND tc.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$companionship = $this->db->f('companionship');
@@ -933,7 +933,7 @@ class tc
 
 		if($action == 'save') {
 			// Get a list of all the companionships in this district
-			$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $district;
+			$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE type='H' AND valid=1 AND district=". $district;
 			$this->db->query($sql,__LINE__,__FILE__);
 			$j=0; $unique_companionships = '';
 			while ($this->db->next_record()) {
@@ -986,7 +986,7 @@ class tc
 		}      
 
 		// Select all the unique companionship numbers for this district
-		$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $district;
+		$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE type='H' AND valid=1 AND district=". $district;
 		$this->db->query($sql,__LINE__,__FILE__);
 		$j=0; $unique_companionships = '';
 		while ($this->db->next_record()) {
@@ -999,8 +999,7 @@ class tc
 		for ($j=0; $j < count($unique_companionships); $j++) {
 			$companion_table_entry = "";
 			// Select all the companions in each companionship
-			$sql = "SELECT * FROM tc_companionship where valid=1 and ".
-			"companionship=". $unique_companionships[$j]['companionship'];
+			$sql = "SELECT * FROM tc_companionship WHERE type='H' AND valid=1 AND companionship=". $unique_companionships[$j]['companionship'];
 			$this->db->query($sql,__LINE__,__FILE__);
 
 			while ($this->db->next_record()) {
@@ -2214,7 +2213,7 @@ class tc
 			$i++;
 		}
 		// add any YM that are home teachers
-		$sql = "SELECT * FROM tc_companionship where valid=1";
+		$sql = "SELECT * FROM tc_companionship WHERE type='H' AND valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$tmp_individual = $this->db->f('individual');
@@ -2238,15 +2237,15 @@ class tc
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
 					if($location == "") {
-						$supervisor = $entry['supervisor'];
-						$supervisor_array = explode(",", $individ2name[$supervisor]);
-						$supervisor_last_name = $supervisor_array[0];
-						$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
+						$leader = $entry['leader'];
+						$leader_array = explode(",", $individ2name[$leader]);
+						$leader_last_name = $leader_array[0];
+						$sql = "SELECT * FROM tc_individual where individual='$leader'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
-							$supervisor_address = $this->db2->f('address');
+							$leader_address = $this->db2->f('address');
 						}
-						$location = "$supervisor_last_name"." home ($supervisor_address)";
+						$location = "$leader_last_name"." home ($leader_address)";
 					}
 					if($indiv == 0) { $location = ""; }
 
@@ -2288,14 +2287,14 @@ class tc
 		}
 
 		// Get the Districts
-		$sql = "SELECT * FROM tc_district AS td JOIN (tc_presidency AS tp, tc_individual AS ti) WHERE td.district=tp.district AND td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN (tc_presidency AS tp, tc_individual AS ti) WHERE td.district=tp.district AND td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$district = $this->db->f('district');
 			$districts[$i]['district'] = $this->db->f('district');
 			$districts[$i]['name'] = $this->db->f('name');
-			$districts[$i]['supervisor'] = $this->db->f('supervisor');
+			$districts[$i]['leader'] = $this->db->f('leader');
 			$districts[$i]['presidency'] = $this->db->f('presidency');
 			$i++;
 		}
@@ -2315,15 +2314,15 @@ class tc
 			$table_data=""; $appt_table_data="";
 			$this->t->set_var('district_number',$districts[$d]['district']);
 			$this->t->set_var('district_name',$districts[$d]['name']);	
-			$supervisor = $districts[$d]['supervisor'];
-			$supervisor_array = explode(",", $supervisor);
-			$supervisor_last_name = $supervisor_array[0];
-			$sql = "SELECT * FROM tc_individual where individual='$supervisor'";
+			$leader = $districts[$d]['leader'];
+			$leader_array = explode(",", $leader);
+			$leader_last_name = $leader_array[0];
+			$sql = "SELECT * FROM tc_individual where individual='$leader'";
 			$this->db2->query($sql,__LINE__,__FILE__);
 			if($this->db2->next_record()) {
-				$supervisor_address = $this->db2->f('address');
+				$leader_address = $this->db2->f('address');
 			}
-			$location = "$supervisor_last_name"." home ($supervisor_address)";
+			$location = "$leader_last_name"." home ($leader_address)";
 			$table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": All Individuals with Interviews Not Completed";
 			$appt_table_title = "District ".$districts[$d]['district'].": ".$districts[$d]['name'].": Interview Appointment Slots";
 			$this->t->set_var('table_title',$table_title);
@@ -2337,7 +2336,7 @@ class tc
 				$appointment = $this->db->f('appointment');
 				$indiv = $this->db->f('individual');
 				$location = $this->db->f('location');
-				if(($location == "") && ($indiv > 0)) { $location = "$supervisor_last_name"." home ($supervisor_address)"; }
+				if(($location == "") && ($indiv > 0)) { $location = "$leader_last_name"." home ($leader_address)"; }
 
 				$date = $this->db->f('date');
 				$date_array = explode("-",$date);
@@ -2370,7 +2369,7 @@ class tc
 				$appt_table_data.= 'name="appt_notes['.$appointment.'][location]" value="'.$location.'">';
 
 				$appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][appointment]" value="'.$appointment.'">';
-				$appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][supervisor]" value="'.$supervisor.'">';
+				$appt_table_data.= '<input type=hidden name="appt_notes['.$appointment.'][leader]" value="'.$leader.'">';
 
 				$tr_color = $this->nextmatchs->alternate_row_color($tr_color);
 				$this->t->set_var('tr_color',$tr_color);
@@ -2382,7 +2381,7 @@ class tc
 			// INTERVIEW SCHEDULING TABLE
 
 			// Select all the unique companionship numbers for this district
-			$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $districts[$d]['district'];
+			$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE type='H' AND valid=1 AND district=". $districts[$d]['district'];
 			$this->db->query($sql,__LINE__,__FILE__);
 			$j=0; $unique_companionships = '';
 			while ($this->db->next_record())
@@ -2444,7 +2443,7 @@ class tc
 						$link_data['interview'] = '';
 						$link_data['action'] = 'add';
 						$link_data['type'] = 'H';
-						$link_data['interviewer'] = $districts[$d]['supervisor'];
+						$link_data['interviewer'] = $districts[$d]['leader'];
 						$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 						$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
 						$table_data.= "<td align=center>$phone</td>";
@@ -3092,13 +3091,13 @@ class tc
 		else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
 		else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.supervisor=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$districts[$i]['district'] = $this->db->f('district');
 			$districts[$i]['name'] = $this->db->f('name');
-			$districts[$i]['supervisor'] = $this->db->f('supervisor');
+			$districts[$i]['leader'] = $this->db->f('leader');
 			$i++;
 		}
 
@@ -3122,10 +3121,10 @@ class tc
 		for ($i=0; $i < count($districts); $i++) {
 			$this->t->set_var('district_number',$districts[$i]['district']);
 			$this->t->set_var('district_name',$districts[$i]['name']);	
-			$supervisor = $districts[$i]['supervisor'];
+			$leader = $districts[$i]['leader'];
 
 			// Select all the unique companionship numbers for this district
-			$sql = "SELECT distinct companionship FROM tc_companionship where valid=1 and district=". $districts[$i]['district'];
+			$sql = "SELECT DISTINCT companionship FROM tc_companionship WHERE type='H' AND valid=1 AND district=". $districts[$i]['district'];
 			$this->db->query($sql,__LINE__,__FILE__);
 			$j=0; $unique_companionships = '';
 			while ($this->db->next_record()) {
@@ -3153,7 +3152,7 @@ class tc
 					$phone = $indiv_phone[$individual];
 					$link_data['menuaction'] = 'tc.tc.int_update';
 					$link_data['companionship'] = $companionship;
-					$link_data['interviewer'] = $supervisor;
+					$link_data['interviewer'] = $leader;
 					$link_data['individual'] = $individual;
 					$link_data['name'] = $name;
 					$link_data['interview'] = '';
@@ -4058,15 +4057,15 @@ class tc
 							$family_address = $familyid2address[$family];
 							$location = "$family_last_name"." home ($family_address)";
 						} else if($indiv > 0) {
-							$supervisor_name_array = explode(",",$presidency2name[$presidency]);
-							$supervisor_last_name = $supervisor_name_array[0];
+							$leader_name_array = explode(",",$presidency2name[$presidency]);
+							$leader_last_name = $leader_name_array[0];
 							#print "presidency2indiv: $presidency $presidency2indiv[$presidency]<br>";
 							$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 							$this->db2->query($sql,__LINE__,__FILE__);
 							if($this->db2->next_record()) {
-								$supervisor_address = $this->db2->f('address');
+								$leader_address = $this->db2->f('address');
 							}
-							$location = "$supervisor_last_name"." home ($supervisor_address)";
+							$location = "$leader_last_name"." home ($leader_address)";
 						}
 					}
 
@@ -4207,14 +4206,14 @@ class tc
 						$family_address = $familyid2address[$family];
 						$location = "$family_last_name"." home ($family_address)";
 					} else if($indiv > 0) {
-						$supervisor_name_array = explode(",",$presidency2name[$presidency]);
-						$supervisor_last_name = $supervisor_name_array[0];
+						$leader_name_array = explode(",",$presidency2name[$presidency]);
+						$leader_last_name = $leader_name_array[0];
 						$sql = "SELECT * FROM tc_individual where individual='$presidency2indiv[$presidency]'";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						if($this->db2->next_record()) {
-							$supervisor_address = $this->db2->f('address');
+							$leader_address = $this->db2->f('address');
 						}
-						$location = "$supervisor_last_name"." home ($supervisor_address)";
+						$location = "$leader_last_name"." home ($leader_address)";
 					}
 				}
 
@@ -4563,7 +4562,7 @@ class tc
 			$name = "High Priests";
 			$indiv = 0;
 			$valid = 0;
-			$this->db2->query("INSERT INTO tc_district (district,supervisor,valid) " .
+			$this->db2->query("INSERT INTO tc_district (district,leader,valid) " .
 			                  "VALUES ('" . $district . "','" . 
 			                  $indiv . "','" . $valid . "'" .
 			                  ")",__LINE__,__FILE__);
@@ -4581,7 +4580,7 @@ class tc
 
 				// If we have a valid district, add it to the district table
 				if($district > 0) {
-					$this->db2->query("INSERT INTO tc_district (district,supervisor,valid) " .
+					$this->db2->query("INSERT INTO tc_district (district,leader,valid) " .
 					                  "VALUES ('" . $district . "','" . 
 					                  $indiv . "','" . $valid . "'" .
 					                  ")",__LINE__,__FILE__);
