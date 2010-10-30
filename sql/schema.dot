@@ -47,7 +47,7 @@ digraph schema {
     shape = "record"
   ];
   interview   [
-    label = "interview||<in> interview|<i> interviewer|<il> individual|<t> date|<n> notes|<it> interview_type"
+    label = "interview||<in> interview|<i> interviewer|<il> individual|<t> date|<n> notes|<t> type"
     shape = "record"
   ];
   presidency    [

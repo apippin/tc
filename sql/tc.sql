@@ -149,7 +149,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_interview` (
   `individual` int(16) unsigned default NULL,
   `date` date default NULL,
   `notes` text,
-  `interview_type` enum('hti','ppi') NOT NULL DEFAULT 'hti',
+  `type` enum('H','P') NOT NULL DEFAULT 'H',
   PRIMARY KEY  (`interview`)
 ) ENGINE=MyISAM AUTO_INCREMENT=248 DEFAULT CHARSET=latin1;
 

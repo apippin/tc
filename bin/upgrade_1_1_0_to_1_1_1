@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use DBI;
+use Getopt::Std;
+
+$mydir = `cd \$(dirname $0) 2>/dev/null; pwd`; chomp($mydir);
+unshift @INC,("$mydir/../setup");
+
+if( -f "$mydir/../setup/db_config.local") { require "db_config.local"; }
+else { require "db_config"; }
+
+###################################################
+# Connect to the database
+$dbh=DBI->connect("dbi:mysql:dbname=$dbname:host=$dbhost:port=$dbport",$dbuser,$dbpass,{
+    AutoCommit=>0,
+    PrintError=>0}) or print "Connect Failure:".$DBI::errstr."\n" and exit 2;
+###################################################
+
+# Change interview_type field in tc_interview table to type, change enum to use 'H','P'
+$sth = $dbh->prepare("ALTER TABLE `tc_interview` ADD `type` ENUM( 'H', 'P' ) NOT NULL AFTER `interview_type`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_interview SET type='H' WHERE interview_type='hti'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_interview SET type='P' WHERE interview_type='ppi'");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("ALTER TABLE `tc_interview` DROP `interview_type` ");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+print "-> Done!\n";
+
+###################################################
+# Disconnect from the database
+$dbh->disconnect();
+###################################################

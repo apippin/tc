@@ -5,7 +5,7 @@
 	<input type=hidden name=interviewer value={interviewer}>
 	<input type=hidden name=individual value={individual}>
 	<input type=hidden name=companionship value={companionship}>
-        <input type=hidden name=interview_type value={interview_type}>
+        <input type=hidden name=type value={type}>
 	<table border="0" width="60%" cellspacing="2" cellpadding="2">
 		<tr>
 			<td align="center" bgcolor="#c9c9c9"><font face="{font}"><b>{lang_action}:&nbsp;{name}</b></font></td>

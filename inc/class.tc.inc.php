@@ -2066,11 +2066,11 @@ class tc
 			$year_start = $year . "-" . $start_of_period . "-01";
 			$year_end = $year . "-" . $end_of_period . "-31";
 			$sql = "SELECT * FROM tc_interview WHERE date >= '$year_start' AND date <= '$year_end' ".
-			       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
+			       "AND individual=" . $id . " AND type='P' ORDER BY date DESC";
 			$this->db2->query($sql,__LINE__,__FILE__);
 
 			if(!$this->db2->next_record()) {
-				$sql = "SELECT * FROM tc_interview WHERE individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
+				$sql = "SELECT * FROM tc_interview WHERE individual=" . $id . " AND type='P' ORDER BY date DESC";
 				$this->db->query($sql,__LINE__,__FILE__);
 				if($this->db->next_record()) { 
 					$date = $this->db->f('date'); 
@@ -2081,7 +2081,7 @@ class tc
 				$link_data['individual'] = $id;
 				$link_data['name'] = $name;
 				$link_data['interview'] = '';
-				$link_data['interview_type'] = 1;
+				$link_data['type'] = 1;
 				$link_data['action'] = 'add';
 				$link_data['interviewer'] = $interviewer;
 				$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
@@ -2114,7 +2114,7 @@ class tc
 				$link_data['individual'] = $this->db2->f('individual');
 				$link_data['name'] = $name;
 				$link_data['interview'] = $this->db2->f('interview');
-				$link_data['interview_type'] = $this->db2->f('interview_type');
+				$link_data['type'] = $this->db2->f('type');
 				$link_data['action'] = 'view';
 				$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 				$indivs_with_yearly_ppi++;
@@ -2427,11 +2427,11 @@ class tc
 					}
 
 					// If this companionship has had a hometeaching interview this quarter, don't show them on the schedule list
-					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id' AND interview_type='hti'";
+					$sql = "SELECT * FROM tc_interview WHERE date >= '$quarter_start' AND date < '$quarter_end' AND individual='$id' AND type='H'";
 					$this->db2->query($sql,__LINE__,__FILE__);
 
 					if(!$this->db2->next_record()) {
-						$sql = "SELECT * FROM tc_interview WHERE individual='$id' AND interview_type='hti' ORDER BY date DESC";
+						$sql = "SELECT * FROM tc_interview WHERE individual='$id' AND type='H' ORDER BY date DESC";
 						$this->db3->query($sql,__LINE__,__FILE__);
 						if($this->db3->next_record()) { 
 							$date = $this->db3->f('date'); 
@@ -2443,7 +2443,7 @@ class tc
 						$link_data['name'] = $name;
 						$link_data['interview'] = '';
 						$link_data['action'] = 'add';
-						$link_data['interview_type'] = 'hti';
+						$link_data['type'] = 'H';
 						$link_data['interviewer'] = $districts[$d]['supervisor'];
 						$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 						$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -2473,7 +2473,7 @@ class tc
 						$link_data['individual'] = $this->db2->f('individual');
 						$link_data['name'] = $name;
 						$link_data['interview'] = $this->db2->f('interview');
-						$link_data['interview_type'] = 'hti';
+						$link_data['type'] = 'H';
 						$link_data['action'] = 'view';
 						$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);    
 						$comps_with_quarterly_int++;
@@ -2880,7 +2880,7 @@ class tc
 			$link_data['individual'] = $id;
 			$link_data['name'] = $name;
 			$link_data['interview'] = '';
-			$link_data['interview_type'] = 'ppi'; 
+			$link_data['type'] = 'P'; 
 			$link_data['action'] = 'add';
 			$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 			$this->nextmatchs->template_alternate_row_color(&$this->t);
@@ -2891,7 +2891,7 @@ class tc
 				$year = date('Y') - $m;
 				$year_start = $year - 1 . "-12-31"; $year_end = $year + 1 . "-01-01";
 				$sql = "SELECT * FROM tc_interview WHERE date > '$year_start' AND date < '$year_end' ".
-				       "AND individual=" . $id . " AND interview_type='ppi' ORDER BY date DESC";
+				       "AND individual=" . $id . " AND type='P' ORDER BY date DESC";
 				$this->db2->query($sql,__LINE__,__FILE__);
 
 				if(!$total_ppis[$m]) { $total_ppis[$m] = 0; }
@@ -2903,7 +2903,7 @@ class tc
 					$link_data['indiv'] = $id;
 					$link_data['name'] = $name;
 					$link_data['interview'] = $this->db2->f('interview');
-					$link_data['interview_type'] = 'ppi';
+					$link_data['type'] = 'P';
 					$link_data['action'] = 'view';
 					$date = $this->db2->f('date');
 					$date_array = explode("-",$date);
@@ -2953,7 +2953,7 @@ class tc
 		$individual = get_var('individual',array('GET','POST'));
 		$date = get_var('date',array('GET','POST'));
 		$notes = get_var('notes',array('GET','POST'));
-		$interview_type = get_var('interview_type',array('GET','POST'));
+		$type = get_var('type',array('GET','POST'));
 
 	    $sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND ";
 	    if($this->yearly_ppi_interviewer == 1) { $sql .= " (tp.president=1)"; }
@@ -2982,7 +2982,7 @@ class tc
 			                 ", individual='" . $individual . "'" .
 			                 ", date='" . $date . "'" .
 			                 ", notes=\"" . $notes . "\"" .
-			                 ", interview_type='" . $interview_type . "'" .
+			                 ", type='" . $type . "'" .
 			                 " WHERE interview=" . $interview,__LINE__,__FILE__);
 			$this->ppi_view();
 			return false;
@@ -2990,9 +2990,9 @@ class tc
 
 		if($action == 'insert') {
 			$notes = get_var('notes',array('POST'));
-			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
+			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,type) " .
 			                 "VALUES ('" . $interviewer . "','" . $individual . "','" .
-			                 $date . "',\"" . $notes . "\",'" . $interview_type  ."')",__LINE__,__FILE__);
+			                 $date . "',\"" . $notes . "\",'" . $type  ."')",__LINE__,__FILE__);
 			$this->ppi_view();
 			return false;
 		}
@@ -3005,7 +3005,7 @@ class tc
 			$this->t->set_var('individual',$individual);
 			$this->t->set_var('date','');
 			$this->t->set_var('notes','');
-			$this->t->set_var('interview_type',$interview_type);
+			$this->t->set_var('type',$type);
 			$this->t->set_var('eqpresppi_checked','checked');
 			$this->t->set_var('lang_done','Cancel');
 			$this->t->set_var('lang_action','Adding New PPI');
@@ -3014,7 +3014,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND interview_type='ppi'";
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND type='P'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
@@ -3023,8 +3023,8 @@ class tc
 			$this->t->set_var('individual',$this->db->f('individual'));
 			$this->t->set_var('date',$this->db->f('date'));
 			$this->t->set_var('notes',$this->db->f('notes'));
-			$this->t->set_var('interview_type',$this->db->f('interview_type'));
-			if($this->db->f('interview_type') == 'ppi') { $this->t->set_var('eqpresppi_checked','checked'); }
+			$this->t->set_var('type',$this->db->f('type'));
+			if($this->db->f('type') == 'P') { $this->t->set_var('eqpresppi_checked','checked'); }
 		}
 
 		if($action == 'edit') {
@@ -3157,7 +3157,7 @@ class tc
 					$link_data['individual'] = $individual;
 					$link_data['name'] = $name;
 					$link_data['interview'] = '';
-					$link_data['interview_type'] = 'hti';
+					$link_data['type'] = 'H';
 					$link_data['action'] = 'add';
 					$link = $GLOBALS['phpgw']->link('/tc/index.php',$link_data);
 					$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') ."><td title=\"$phone\"><a href=$link>$name</a></td>";
@@ -3177,7 +3177,7 @@ class tc
 						$month_end = "$year"."-"."$month"."-"."31";
 						$month = "$month"."/"."$year";
 						$sql = "SELECT * FROM tc_interview WHERE date >= '$month_start' AND date <= '$month_end' ".
-						       "AND individual=" . $individual . " AND interview_type='hti' ORDER BY date DESC";
+						       "AND individual=" . $individual . " AND type='H' ORDER BY date DESC";
 						$this->db2->query($sql,__LINE__,__FILE__);
 						$header_row .= "<th width=$int_width><font size=-2>$month</th>";
 
@@ -3195,7 +3195,7 @@ class tc
 							$link_data['name'] = $name;
 							$link_data['interview'] = $this->db2->f('interview');
 							$link_data['action'] = 'view';
-							$link_data['interview_type'] = 'hti';
+							$link_data['type'] = 'H';
 							$date = $this->db2->f('date');
 							$date_array = explode("-",$date);
 							$month = $date_array[1];
@@ -3282,7 +3282,7 @@ class tc
 		$individual = get_var('individual',array('GET','POST'));
 		$date = get_var('date',array('GET','POST'));
 		$notes = get_var('notes',array('GET','POST'));
-		$interview_type = get_var('interview_type',array('GET','POST'));
+		$type = get_var('type',array('GET','POST'));
 
 		$sql = "SELECT * FROM tc_presidency AS tp JOIN tc_individual AS ti WHERE tp.individual=ti.individual AND tp.valid=1 AND (tp.president=1 OR tp.counselor=1 OR tp.secretary=1 OR tp.district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
@@ -3306,7 +3306,7 @@ class tc
 			                 ", individual='" . $individual . "'" .
 			                 ", date='" . $date . "'" .
 			                 ", notes=\"" . $notes . "\"" .
-			                 ", interview_type='" . $interview_type . "'" .
+			                 ", type='" . $type . "'" .
 			                 " WHERE interview=" . $interview,__LINE__,__FILE__);
 			$this->int_view();
 			return false;
@@ -3314,9 +3314,9 @@ class tc
 
 		if($action == 'insert') {
 			$notes = get_var('notes',array('POST'));
-			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,interview_type) " .
+			$this->db->query("INSERT INTO tc_interview (interviewer,individual,date,notes,type) " .
 			                 "VALUES ('" . $interviewer . "','" . $individual . "','" .
-			                 $date . "',\"" . $notes ."\",'" . $interview_type . "')",__LINE__,__FILE__);
+			                 $date . "',\"" . $notes ."\",'" . $type . "')",__LINE__,__FILE__);
 			$this->int_view();
 			return false;
 		}
@@ -3329,7 +3329,7 @@ class tc
 			$this->t->set_var('individual',$individual);
 			$this->t->set_var('date','');
 			$this->t->set_var('notes','');
-			$this->t->set_var('interview_type',$interview_type);
+			$this->t->set_var('type',$type);
 			$this->t->set_var('lang_done','Cancel');
 			$this->t->set_var('lang_action','Adding New Interview');
 			$this->t->set_var('actionurl',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.int_update&interview=' .
@@ -3337,7 +3337,7 @@ class tc
 		}
 
 		if($action == 'edit' || $action == 'view') {
-			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND interview_type='hti'";
+			$sql = "SELECT * FROM tc_interview WHERE interview=" . $interview . " AND type='H'";
 			$this->db->query($sql,__LINE__,__FILE__);
 			$this->db->next_record();
 			$this->t->set_var('interview',$interview);
@@ -3346,8 +3346,8 @@ class tc
 			$this->t->set_var('individual',$this->db->f('individual'));
 			$this->t->set_var('date',$this->db->f('date'));
 			$this->t->set_var('notes',$this->db->f('notes'));
-			$this->t->set_var('interview_type',$this->db->f('interview_type'));
-			if($this->db->f('interview_type') == 'ppi') { $this->t->set_var('eqpresppi_checked','checked'); }
+			$this->t->set_var('type',$this->db->f('type'));
+			if($this->db->f('type') == 'P') { $this->t->set_var('eqpresppi_checked','checked'); }
 		}
 
 		if($action == 'edit') {
