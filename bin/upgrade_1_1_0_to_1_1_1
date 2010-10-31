@@ -82,6 +82,10 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_leader` DROP `district`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# remove companion1 and companion2 from tc_visit
+$sth = $dbh->prepare("ALTER TABLE `tc_visit` DROP `companion1`, DROP `companion2`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 
 
 print "-> Done!\n";

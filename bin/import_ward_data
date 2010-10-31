@@ -615,7 +615,7 @@ sub update_tc_visit_table
 				if ($importing_status ne '')
 				{
 					# add visit if it doesn't exist in tc_visit
-					$sth = $dbh->prepare("insert into tc_visit values (NULL, '$family_id', '$comp_id', '', '', '$visit_date', '', '$importing_status', 'H')");
+					$sth = $dbh->prepare("insert into tc_visit values (NULL, '$family_id', '$comp_id', '$visit_date', '', '$importing_status', 'H')");
 					$sth->execute or die "-E- DB error: $DBI::errstr\n";
 				}
 			}

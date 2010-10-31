@@ -175,8 +175,6 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_visit` (
   `visit` int(16) unsigned NOT NULL auto_increment,
   `family` int(16) unsigned default NULL,
   `companionship` int(16) unsigned default NULL,
-  `companion1` int(16) unsigned default NULL,
-  `companion2` int(16) unsigned default NULL,
   `date` date default NULL,
   `notes` text,
   `visited` enum('y','n','') default NULL,
