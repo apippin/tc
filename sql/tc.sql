@@ -163,9 +163,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_leader` (
   `individual` int(16) unsigned NOT NULL default '0',
   `district` int(16) unsigned default '0',
   `email` varchar(60) NOT NULL,
-  `president` tinyint(1) default '0',
-  `counselor` tinyint(1) default '0',
-  `secretary` tinyint(1) default '0',
+  `type` enum( 'P', 'C', 'S', 'D' ) NOT NULL,
   `valid` tinyint(1) default '1',
   KEY `leader` (`leader`),
   KEY `individual` (`individual`)

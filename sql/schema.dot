@@ -51,7 +51,7 @@ digraph schema {
     shape = "record"
   ];
   leader    [
-    label = "leader||<l> leader|<i> individual|<d> district|<em> email|<pr> president|<cn> counselor|<sec> secreatary|<v> valid"
+    label = "leader||<l> leader|<i> individual|<d> district|<em> email|<t> type|<v> valid"
     shape = "record"
   ];
   visit   [

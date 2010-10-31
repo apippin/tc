@@ -874,7 +874,7 @@ class tc
 		$email_contents .= "\r\n";
 		
 		// email changes to leader
-		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND (tl.president=1 OR tl.counselor=1 OR tl.secretary=1) AND tl.valid=1";
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND (tl.type='P' OR tl.type='C' OR tl.type='S') AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$email = "";
@@ -889,7 +889,7 @@ class tc
 				$to .= ", $email";
 			}
 		}
-		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.president=1 AND tl.valid=1";
+		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.type='P' AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if ($this->db->next_record()) {
 			if ($this->db->f('email1') != "") {
@@ -1965,9 +1965,9 @@ class tc
 
 		// Get the President
 		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti where tl.individual=ti.individual AND tl.valid=1 AND ";
-		if($this->yearly_ppi_interviewer == 1) { $sql .= " (tl.president=1)"; }
-		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tl.president=1 OR tl.counselor=1)"; }
-		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.president=1 OR tl.counselor=1 OR tl.secretary=1)"; }
+		if($this->yearly_ppi_interviewer == 1) { $sql .= " (tl.type='P')"; }
+		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tl.type='P' OR tl.type='C')"; }
+		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.type='P' OR tl.type='C' OR tl.type='S')"; }
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 		  $leader_name = $this->db->f('name');
@@ -2625,7 +2625,7 @@ class tc
 		$appt_table_data = ""; 
 
 		// Find out what the President ID is
-		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.president=1 AND tl.valid=1";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.type='P' AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$leader_name = $this->db->f('name');
@@ -2832,7 +2832,7 @@ class tc
 			$this->t->set_var('lang_num_months','Years of History');
 		}
 
-		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.president=1 AND tl.valid=1";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.type='P' AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if($this->db->next_record()) {
 			$president_name = $this->db->f('name');
@@ -2955,9 +2955,9 @@ class tc
 		$type = get_var('type',array('GET','POST'));
 
 	    $sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 AND ";
-	    if($this->yearly_ppi_interviewer == 1) { $sql .= " (tl.president=1)"; }
-		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tl.president=1 OR tl.counselor=1)"; }
-		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.president=1 OR tl.counselor=1 OR tl.secretary=1)"; }
+	    if($this->yearly_ppi_interviewer == 1) { $sql .= " (tl.type='P')"; }
+		if($this->yearly_ppi_interviewer == 2) { $sql .= " (tl.type='P' OR tl.type='C')"; }
+		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.type='P' OR tl.type='C' OR tl.type='S')"; }
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -3283,7 +3283,7 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$type = get_var('type',array('GET','POST'));
 
-		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 AND (tl.president=1 OR tl.counselor=1 OR tl.secretary=1 OR tl.district!=0)";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 AND (tl.type='P' OR tl.type='C' OR tl.type='D' OR tl.district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -4527,23 +4527,24 @@ class tc
 				//print "counselor=$counselor secretary=$secretary<br>";
 
 				if(($indiv > 0) || ($name != "")) {
+                    $leader_type = 'D';
+                    if ($secretary == 1) {$leader_type = 'S';}
+                    if ($counselor == 1) {$leader_type = 'C';}
+                    if ($president == 1) {$leader_type = 'P';}
 					if($id < $this->max_leader_members) {
 						//print "Updating Existing Entry<br>";
 						$this->db2->query("UPDATE tc_leader set" .
 						                  " individual=" . $indiv . 
 						                  " ,district=" . $district . 
 						                  " ,email='" . $email . "'" .
-						                  " ,president='" . $president . "'" .
-						                  " ,counselor='" . $counselor . "'" .
-						                  " ,secretary='" . $secretary . "'" .
+						                  " ,type='" . $leader_type . "'" .
 						                  " WHERE leader=" . $id,__LINE__,__FILE__);
 					} else {
 						//print "Adding New Entry<br>";
 						$this->db2->query("INSERT INTO tc_leader (leader,individual,district," .
-						                  "email,president,counselor,secretary,valid) " .
+						                  "email,type,valid) " .
 						                  "VALUES (NULL,'" . $indiv . "','" . $district . "','" .
-						                  $email . "','" . $president  . "','" .
-						                  $counselor . "','" . $secretary . "','1'" .
+						                  $email . "','" . $leader_type . "','1'" .
 						                  ")",__LINE__,__FILE__);
 					}
 				} else {
@@ -4609,9 +4610,10 @@ class tc
 			$district = $this->db->f('district');
 			$name = $this->db->f('name');
 			$email = $this->db->f('email');
-			$president = $this->db->f('president');
-			$counselor = $this->db->f('counselor');
-			$secretary = $this->db->f('secretary');
+            $leader_type = $this->db->f('type');
+			if ($leader_type == 'P') {$president = 1;} else {$president = 0;}
+			if ($leader_type == 'C') {$counselor = 1;} else {$counselor = 0;}
+			if ($leader_type == 'S') {$secretary = 1;} else {$secretary = 0;}
 
 			// Create the forms needed in the table
 			$table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";

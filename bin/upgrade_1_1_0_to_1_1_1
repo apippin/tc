@@ -60,6 +60,21 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("RENAME TABLE `tc_presidency` TO `tc_leader`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# add type field to tc_leader in place of president, counselor, secretary fields
+$sth = $dbh->prepare("ALTER TABLE `tc_leader` ADD `type` ENUM( 'P', 'C', 'S', 'D' ) NOT NULL AFTER `email`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_leader SET type='P' WHERE president=1");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_leader SET type='C' WHERE counselor=1");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_leader SET type='S' WHERE secretary=1");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_leader SET type='D' WHERE president=0 AND counselor=0 AND secretary=0");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("ALTER TABLE `tc_leader` DROP `president`, DROP `counselor`, DROP `secretary`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+
 print "-> Done!\n";
 
 ###################################################
