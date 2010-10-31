@@ -40,14 +40,6 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_companionship` ADD `type` ENUM( 'H', 'P' ) NOT NULL DEFAULT 'H' AFTER `district`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
-# rename supervisor field in tc_district to leader
-$sth = $dbh->prepare("ALTER TABLE `tc_district` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
-$sth->execute or die "-E- DB error: $DBI::errstr\n";
-
-# rename supervisor field in tc_district_sandbox to leader
-$sth = $dbh->prepare("ALTER TABLE `tc_district_sandbox` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
-$sth->execute or die "-E- DB error: $DBI::errstr\n";
-
 # rename presidency field in tc_appointment to leader
 $sth = $dbh->prepare("ALTER TABLE `tc_appointment` CHANGE `presidency` `leader` INT( 16 ) UNSIGNED NOT NULL DEFAULT '0'");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
@@ -73,6 +65,23 @@ $sth = $dbh->prepare("UPDATE tc_leader SET type='D' WHERE president=0 AND counse
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_leader` DROP `president`, DROP `counselor`, DROP `secretary`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# rename supervisor field in tc_district to leader
+$sth = $dbh->prepare("ALTER TABLE `tc_district` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_district AS td JOIN tc_leader AS tl SET td.leader=tl.leader WHERE td.leader=tl.individual AND td.district=tl.district AND tl.valid=1 AND td.valid=1");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# rename supervisor field in tc_district_sandbox to leader
+$sth = $dbh->prepare("ALTER TABLE `tc_district_sandbox` CHANGE `supervisor` `leader` INT( 16 ) UNSIGNED NULL DEFAULT NULL");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+$sth = $dbh->prepare("UPDATE tc_district_sandbox AS tdc JOIN tc_leader AS tl SET tdc.leader=tl.leader WHERE tdc.leader=tl.individual AND tdc.district=tl.district AND tl.valid=1");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# remove district field from tc_leader
+$sth = $dbh->prepare("ALTER TABLE `tc_leader` DROP `district`");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 
 
 print "-> Done!\n";

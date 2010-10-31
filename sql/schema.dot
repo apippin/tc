@@ -51,7 +51,7 @@ digraph schema {
     shape = "record"
   ];
   leader    [
-    label = "leader||<l> leader|<i> individual|<d> district|<em> email|<t> type|<v> valid"
+    label = "leader||<l> leader|<i> individual|<em> email|<t> type|<v> valid"
     shape = "record"
   ];
   visit   [
@@ -115,7 +115,7 @@ digraph schema {
 
   companionship:d -> district:d
   
-  district:l      -> individual:i
+  district:l      -> leader:l
   
   individual:sp   -> scheduling_priority:sp
   
@@ -130,7 +130,6 @@ digraph schema {
   interview:i     -> individual:i
 
   leader:i    -> individual:i
-  leader:d    -> district:d
 
   visit:c         -> companionship:c
   visit:f         -> family:f
@@ -146,7 +145,7 @@ digraph schema {
   accomplishment:i   -> individual:i
   accomplishment:t   -> task:t
  
-  district_sandbox:l      -> individual:i
+  district_sandbox:l      -> leader:l
   companion_sandbox:i     -> individual:i
   companion_sandbox:cp    -> companionship_sandbox:cp
   companionship_sandbox:tcp -> companionship:c

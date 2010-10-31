@@ -161,7 +161,6 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_interview` (
 CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_leader` (
   `leader` int(16) unsigned NOT NULL auto_increment,
   `individual` int(16) unsigned NOT NULL default '0',
-  `district` int(16) unsigned default '0',
   `email` varchar(60) NOT NULL,
   `type` enum( 'P', 'C', 'S', 'D' ) NOT NULL,
   `valid` tinyint(1) default '1',

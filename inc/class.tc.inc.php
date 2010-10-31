@@ -228,7 +228,7 @@ class tc
 		$this->t->set_var('ht_sandbox_link',$GLOBALS['phpgw']->link('/tc/index.php','menuaction=tc.tc.ht_sandbox'));
 		$this->t->set_var('ht_sandbox_link_title','Hometeaching Sandbox'); 
 
-		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN (tc_individual AS ti, tc_leader AS tl) WHERE td.leader=tl.leader AND tl.individual=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -2287,14 +2287,13 @@ class tc
 		}
 
 		// Get the Districts
-		$sql = "SELECT * FROM tc_district AS td JOIN (tc_leader AS tl, tc_individual AS ti) WHERE td.district=tl.district AND td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN (tc_leader AS tl, tc_individual AS ti) WHERE td.leader=tl.leader AND tl.individual=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
 			$district = $this->db->f('district');
 			$districts[$i]['district'] = $this->db->f('district');
 			$districts[$i]['name'] = $this->db->f('name');
-			$districts[$i]['leader'] = $this->db->f('leader');
 			$districts[$i]['leader'] = $this->db->f('leader');
 			$i++;
 		}
@@ -3091,7 +3090,7 @@ class tc
 		else if($current_month >= 7 && $current_month <= 9) { $current_month=9; }
 		else if($current_month >= 10 && $current_month <= 12) { $current_month=12; }
 
-		$sql = "SELECT * FROM tc_district AS td JOIN tc_individual AS ti WHERE td.leader=ti.individual AND td.valid=1 ORDER BY td.district ASC";
+		$sql = "SELECT * FROM tc_district AS td JOIN (tc_individual AS ti, tc_leader AS tl) WHERE td.leader=tl.leader AND tl.individual=ti.individual AND td.valid=1 ORDER BY td.district ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		$i=0;
 		while ($this->db->next_record()) {
@@ -3283,7 +3282,7 @@ class tc
 		$notes = get_var('notes',array('GET','POST'));
 		$type = get_var('type',array('GET','POST'));
 
-		$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1 AND (tl.type='P' OR tl.type='C' OR tl.type='D' OR tl.district!=0)";
+		$sql = "SELECT * FROM tc_leader AS tl JOIN (tc_individual AS ti, tc_district AS td) WHERE tl.individual=ti.individual AND tl.leader=td.leader AND tl.valid=1 AND (tl.type='P' OR tl.type='C' OR tl.type='D' OR td.district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
 			$indiv = $this->db2->f('individual');
@@ -4512,6 +4511,21 @@ class tc
 			}
 		} else if($action == "leader") {
 			$new_data = get_var('eqpres',array('POST'));
+            
+			// Delete all the previous district entries from the table
+			$this->db->query("DELETE from tc_district where valid=1",__LINE__,__FILE__);
+			$this->db->query("DELETE from tc_district where valid=0",__LINE__,__FILE__);
+            
+			// Always add a "District 0" assigned to the High Priests Group
+			$district = 0;
+			$name = "High Priests";
+			$indiv = 0;
+			$valid = 0;
+			$this->db2->query("INSERT INTO tc_district (district,leader,valid) " .
+			                  "VALUES ('" . $district . "','" . 
+			                  $indiv . "','" . $valid . "'" .
+			                  ")",__LINE__,__FILE__);
+
 			foreach ($new_data as $entry) {
 				$id = $entry['id'];
 				$email = $entry['email'];
@@ -4535,56 +4549,29 @@ class tc
 						//print "Updating Existing Entry<br>";
 						$this->db2->query("UPDATE tc_leader set" .
 						                  " individual=" . $indiv . 
-						                  " ,district=" . $district . 
 						                  " ,email='" . $email . "'" .
 						                  " ,type='" . $leader_type . "'" .
 						                  " WHERE leader=" . $id,__LINE__,__FILE__);
 					} else {
 						//print "Adding New Entry<br>";
-						$this->db2->query("INSERT INTO tc_leader (leader,individual,district," .
+						$this->db2->query("INSERT INTO tc_leader (leader,individual," .
 						                  "email,type,valid) " .
-						                  "VALUES (NULL,'" . $indiv . "','" . $district . "','" .
+						                  "VALUES (NULL,'" . $indiv . "','" . 
 						                  $email . "','" . $leader_type . "','1'" .
 						                  ")",__LINE__,__FILE__);
+                        $id = mysql_insert_id();
+					}
+					
+					// If we have a valid district, add it to the district table
+					if($district > 0) {
+						$valid = 1;
+						$this->db2->query("INSERT INTO tc_district (district,leader,valid) " .
+										  "VALUES ('" . $district . "','" . 
+										  $id . "','" . $valid . "'" .
+										  ")",__LINE__,__FILE__);
 					}
 				} else {
 					//print "Ignoring Blank Entry<br>";
-				}
-			}
-
-			// Now update the tc_district table appropriately
-
-			// Delete all the previous district entries from the table
-			$this->db->query("DELETE from tc_district where valid=1",__LINE__,__FILE__);
-			$this->db->query("DELETE from tc_district where valid=0",__LINE__,__FILE__);
-
-			// Always add a "District 0" assigned to the High Priests Group
-			$district = 0;
-			$name = "High Priests";
-			$indiv = 0;
-			$valid = 0;
-			$this->db2->query("INSERT INTO tc_district (district,leader,valid) " .
-			                  "VALUES ('" . $district . "','" . 
-			                  $indiv . "','" . $valid . "'" .
-			                  ")",__LINE__,__FILE__);
-
-			// Requery the tc_leader table
-			$sql = "SELECT * FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.valid=1";
-			$this->db->query($sql,__LINE__,__FILE__);
-			while ($this->db->next_record()) {
-				// Extract the data for each leader record
-				$id = $this->db->f('leader');
-				$indiv = $this->db->f('individual');
-				$name = $this->db->f('name');
-				$district = $this->db->f('district');
-				$valid = 1;
-
-				// If we have a valid district, add it to the district table
-				if($district > 0) {
-					$this->db2->query("INSERT INTO tc_district (district,leader,valid) " .
-					                  "VALUES ('" . $district . "','" . 
-					                  $indiv . "','" . $valid . "'" .
-					                  ")",__LINE__,__FILE__);
 				}
 			}
 
@@ -4607,13 +4594,20 @@ class tc
 			// Extract the data for each leader record
 			$id = $this->db->f('leader');
 			$indiv = $this->db->f('individual');
-			$district = $this->db->f('district');
 			$name = $this->db->f('name');
 			$email = $this->db->f('email');
             $leader_type = $this->db->f('type');
 			if ($leader_type == 'P') {$president = 1;} else {$president = 0;}
 			if ($leader_type == 'C') {$counselor = 1;} else {$counselor = 0;}
 			if ($leader_type == 'S') {$secretary = 1;} else {$secretary = 0;}
+
+			$sql = "SELECT * FROM tc_district AS td JOIN tc_leader AS tl WHERE td.leader=tl.leader AND td.leader=$id AND td.district!=0 AND td.valid=1";
+			$this->db2->query($sql,__LINE__,__FILE__);
+            if ($this->db2->next_record()) {
+				$district = $this->db2->f('district');
+            } else {
+				$district = 0;
+            }
 
 			// Create the forms needed in the table
 			$table_data .= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
