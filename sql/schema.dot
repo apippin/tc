@@ -75,7 +75,7 @@ digraph schema {
     shape = "record"
   ];
   accomplishment   [
-    label = "accomplishment||<a> accomplishment|<i> individual|<d> date|<t> task|<n> note"
+    label = "accomplishment||<a> accomplishment|<i> individual|<d> date|<t> task|<n> notes"
     shape = "record"
   ];
   task   [

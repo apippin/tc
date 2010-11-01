@@ -90,6 +90,9 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("UPDATE tc_interview AS ti JOIN tc_leader AS tl SET ti.interviewer=tl.leader WHERE ti.interviewer=tl.individual");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# rename note field in tc_accomplishment to notes
+$sth = $dbh->prepare("ALTER TABLE `tc_accomplishment` CHANGE `note` `notes` VARCHAR( 128 ) NOT NULL ");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 print "-> Done!\n";
 

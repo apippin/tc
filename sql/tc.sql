@@ -225,7 +225,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_accomplishment` (
   `individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
   `date` DATE NULL DEFAULT NULL ,
   `task` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
-  `note` VARCHAR( 128 ) NOT NULL
+  `notes` VARCHAR( 128 ) NOT NULL
 ) ENGINE = MYISAM ;
 
 --
