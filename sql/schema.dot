@@ -127,7 +127,7 @@ digraph schema {
   participation:a -> activity:a
 
   interview:il    -> individual:i
-  interview:i     -> individual:i
+  interview:i     -> leader:l
 
   leader:i    -> individual:i
 

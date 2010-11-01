@@ -2959,12 +2959,12 @@ class tc
 		if($this->yearly_ppi_interviewer == 3) { $sql .= " (tl.type='P' OR tl.type='C' OR tl.type='S')"; }
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
-			$indiv = $this->db2->f('individual');
+			$leader = $this->db2->f('leader');
 			$interviewer_name = $this->db2->f('name');
-			if($indiv == $interviewer) {
-				$this->t->set_var('interviewer',$indiv . ' selected');
+			if($leader == $interviewer) {
+				$this->t->set_var('interviewer',$leader . ' selected');
 			} else {
-				$this->t->set_var('interviewer',$indiv);
+				$this->t->set_var('interviewer',$leader);
 			}
 			#print "indiv: $indiv interviewer: $interviewer<br>";
 			$this->t->set_var('interviewer_name',$interviewer_name);
@@ -3285,12 +3285,12 @@ class tc
 		$sql = "SELECT * FROM tc_leader AS tl JOIN (tc_individual AS ti, tc_district AS td) WHERE tl.individual=ti.individual AND tl.leader=td.leader AND tl.valid=1 AND (tl.type='P' OR tl.type='C' OR tl.type='D' OR td.district!=0)";
 		$this->db2->query($sql,__LINE__,__FILE__);
 		while ($this->db2->next_record()) {
-			$indiv = $this->db2->f('individual');
+			$leader = $this->db2->f('leader');
 			$interviewer_name = $this->db2->f('name');
-			if($indiv == $interviewer) {
-				$this->t->set_var('interviewer',$indiv . ' selected');
+			if($leader == $interviewer) {
+				$this->t->set_var('interviewer',$leader . ' selected');
 			} else {
-				$this->t->set_var('interviewer',$indiv);
+				$this->t->set_var('interviewer',$leader);
 			}
 			$this->t->set_var('interviewer_name',$interviewer_name);
 			$this->t->fp('int_list','interviewer_list',True);

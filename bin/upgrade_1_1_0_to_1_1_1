@@ -86,6 +86,9 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_visit` DROP `companion1`, DROP `companion2`");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# change tc_interview so interviewer points to tc_leader.leader
+$sth = $dbh->prepare("UPDATE tc_interview AS ti JOIN tc_leader AS tl SET ti.interviewer=tl.leader WHERE ti.interviewer=tl.individual");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
 
 
 print "-> Done!\n";
