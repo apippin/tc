@@ -94,6 +94,26 @@ $sth->execute or die "-E- DB error: $DBI::errstr\n";
 $sth = $dbh->prepare("ALTER TABLE `tc_accomplishment` CHANGE `note` `notes` VARCHAR( 128 ) NOT NULL ");
 $sth->execute or die "-E- DB error: $DBI::errstr\n";
 
+# add primary key to tc_calling
+$sth = $dbh->prepare("ALTER TABLE `tc_calling` ADD `calling` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# add primary key to tc_attendance
+$sth = $dbh->prepare("ALTER TABLE `tc_attendance` ADD `attendance` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# add primary key to tc_participation
+$sth = $dbh->prepare("ALTER TABLE `tc_participation` ADD `participation` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# add primary key to tc_willingness
+$sth = $dbh->prepare("ALTER TABLE `tc_willingness` ADD `willingness` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
+# add primary key to tc_email_list_membership
+$sth = $dbh->prepare("ALTER TABLE `tc_email_list_membership` ADD `email_list_membership` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+$sth->execute or die "-E- DB error: $DBI::errstr\n";
+
 print "-> Done!\n";
 
 ###################################################

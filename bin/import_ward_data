@@ -247,7 +247,7 @@ sub update_tc_calling_table()
 		$individual = $data[0]{'individual'};
 
 		print "   Adding new Calling: $name -> $position\n";
-		$sth = $dbh->prepare("insert into tc_calling values ('$individual','$organization','$position','$month $year')");
+		$sth = $dbh->prepare("insert into tc_calling values (NULL,'$individual','$organization','$position','$month $year')");
 		$sth->execute or die "-E- DB error: $DBI::errstr\n";
 	}
 }

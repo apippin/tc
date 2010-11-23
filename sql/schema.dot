@@ -15,11 +15,11 @@ digraph schema {
     shape = "record"
   ];
   attendance   [
-    label = "attendance||<i> individual|<d> date"
+    label = "attendance||<a> attendance|<i> individual|<d> date"
     shape = "record"
   ];
   calling       [
-    label = "calling||<i> individual|<o> organization|<p> position|<s> sustained"
+    label = "calling||<c> calling|<i> individual|<o> organization|<p> position|<s> sustained"
     shape = "record"
   ];
   companion   [
@@ -43,7 +43,7 @@ digraph schema {
     shape = "record"
   ];
   participation   [
-    label = "participation||<i> individual|<a> activity"
+    label = "participation||<p> participation|<i> individual|<a> activity"
     shape = "record"
   ];
   interview   [
@@ -59,7 +59,7 @@ digraph schema {
     shape = "record"
   ];
   willingness   [
-    label = "willingness||<i> individual|<a> assignment|<w> willing"
+    label = "willingness||<wn> willingness|<i> individual|<a> assignment|<w> willing"
     shape = "record"
   ];
   scheduling_priority   [
@@ -71,7 +71,7 @@ digraph schema {
     shape = "record"
   ];
   email_list_membership   [
-    label = "email_list_membership||<i> individual|<e> email_list"
+    label = "email_list_membership||<elm> email_list_membership|<i> individual|<e> email_list"
     shape = "record"
   ];
   accomplishment   [

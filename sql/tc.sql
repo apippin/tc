@@ -19,8 +19,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_activity` (
   `assignment` int(16) unsigned NOT NULL,
   `date` date default NULL,
   `notes` text,
-  PRIMARY KEY  (`activity`),
-  KEY `assignment` (`assignment`)
+  PRIMARY KEY  (`activity`)
 ) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
 
 --
@@ -51,23 +50,24 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_assignment` (
 --
 -- Table structure for table `tc_attendance`
 --
-CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_attendance` (
-  `individual` int(16) unsigned NOT NULL default '0',
-  `date` date default NULL,
-  KEY `individual` (`individual`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `tc_attendance` (
+  `attendance` int(11) NOT NULL AUTO_INCREMENT,
+  `individual` int(16) unsigned NOT NULL DEFAULT '0',
+  `date` date DEFAULT NULL,
+  PRIMARY KEY (`attendance`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28 ;
 
 --
 -- Table structure for table `tc_calling`
 --
-CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_calling` (
-  `individual` int(16) unsigned default '0',
-  `organization` varchar(30) default NULL,
-  `position` varchar(30) default NULL,
-  `sustained` varchar(30) default NULL,
-  KEY `individual` (`individual`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
+CREATE TABLE IF NOT EXISTS `tc_calling` (
+  `calling` int(11) NOT NULL AUTO_INCREMENT,
+  `individual` int(16) unsigned DEFAULT '0',
+  `organization` varchar(30) DEFAULT NULL,
+  `position` varchar(30) DEFAULT NULL,
+  `sustained` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`calling`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=203 ;
 --
 -- Table structure for table `tc_companion`
 --
@@ -135,11 +135,12 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_family` (
 --
 -- Table structure for table `tc_participation`
 --
-CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_participation` (
-  `individual` int(16) unsigned NOT NULL default '0',
-  `activity` int(16) unsigned default NULL,
-  UNIQUE KEY `activity_ndx` (`individual`,`activity`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `tc_participation` (
+  `participation` int(11) NOT NULL AUTO_INCREMENT,
+  `individual` int(16) unsigned NOT NULL DEFAULT '0',
+  `activity` int(16) unsigned DEFAULT NULL,
+  PRIMARY KEY (`participation`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
 
 --
 -- Table structure for table `tc_interview`
@@ -185,12 +186,13 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_visit` (
 --
 -- Table structure for table `tc_willingness`
 --
-CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_willingness` (
+CREATE TABLE IF NOT EXISTS `tc_willingness` (
+  `willingness` int(11) NOT NULL AUTO_INCREMENT,
   `individual` int(16) unsigned NOT NULL,
   `assignment` int(16) unsigned NOT NULL,
   `willing` enum('y','n','') NOT NULL,
-  KEY `individual` (`individual`,`assignment`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`willingness`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
 -- Table structure for table `tc_scheduling_priority`
@@ -212,10 +214,12 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_email_list` (
 --
 -- Table structure for table `tc_email_list_membership`
 --
-CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_email_list_membership` (
-  `individual` INT( 16 ) UNSIGNED NULL DEFAULT NULL ,
-  `email_list` INT( 16 ) UNSIGNED NULL DEFAULT NULL
-) ENGINE = MYISAM ;
+CREATE TABLE IF NOT EXISTS `tc_email_list_membership` (
+  `email_list_membership` int(11) NOT NULL AUTO_INCREMENT,
+  `individual` int(16) unsigned DEFAULT NULL,
+  `email_list` int(16) unsigned DEFAULT NULL,
+  PRIMARY KEY (`email_list_membership`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
 -- Table structure for table `tc_accomplishment`
