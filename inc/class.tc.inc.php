@@ -4734,141 +4734,143 @@ class tc
 
 	function email_appt($appointment, $old_indiv_email)
 	{
-		//print "Emailing notification of appointment: $appointment <br>";
+		if ($this->email_individual_appt > 0) {
+			//print "Emailing notification of appointment: $appointment <br>";
 
-		$sql = "SELECT * FROM tc_appointment where appointment='$appointment'";
-		$this->db->query($sql,__LINE__,__FILE__);
+			$sql = "SELECT * FROM tc_appointment where appointment='$appointment'";
+			$this->db->query($sql,__LINE__,__FILE__);
 
-		while ($this->db->next_record()) {
-			$appointment = $this->db->f('appointment');
-			$leader = $this->db->f('leader');
-			$location = $this->db->f('location');
-			$interviewer = "";
-			$email = "";
-			$indiv = $this->db->f('individual');
-			$indiv_name = "";
-			$family = $this->db->f('family');
-			$family_name = "";
-			$appt_name = "";
-			$phone = "";
-			$uid = $this->db->f('uid');
-		  		  
-			// Extract the year, month, day, hours, minutes, seconds from the appointment time
-			$appt_date = $this->db->f('date');
-			$date_array = explode("-",$appt_date);
-			$year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
-			$appt_time = $this->db->f('time');
-			$time_array = explode(":",$appt_time);
-			$hour = $time_array[0]; $minute = $time_array[1]; $seconds = $time_array[2];
+			while ($this->db->next_record()) {
+				$appointment = $this->db->f('appointment');
+				$leader = $this->db->f('leader');
+				$location = $this->db->f('location');
+				$interviewer = "";
+				$email = "";
+				$indiv = $this->db->f('individual');
+				$indiv_name = "";
+				$family = $this->db->f('family');
+				$family_name = "";
+				$appt_name = "";
+				$phone = "";
+				$uid = $this->db->f('uid');
+			  		  
+				// Extract the year, month, day, hours, minutes, seconds from the appointment time
+				$appt_date = $this->db->f('date');
+				$date_array = explode("-",$appt_date);
+				$year = $date_array[0]; $month = $date_array[1]; $day = $date_array[2];
+				$appt_time = $this->db->f('time');
+				$time_array = explode(":",$appt_time);
+				$hour = $time_array[0]; $minute = $time_array[1]; $seconds = $time_array[2];
 
-			// Format the appointment time into an iCal UTC equivalent
-			$dtstamp = gmdate("Ymd"."\T"."His"."\Z");
-			$dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
-			$dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
+				// Format the appointment time into an iCal UTC equivalent
+				$dtstamp = gmdate("Ymd"."\T"."His"."\Z");
+				$dtstart = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds,$month,$day,$year));
+				$dtstartstr = date("l, F d, o g:i A", mktime($hour,$minute,$seconds,$month,$day,$year));
 
-			$sql = "SELECT tl.email AS email1, ti.email AS email2, ti.name AS name FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.leader='$leader'";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			if($this->db2->next_record()) {
-				if ($this->db2->f('email1') != "") {
-					$email = $this->db2->f('email1');
-				} else { 
-					$email = $this->db2->f('email2');
-				}
-				$interviewer = $this->db2->f('name');
-			}
-
-			// Set the email address of the interviewer
-			$from = $email;
-
-			if($indiv > 0) {
-				$sql = "SELECT * FROM tc_individual where individual='$indiv'";
+				$sql = "SELECT tl.email AS email1, ti.email AS email2, ti.name AS name FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.leader='$leader'";
 				$this->db2->query($sql,__LINE__,__FILE__);
 				if($this->db2->next_record()) {
-					$indiv_name = $this->db2->f('name');
-					$phone = $this->db2->f('phone');
-  				    $indiv_email = $this->db2->f('email');
-				    if(($this->email_individual_appt == 1) && ($indiv_email != "")) {
-					  $email .= ", $indiv_email";
+					if ($this->db2->f('email1') != "") {
+						$email = $this->db2->f('email1');
+					} else { 
+						$email = $this->db2->f('email2');
 					}
-					$appt_name = $indiv_name . " Interview";
-					$duration = $this->default_ppi_appt_duration * 60;
+					$interviewer = $this->db2->f('name');
 				}
-			}
 
-			if($family > 0) {
-				$sql = "SELECT * FROM tc_family WHERE family='$family'";
-				$this->db2->query($sql,__LINE__,__FILE__);
-				if($this->db2->next_record()) {
-					$individual = $this->db2->f('individual');
-					$sql = "SELECT * FROM tc_individual where individual='$individual'";
-					$this->db3->query($sql,__LINE__,__FILE__);
-					if($this->db3->next_record()) {
-						$phone = $this->db3->f('phone');
-						$family_name = $this->db3->f('name');
-						$phone = $this->db3->f('phone');
-					    $indiv_email = $this->db3->f('email');
-					    if(($this->email_individual_appt == 1) && ($indiv_email != "")) {
-						  $email .= ", $indiv_email";
+				// Set the email address of the interviewer
+				$from = $email;
+
+				if($indiv > 0) {
+					$sql = "SELECT * FROM tc_individual where individual='$indiv'";
+					$this->db2->query($sql,__LINE__,__FILE__);
+					if($this->db2->next_record()) {
+						$indiv_name = $this->db2->f('name');
+						$phone = $this->db2->f('phone');
+						$indiv_email = $this->db2->f('email');
+						if(($this->email_individual_appt == 2) && ($indiv_email != "")) {
+							$email .= ", $indiv_email";
 						}
+						$appt_name = $indiv_name . " Interview";
+						$duration = $this->default_ppi_appt_duration * 60;
 					}
-					$appt_name = $family_name . " Family Visit";
-					$duration = $this->default_visit_appt_duration * 60;
 				}
-			}
 
-			$dtend = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
-			$dtendstr = date("g:i A", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
-			$date = $dtstartstr . "-" . $dtendstr;
-			$description = "$appt_name : $phone";
-
-			if(($uid == 0) && ($appt_name != "")) {
-				// Create a new calendar item for this appointment, since this must be the first time we
-				// are sending it out.
-				print "Sent new appointment for " . $interviewer . " to '" . $email . "' for " . $appt_name . "<br>";
-				$uid = rand() . rand(); // Generate a random identifier for this appointment
-				$subject = "Created: $appt_name";
-
-				$this->db->query("UPDATE tc_appointment set" .
-				                 " uid=" . $uid . 
-				                 " WHERE appointment=" . $appointment,__LINE__,__FILE__);
-
-				$action = "PUBLISH";
-				$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				                      $dtend, $date, $location, $appt_name, $description, $uid);
-			} else if(($uid != 0) && ($appt_name == "")) {
-				// Remove the calendar item for this appointment since it has already been sent
-				// and there is no name we have changed it to.
-			    if(($this->email_individual_appt == 1) && ($old_indiv_email != "")) {
-				  $email .= ", $old_indiv_email";
+				if($family > 0) {
+					$sql = "SELECT * FROM tc_family WHERE family='$family'";
+					$this->db2->query($sql,__LINE__,__FILE__);
+					if($this->db2->next_record()) {
+						$individual = $this->db2->f('individual');
+						$sql = "SELECT * FROM tc_individual where individual='$individual'";
+						$this->db3->query($sql,__LINE__,__FILE__);
+						if($this->db3->next_record()) {
+							$phone = $this->db3->f('phone');
+							$family_name = $this->db3->f('name');
+							$phone = $this->db3->f('phone');
+							$indiv_email = $this->db3->f('email');
+							if(($this->email_individual_appt == 2) && ($indiv_email != "")) {
+								$email .= ", $indiv_email";
+							}
+						}
+						$appt_name = $family_name . " Family Visit";
+						$duration = $this->default_visit_appt_duration * 60;
+					}
 				}
-				print "Sent deleted appointment for " . $interviewer . " to '" . $email . "' for " . $appt_date . " " . $appt_time . "<br>";
-				$subject = "Canceled: $appt_date $appt_time";
 
-				$this->db->query("UPDATE tc_appointment set" .
-				                 " uid=0" . 
-				                 " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+				$dtend = gmdate("Ymd"."\T"."His"."\Z", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+				$dtendstr = date("g:i A", mktime($hour,$minute,$seconds+$duration,$month,$day,$year));
+				$date = $dtstartstr . "-" . $dtendstr;
+				$description = "$appt_name : $phone";
 
-				$action = "CANCEL";
-				$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				                      $dtend, $date, $location, $subject, $subject, $uid);
-			} else if($uid != 0) {
-				// Update the existing appointment since we have changed it
-				print "Sent updated appointment for " . $interviewer . " to '" . $email . "' for " . $appt_name . "<br>";
+				if(($uid == 0) && ($appt_name != "")) {
+					// Create a new calendar item for this appointment, since this must be the first time we
+					// are sending it out.
+					print "Sent new appointment for " . $interviewer . " to '" . $email . "' for " . $appt_name . "<br>";
+					$uid = rand() . rand(); // Generate a random identifier for this appointment
+					$subject = "Created: $appt_name";
 
-				$subject = "Canceled: $appt_date $appt_time";
-				$action = "CANCEL";
-				$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				$dtend, $date, $location, $subject, $subject, $uid);
+					$this->db->query("UPDATE tc_appointment set" .
+						         " uid=" . $uid . 
+						         " WHERE appointment=" . $appointment,__LINE__,__FILE__);
 
-				$uid = rand() . rand(); // Generate a random identifier for this appointment
-				$this->db->query("UPDATE tc_appointment set" .
-				                 " uid=" . $uid .
-				                 " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+					$action = "PUBLISH";
+					$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+						              $dtend, $date, $location, $appt_name, $description, $uid);
+				} else if(($uid != 0) && ($appt_name == "")) {
+					// Remove the calendar item for this appointment since it has already been sent
+					// and there is no name we have changed it to.
+					if(($this->email_individual_appt == 2) && ($old_indiv_email != "")) {
+						$email .= ", $old_indiv_email";
+					}
+					print "Sent deleted appointment for " . $interviewer . " to '" . $email . "' for " . $appt_date . " " . $appt_time . "<br>";
+					$subject = "Canceled: $appt_date $appt_time";
 
-				$subject = "Updated: $appt_name";
-				$action = "PUBLISH";
-				$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
-				                      $dtend, $date, $location, $appt_name, $description, $uid);
+					$this->db->query("UPDATE tc_appointment set" .
+						         " uid=0" . 
+						         " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+
+					$action = "CANCEL";
+					$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+						              $dtend, $date, $location, $subject, $subject, $uid);
+				} else if($uid != 0) {
+					// Update the existing appointment since we have changed it
+					print "Sent updated appointment for " . $interviewer . " to '" . $email . "' for " . $appt_name . "<br>";
+
+					$subject = "Canceled: $appt_date $appt_time";
+					$action = "CANCEL";
+					$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+					$dtend, $date, $location, $subject, $subject, $uid);
+
+					$uid = rand() . rand(); // Generate a random identifier for this appointment
+					$this->db->query("UPDATE tc_appointment set" .
+						         " uid=" . $uid .
+						         " WHERE appointment=" . $appointment,__LINE__,__FILE__);
+
+					$subject = "Updated: $appt_name";
+					$action = "PUBLISH";
+					$this->send_ical_appt($action, $email, $from, $subject, $dtstamp, $dtstart,
+						              $dtend, $date, $location, $appt_name, $description, $uid);
+				}
 			}
 		}
 		return true;
