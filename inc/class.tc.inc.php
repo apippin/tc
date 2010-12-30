@@ -874,7 +874,7 @@ class tc
 		$email_contents .= "\r\n";
 		
 		// email changes to leader
-		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND (tl.type='P' OR tl.type='C' OR tl.type='S') AND tl.valid=1";
+		$sql = "SELECT DISTINCT tl.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND (tl.type='P' OR tl.type='C' OR tl.type='S') AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$email = "";
@@ -889,7 +889,7 @@ class tc
 				$to .= ", $email";
 			}
 		}
-		$sql = "SELECT DISTINCT tp.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.type='P' AND tl.valid=1";
+		$sql = "SELECT DISTINCT tl.email AS email1, ti.email AS email2 FROM tc_leader AS tl JOIN tc_individual AS ti WHERE tl.individual=ti.individual AND tl.type='P' AND tl.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		if ($this->db->next_record()) {
 			if ($this->db->f('email1') != "") {
@@ -4034,7 +4034,7 @@ class tc
 					$appointment = $entry['appointment'];
 					$location = $entry['location'];
 					$date = $entry['date'];
-					$hour = $entry['hour'];
+					$hour = $entry['hour'] % 12;
 					$minute = $entry['minute'];
 					$pm = $entry['pm'];
 					$indiv = $entry['individual'];
@@ -4226,7 +4226,9 @@ class tc
 				$hour = $time_array[0];
 				$minute = $time_array[1];
 				$pm = 0;
-				if($hour > 12) { $pm=1; $hour = $hour - 12; }
+				if($hour >= 12) { $pm=1; }
+				if($hour > 12) { $hour = $hour - 12; }
+				if($hour == 0) { $hour = 12; }
 				$time_string = date("g:i a", mktime($time_array[0], $time_array[1], $time_array[2]));
 
 				$table_data.= "<tr bgcolor=". $this->t->get_var('tr_color') .">";
