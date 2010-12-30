@@ -2213,18 +2213,13 @@ class tc
 			$i++;
 		}
 		// add any YM that are home teachers
-		$sql = "SELECT * FROM tc_companionship WHERE type='H' AND valid=1";
+		$sql = "SELECT * FROM tc_companionship AS tcp JOIN (tc_companion AS tc, tc_individual AS ti) WHERE tcp.companionship=tc.companionship AND tc.individual=ti.individual AND ti.steward='' AND tcp.type='H' AND tcp.valid=1 AND ti.valid=1";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
-			$tmp_individual = $this->db->f('individual');
-			$sql = "Select * FROM tc_individual where individual='$tmp_individual' and steward='' and valid=1";
-			$this->db2->query($sql,__LINE__,__FILE__);
-			while ($this->db2->next_record()) {
-				$indiv_name_data[$i] = $this->db2->f('name');
-				$individual_data[$i] = $this->db2->f('individual');
-				$individ2name[$individual_data[$i]] = $indiv_name_data[$i];
-				$i++;
-			}
+			$indiv_name_data[$i] = $this->db->f('name');
+			$individual_data[$i] = $this->db->f('individual');
+			$individ2name[$individual_data[$i]] = $indiv_name_data[$i];
+			$i++;
 		}
 		array_multisort($indiv_name_data, $individual_data);
 
