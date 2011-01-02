@@ -614,7 +614,7 @@ class tc
 		}
 
 		# get list of individuals who are and are not home teachers
-		$sql = "SELECT * FROM tc_individual WHERE steward='$this->default_stewardship' AND valid=1 ORDER BY name ASC";
+		$sql = "SELECT * FROM tc_individual WHERE (steward='$this->default_stewardship' OR (steward='' AND (priesthood='Teacher' OR priesthood='Priest'))) AND valid=1 ORDER BY name ASC";
 		$this->db->query($sql,__LINE__,__FILE__);
 		while ($this->db->next_record()) {
 			$individual = $this->db->f('individual');
