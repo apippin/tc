@@ -754,16 +754,17 @@ sub remove_obsolete_scheduling_priority
 		$scheduling_priority = $sqlhashref->{scheduling_priority};
 		$individual = $sqlhashref->{individual};
 		if ($scheduling_priority != "NULL") {
+			#print "$name\n";
+			# set scheduling_priority to NULL
+			#print "UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual\n";
+			$sth2 = $dbh->prepare("UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual");
+			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
+
+			# if nobody is reusing the scheduling priority entry, then remove it
 			#print "SELECT * FROM $table_name WHERE scheduling_priority=$scheduling_priority AND valid=1\n";
 			$sth2 = $dbh->prepare("SELECT * FROM $table_name WHERE scheduling_priority=$scheduling_priority AND valid=1");
 			$sth2->execute or die "-E- DB error: $DBI::errstr\n";
 			if (!($sqlhashref2 = $sth2->fetchrow_hashref)) {
-				#print "$name\n";
-				# set scheduling_priority to NULL
-				#print "UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual\n";
-				$sth3 = $dbh->prepare("UPDATE $table_name SET scheduling_priority=NULL WHERE individual=$individual");
-				$sth3->execute or die "-E- DB error: $DBI::errstr\n";
-				
 				# remove entry from tc_scheduling_priority
 				#print "DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority\n";
 				$sth3 = $dbh->prepare("DELETE FROM tc_scheduling_priority WHERE scheduling_priority=$scheduling_priority");
