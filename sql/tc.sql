@@ -75,7 +75,7 @@ CREATE TABLE /*!42501 IF NOT EXISTS*/ `tc_companion` (
   `companion` INT( 16 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
   `individual` INT( 16 ) UNSIGNED NOT NULL ,
   `companionship` INT( 16 ) UNSIGNED NOT NULL ,
-  `scheduling_priority` INT( 16 ) UNSIGNED NOT NULL ,
+  `scheduling_priority` INT( 16 ) UNSIGNED DEFAULT NULL ,
   `valid` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0'
 ) ENGINE = MYISAM ;
 
