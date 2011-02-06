@@ -571,6 +571,15 @@ class tc
 					$this->db3->query($sql,__LINE__,__FILE__);
 				}
 			}
+			$sql = "SELECT * FROM tc_family AS tf JOIN tc_individual AS ti WHERE tf.individual=ti.individual AND tf.companionship=0 AND ti.steward='$this->default_stewardship' AND tf.scheduling_priority!='NULL' AND ti.valid=1";
+			$this->db->query($sql,__LINE__,__FILE__);
+			while ($this->db->next_record()) {
+				$individual = $this->db->f('individual');
+				$family = $this->db->f('family');
+				$sql = "INSERT INTO tc_family_sandbox (tc_family,individual) VALUES (\"$family\",\"$individual\")";
+				$this->db2->query($sql,__LINE__,__FILE__);
+			}
+
 		} else if ($_POST['changes']) {
 			$this->ht_sandbox_changes();
 		}
