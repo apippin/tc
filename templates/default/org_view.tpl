@@ -21,7 +21,7 @@ $(document).ready(function()
 
 	<table id="callings" class="tablesorter" border="0" width=80% cellspacing="2" cellpadding="2">
 		<thead>
-		<tr
+		<tr>
 			<th colspan="1" align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Name</b></font></th>
 			<th colspan="1" align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Calling</b></font></th>
 			<th colspan="1" align="center" bgcolor="#c9c9c9"><font face="{font}"><b>Organization</b></font></th>
