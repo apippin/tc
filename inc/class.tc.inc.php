@@ -1003,7 +1003,7 @@ class tc
 			$j++;
 		}
 
-		$comp_width=300; $visit_width=25; $table_width=$comp_width + $visit_width;
+		$comp_width=300; $visit_width=45; $table_width=$comp_width + $visit_width;
 		$table_data=""; $num_companionships = 0; $num_families = 0; $visits=0;
 		for ($j=0; $j < count($unique_companionships); $j++) {
 			$companion_table_entry = "";
