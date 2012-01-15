@@ -3735,7 +3735,6 @@ class tc
 		$avenonattendance_str = "";
 		$num_months=0;
 		$ave_total_attended=0;
-		ksort($attendance);
 		foreach($attendance as $att => $value) {
 			$total_attended = $attendance[$att];
 			$ave_total_attended += $attendance[$att]; $num_months++;
